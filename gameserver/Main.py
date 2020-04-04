@@ -35,8 +35,22 @@ class Room:
         while True:
             await asyncio.sleep(1)
             for player in self.__players:
-                await player.sendMessage("Game!")
+                try:
+                    await player.sendMessage("Game!")
+                except websockets.exceptions.ConnectionClosed:
+                    self.__players.remove(player)
+                    winner = self.__players.pop()
+                    await self.__gameOver(winner, player)
+                    return
     
+    @staticmethod
+    async def __gameOver(winner, loser):
+        await winner.sendMessageSafe("You win!")
+        await winner.disconnect()  # TODO: congratulate winner.
+
+        await loser.sendMessageSafe("You lose!")
+        await loser.disconnect()  # TODO: roast loser.
+        
     async def __keepConnected(self):
         while not self.__finished:
             await asyncio.sleep(2)
@@ -47,6 +61,12 @@ class Room:
     def setID(self, ID: int):
         if self.__ID is None:
             self.__ID = ID
+    
+    def getID(self):
+        return self.__ID
+    
+    def __repr__(self):
+        return "Room({}, started={}, finished={})".format(self.__players, self.__started, self.__finished)
 
 
 class Player:
@@ -63,6 +83,15 @@ class Player:
     async def sendMessage(self, msg: str):
         await self.__websocket.send(msg)
     
+    async def sendMessageSafe(self, msg: str):
+        """
+        Do not use it if the game is in progress!
+        """
+        try:
+            await self.__websocket.send(msg)
+        except websockets.exceptions.ConnectionClosed:
+            return
+    
     async def joinTheRoom(self):
         while not self.__room.isFull():
             await asyncio.sleep(1)
@@ -72,26 +101,34 @@ class Player:
     def setRoom(self, room: Room):
         if self.__room is None:
             self.__room = room
+    
+    async def disconnect(self):
+        try:
+            await self.__websocket.close()
+        except websockets.ConnectionClosed:  # Already closed, no need.
+            return
+    
+    def __repr__(self):
+        return "Player({}, address={})".format(self.__ID, self.__address)
 
 
 class RoomList:
     __rooms = dict()
     
     @classmethod
-    def addPlayer(cls, player: Player) -> bool:
+    def addPlayer(cls, player: Player) -> int:
         """
-        Returns True if found a game and False if queued.
+        Returns room ID.
         """
         for room in cls.__rooms.values():
             if room.tryToAddPlayer(player):
-                cls.__addRoom(2)
                 player.setRoom(room)
-                return True
+                return room.getID()
 
         room = cls.__addRoom(2)
         if room.tryToAddPlayer(player):
             player.setRoom(room)
-            return False
+            return room.getID()
 
         logging.error("Unable to add a user to the room!")
         raise ValueError("Unable to add a user to the room!")
@@ -102,6 +139,7 @@ class RoomList:
         for i in range(50):  # Room limit of 50.
             if i not in cls.__rooms.keys():
                 cls.__rooms[i] = Room(size)
+                cls.__rooms[i].setID(i)
                 return cls.__rooms[i]
     
         logging.warning("Reached room limit!")
@@ -109,7 +147,7 @@ class RoomList:
     
     @classmethod
     def removeRoom(cls, roomID: int):
-        cls.__rooms[roomID] = None
+        cls.__rooms.pop(roomID)
 
 
 async def userHandler(websocket: websockets.WebSocketClientProtocol, _):  # _ is path.
@@ -117,8 +155,9 @@ async def userHandler(websocket: websockets.WebSocketClientProtocol, _):  # _ is
     player = Player(Id, websocket)
     Id += 1
     logging.info("%s has connected.", player.getAddress())
-    RoomList.addPlayer(player)
+    roomID = RoomList.addPlayer(player)
     await player.joinTheRoom()
+    RoomList.removeRoom(roomID)
 
 
 sslContext = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
