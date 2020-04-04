@@ -3,6 +3,7 @@ import asyncio
 import websockets
 
 from src.room.Room import Room
+from src.util.Logger import logger
 
 
 class Player:
@@ -40,7 +41,9 @@ class Player:
     
     async def disconnect(self):
         try:
+            await self.__websocket.ping()
             await self.__websocket.close()
+            logger.info(self.__address + " has been disconnected.")
         except websockets.ConnectionClosed:  # Already closed, no need.
             return
     

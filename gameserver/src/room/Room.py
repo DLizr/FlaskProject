@@ -1,6 +1,7 @@
 import asyncio
 
-from websockets.exceptions import ConnectionClosed
+from src.util.Logger import logger
+from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
 
 
 class Room:
@@ -17,6 +18,7 @@ class Room:
         Returns True if added and False if not.
         """
         if not self.isFull():
+            logger.debug("Adding {} to room {}.".format(player.getAddress(), str(self.__ID)))
             self.__players.add(player)
         else:
             return False
@@ -26,16 +28,26 @@ class Room:
         if self.__started:
             await self.__keepConnected()
         self.__started = True
+        logger.info("The game in room #{} has started.".format(str(self.__ID)))
         while True:
             await asyncio.sleep(1)
             for player in self.__players:
                 try:
                     await player.sendMessage("Game!")
-                except ConnectionClosed:
-                    self.__players.remove(player)
-                    winner = self.__players.pop()
-                    await self.__gameOver(winner, player)
+                except ConnectionClosedOK:
+                    logger.info(player.getAddress() + " has disconnected.")
+                    await self.__onConnectionClose(player)
                     return
+                except ConnectionClosedError as e:
+                    logger.error("{}: Connection with {} has been terminated. Reason: {}".format(str(e.code), player.getAddress(), e.reason))
+                    await self.__onConnectionClose(player)
+                    return
+    
+    async def __onConnectionClose(self, player):
+        self.__players.remove(player)
+        winner = self.__players.pop()
+        await self.__gameOver(winner, player)
+        return
     
     @staticmethod
     async def __gameOver(winner, loser):
