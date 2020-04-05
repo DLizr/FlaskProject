@@ -16,10 +16,10 @@ class Server:
         player = Player(cls.__ID, websocket)
         cls.__ID += 1
         logger.info(player.getAddress() + " has connected.")
-        roomID = RoomList.addPlayer(player)
-        await player.joinTheRoom()
-        RoomList.removeRoom(roomID)
-        logger.info("The game in room #{} has been done.".format(roomID))
+        room = RoomList.addPlayer(player)
+        await room.connectPlayer(player)
+        RoomList.removeRoom(room.getID())
+        logger.info("The game in room #{} is over.".format(room.getID()))
     
     @classmethod
     def run(cls, path):
