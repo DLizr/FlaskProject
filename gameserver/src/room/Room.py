@@ -3,8 +3,9 @@ import asyncio
 from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
 
 from src.util.Logger import logger
-
+from src.exceptions.PlayerKickedException import PlayerKickedException
 from src.player.Player import Player
+from src.game.Game import Game
 
 
 class Room:
@@ -30,33 +31,38 @@ class Room:
     async def connectPlayer(self, player: Player):
         while len(self.__players) < 2:
             await asyncio.sleep(1)
-            await player.sendMessage("Ping!")
+            await player.ping()
         await self.__start()
     
     async def __start(self):
-        if self.__started:
-            await self.__keepConnected()
+        if self.__started:                # Player 1 comes here and starts the game,
+            await self.__keepConnected()  # Player 2 goes to __keepConnected() to avoid doing all the tasks twice.
         self.__started = True
         logger.info("The game in room #{} has started.".format(str(self.__ID)))
-        while True:
-            await asyncio.sleep(1)
-            for player in self.__players:
-                try:
-                    await player.sendMessage("Game!")
-                except ConnectionClosedOK:
-                    logger.info(player.getAddress() + " has disconnected.")
-                    await self.__onConnectionClose(player)
-                    return
-                except ConnectionClosedError as e:
-                    logger.error("{}: Connection with {} has been terminated. Reason: {}".format(str(e.code), player.getAddress(), e.reason))
-                    await self.__onConnectionClose(player)
-                    return
+        player1, player2 = self.__players
+        game = Game(self.__ID)
+        try:
+            await game.start(player1, player2)
+        except ConnectionClosedOK as e:
+            logger.info("{} has disconnected.".format(e.player.getAddress()))
+            await self.__onConnectionClose(e.player)  # Ignore these errors.
+        except PlayerKickedException as e:
+            logger.info("{} has been kicked. Reason: {}.".format(e.player.getAddress(), e.reason))
+            await self.__onConnectionClose(e.player)
+        except ConnectionClosedError as e:
+            logger.error("{}: Connection terminated. Reason: {}".format(e.code, e.reason))
+            await self.__onConnectionError()
     
     async def __onConnectionClose(self, player: Player):
         self.__players.remove(player)
         winner = self.__players.pop()
         await self.__gameOver(winner, player)
         return
+
+    async def __onConnectionError(self):
+        for player in self.__players:
+            player.sendMessageSafe("Server-side connection error. Draw.")
+            player.disconnect()
     
     @staticmethod
     async def __gameOver(winner: Player, loser: Player):

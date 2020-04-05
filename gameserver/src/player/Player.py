@@ -34,5 +34,17 @@ class Player:
         except websockets.ConnectionClosed:  # Already closed, no need.
             return
     
+    def clearMessages(self):
+        self.__websocket.messages.clear()
+    
+    def getMessageIfReceived(self):
+        try:
+            return self.__websocket.messages.popleft()
+        except IndexError:
+            return None
+    
+    async def ping(self):
+        await self.__websocket.ping()
+
     def __repr__(self):
         return "Player({}, address={})".format(self.__ID, self.__address)
