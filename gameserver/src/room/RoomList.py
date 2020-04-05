@@ -7,21 +7,17 @@ class RoomList:
     __rooms = dict()
     
     @classmethod
-    def addPlayer(cls, player: Player) -> int:
-        """
-        Returns room ID.
-        """
+    def addPlayer(cls, player: Player) -> Room:
+
         for room in cls.__rooms.values():
             if room.tryToAddPlayer(player):
-                player.setRoom(room)
                 logger.debug("{} joined room {}.".format(player.getAddress(), str(room.getID())))
-                return room.getID()
+                return room
 
         room = cls.__addRoom(2)
         if room.tryToAddPlayer(player):
-            player.setRoom(room)
             logger.debug("{} joined room {}.".format(player.getAddress(), str(room.getID())))
-            return room.getID()
+            return room
 
         logger.error("Unable to add a user to the room!")
         raise ValueError("Unable to add a user to the room!")

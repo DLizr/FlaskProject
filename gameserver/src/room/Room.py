@@ -1,7 +1,10 @@
 import asyncio
 
-from src.util.Logger import logger
 from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
+
+from src.util.Logger import logger
+
+from src.player.Player import Player
 
 
 class Room:
@@ -13,7 +16,7 @@ class Room:
         self.__started = False
         self.__finished = False
     
-    def tryToAddPlayer(self, player) -> bool:
+    def tryToAddPlayer(self, player: Player) -> bool:
         """
         Returns True if added and False if not.
         """
@@ -24,7 +27,13 @@ class Room:
             return False
         return True
     
-    async def start(self):
+    async def connectPlayer(self, player: Player):
+        while len(self.__players) < 2:
+            await asyncio.sleep(1)
+            await player.sendMessage("Ping!")
+        await self.__start()
+    
+    async def __start(self):
         if self.__started:
             await self.__keepConnected()
         self.__started = True
@@ -43,14 +52,14 @@ class Room:
                     await self.__onConnectionClose(player)
                     return
     
-    async def __onConnectionClose(self, player):
+    async def __onConnectionClose(self, player: Player):
         self.__players.remove(player)
         winner = self.__players.pop()
         await self.__gameOver(winner, player)
         return
     
     @staticmethod
-    async def __gameOver(winner, loser):
+    async def __gameOver(winner: Player, loser: Player):
         await winner.sendMessageSafe("You win!")
         await winner.disconnect()  # TODO: congratulate winner.
 
