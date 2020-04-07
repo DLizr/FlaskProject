@@ -28,7 +28,7 @@ class Phase1:
         self.__getBases()
 
     async def __getBases(self):
-        Messages.getBase(self.__player1)
+        await Messages.getBase(self.__player1)
         
         for i in range(self.__M * self.__N):
             for _ in range(2):
@@ -42,7 +42,7 @@ class Phase1:
             self.__base1[i//self.__M][i%self.__M] = msg
             
             
-        Messages.getBase(self.__player2)
+        await Messages.getBase(self.__player2)
         
         for i in range(self.__M * self.__N):
             for _ in range(2):
