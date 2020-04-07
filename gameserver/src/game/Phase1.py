@@ -25,7 +25,7 @@ class Phase1:
             await self.__player2.sendMessage("TIME:{}".format(str(self.__time - i)))
             await asyncio.sleep(1)
         
-        self.__getBases()
+        await self.__getBases()
 
     async def __getBases(self):
         await Messages.getBase(self.__player1)

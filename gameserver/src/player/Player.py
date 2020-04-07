@@ -15,7 +15,11 @@ class Player:
         return self.__address
     
     async def sendMessage(self, msg: str):
-        await self.__websocket.send(msg)
+        try:
+            await self.__websocket.send(msg)
+        except websockets.exceptions.ConnectionClosed as e:
+            e.player = self
+            raise e
     
     async def sendMessageSafe(self, msg: str):
         """
@@ -44,7 +48,11 @@ class Player:
             return None
     
     async def ping(self):
-        await self.__websocket.ping()
+        try:
+            await self.__websocket.ping()
+        except websockets.exceptions.ConnectionClosed as e:
+            e.player = self
+            raise e
 
     def __repr__(self):
         return "Player({}, address={})".format(self.__ID, self.__address)

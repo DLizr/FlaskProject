@@ -17,16 +17,12 @@ class Messages:
         player.clearMessages()
         await player.sendMessage("READY_CHECK")
         
-        try:
-            for _ in range(10):  # A player has 10 seconds to send the ready signal.
-                msg = player.getMessageIfReceived()
-                if msg == "READY":
-                    return True
-                await player.ping()
-                await asyncio.sleep(1)
-        except ConnectionClosedOK as e:
-            e.player = player
-            raise e
+        for _ in range(10):  # A player has 10 seconds to send the ready signal.
+            msg = player.getMessageIfReceived()
+            if msg == "READY":
+                return True
+            await player.ping()
+            await asyncio.sleep(1)
         
         return False
     
@@ -36,16 +32,12 @@ class Messages:
         player.clearMessages()
         await player.sendMessage("PHASE_1")
         
-        try:
-            for _ in range(5):
-                msg = player.getMessageIfReceived()
-                if msg == "OK":
-                    return
-                await player.ping()
-                await asyncio.sleep(1)
-        except ConnectionClosedOK as e:
-            e.player = player
-            raise e
+        for _ in range(5):
+            msg = player.getMessageIfReceived()
+            if msg == "OK":
+                return
+            await player.ping()
+            await asyncio.sleep(1)
         
         logger.error("{} received a PHASE_1 signal but didn't respond!".format(player.getAddress()))
         await player.disconnect()
@@ -56,16 +48,13 @@ class Messages:
         
         player.clearMessages()
         await player.sendMessage("GET_BASE")
-        try:
-            for _ in range(5):
-                msg = player.getMessageIfReceived()
-                if msg == "OK":
-                    return
-                await player.ping()
-                await asyncio.sleep(1)
-        except ConnectionClosedOK as e:
-            e.player = player
-            raise e
+        
+        for _ in range(5):
+            msg = player.getMessageIfReceived()
+            if msg == "OK":
+                return
+            await player.ping()
+            await asyncio.sleep(1)
         
         logger.error("{} received a GET_BASE signal but didn't respond!".format(player.getAddress()))
         await player.disconnect()

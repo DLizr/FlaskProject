@@ -31,7 +31,14 @@ class Room:
     async def connectPlayer(self, player: Player):
         while len(self.__players) < 2:
             await asyncio.sleep(1)
-            await player.ping()
+            try:
+                await player.ping()
+            except ConnectionClosedOK:
+                logger.info("{} has disconnected.".format(player.getAddress()))
+                return
+            except ConnectionClosedError as e:
+                logger.error("{}: Connection with {} has been terminated. Reason: {}".format(e.code, player.getAddress(), e.reason))
+                return
         await self.__start()
     
     async def __start(self):
@@ -50,7 +57,7 @@ class Room:
             logger.info("{} has been kicked. Reason: {}.".format(e.player.getAddress(), e.reason))
             await self.__onConnectionClose(e.player)
         except ConnectionClosedError as e:
-            logger.error("{}: Connection terminated. Reason: {}".format(e.code, e.reason))
+            logger.error("{}: Connection with {} has beed terminated. Reason: {}".format(e.code, e.player, e.reason))  # Ignore this error.
             await self.__onConnectionError()
     
     async def __onConnectionClose(self, player: Player):
