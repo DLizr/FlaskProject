@@ -1,0 +1,9 @@
+@font-face {
+    font-family: "Russo";
+    src: url("../fonts/RussoOne-Regular.ttf");
+}
+@font-face {
+    font-family: "Neucha";
+    src: url("../fonts/Neucha-Regular.ttf")
+}
+body {margin: 0px;}
