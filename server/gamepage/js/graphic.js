@@ -5,20 +5,13 @@ var c = canvas.getContext("2d");
 c.font = (window.innerWidth + window.innerHeight) / 60 + "pt Neucha"
 
 
-var s = false;
-var s1 = false;
-var w = 0;
-var textWidth = c.measureText("Ожидание противника...").width/2;
-var textHeight = window.innerHeight / 5;
-
-
 window.addEventListener("resize", function() {
     canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-    if (!s) loading.radius = (window.innerHeight + window.innerHeight) / 15;
+    if (loading.waiting) loading.radius = (window.innerHeight + window.innerHeight) / 15;
     let f = (window.innerWidth + window.innerHeight) / 60;
     c.font = f + "pt Neucha";
-    textWidth = c.measureText("Ожидание противника...").width/2;
-    textHeight = window.innerHeight / 5;
+    loading.textX = window.innerWidth/2 - c.measureText("Ожидание противника...").width/2;
+    loading.textY = window.innerHeight * 0.3;
 });
 
 
@@ -29,9 +22,30 @@ loading = new function() {
     this.dR = 0;
     this.dDR = 0.4;
     this.color = "#EEEEEE";
+    this.betweenWallsWidth = 0;
+
+    this.waiting = true;
+    this.speedingUp = false;
+    this.confirming = false;
 
     this.render = function() {
-        x = window.innerWidth / 2; y = window.innerHeight / 2;
+        c.fillStyle = "#1300B1";
+        c.fillRect(0, 0, window.innerWidth, window.innerHeight);
+        if (this.waiting) {
+            this.renderWaitingAnimation();
+            if (this.confirming) 
+                this.renderConfirmationButton();
+            if (this.speedingUp)
+                this.speedUp();
+            else
+                this.renderLoadingText();
+        } else {
+            this.renderOpeningAnimation();
+        }
+    }
+
+    this.renderWaitingAnimation = function() {
+        let x = window.innerWidth / 2; let y = window.innerHeight / 2;
         c.beginPath();
         c.fillStyle=this.color;
         c.strokeStyle=this.color;
@@ -65,32 +79,40 @@ loading = new function() {
         this.dR += this.dDR;
         
     };
+
+    this.textX = window.innerWidth/2 - c.measureText("Ожидание противника...").width/2;
+    this.textY = window.innerHeight * 0.3;
+
+    this.renderLoadingText = function() {
+        c.fillStyle = "#EEEEEE";
+        c.fillText("Ожидание противника...", this.textX, this.textY);
+    }
+
+    this.renderConfirmationButton = function() {
+        // TODO...
+    };
+
+    this.speedUp = function() {
+        loading.speed += 0.004;
+        loading.radius *= 1.02;
+    };
+
+    this.renderOpeningAnimation = function() {
+        if (this.betweenWallsWidth <= window.innerWidth) this.betweenWallsWidth += 10;
+        c.fillStyle = "#DDDDDD";
+        c.fillRect(window.innerWidth/2-this.betweenWallsWidth, 0, 2*this.betweenWallsWidth, window.innerHeight);
+    };
 }
 
 
-renderall = function() {
-    c.fillStyle = "#1300B1";
-    c.fillRect(0, 0, window.innerWidth, window.innerHeight);
-    if (s1) {
-        if (w <= window.innerWidth) w += 10;
-        c.fillStyle = "#DDDDDD";
-        c.fillRect(window.innerWidth/2-w, 0, 2*w, window.innerHeight);
-    } else {
-        loading.render();
-        if (s) {
-            loading.speed += 0.004;
-            loading.radius *= 1.02;
-        } else {
-            c.fillStyle = "#EEEEEE";
-            c.fillText("Ожидание противника...", x - textWidth, y - textHeight);
-        }
-    }
-    
-    window.requestAnimationFrame(renderall);
-};
+render = function() {
+    loading.render();
+    window.requestAnimationFrame(render);
+}
 
-renderall();
+
+render();
 setTimeout(function() {
-    s = true;
-    setTimeout(() => s1 = true, 2500);
+    loading.speedingUp = true;
+    setTimeout(() => loading.waiting = false, 2500);
 }, 6000);
