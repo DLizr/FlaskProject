@@ -20,6 +20,7 @@ window.addEventListener("resize", function() {
     c.font = f + "pt Neucha";
     loading.textX = window.innerWidth/2 - c.measureText("Ожидание противника...").width/2;
     loading.textY = window.innerHeight * 0.3;
+    loading.startRendering();
 });
 
 
@@ -33,19 +34,16 @@ loading = new function() {
     this.betweenWallsWidth = 0;
 
     this.waiting = true;
+    this.confirming = false;
     this.speedingUp = false;
 
     this.render = function() {
-        c.fillStyle = "#1300B1";
-        c.fillRect(0, 0, window.innerWidth, window.innerHeight);
         if (this.waiting) {
             this.renderWaitingAnimation();
             if (this.confirming) 
                 this.renderConfirmationButton();
             if (this.speedingUp)
                 this.speedUp();
-            else
-                this.renderLoadingText();
         } else {
             this.renderOpeningAnimation();
         }
@@ -54,13 +52,13 @@ loading = new function() {
     this.renderWaitingAnimation = function() {
         let x = window.innerWidth / 2; let y = window.innerHeight / 2;
         c.beginPath();
-        c.fillStyle=this.color;
-        c.strokeStyle=this.color;
-        c.lineWidth = 5;
-        c.arc(x, y, this.radius, 0, 7);
-        c.stroke();
 
         let r2 = this.radius / 1.5 + this.dR;
+        c.fillStyle = "#1300B1";
+        c.arc(x, y, this.radius / 1.05, 0, 7);
+        c.fill();
+
+        c.fillStyle = this.color;
         c.beginPath();
         c.moveTo(x + r2 * Math.cos(this.dg + Math.PI * 3 / 4),
                  y + r2 * Math.sin(this.dg + Math.PI * 3 / 4));
@@ -76,7 +74,6 @@ loading = new function() {
         c.fillStyle="#1300B1";
         c.arc(x, y, r2 / 1.3, 0, 7);
         c.fill();
-        c.beginPath();
         c.arc(x, y, r2 / 1.3, 0, 7);
         c.stroke();
 
@@ -86,14 +83,20 @@ loading = new function() {
         this.dR += this.dDR;
         
     };
+    
+    this.startRendering = function() {
+        c.fillStyle = "#1300B1";
+        c.fillRect(0, 0, window.innerWidth, window.innerHeight);
+        c.fillStyle = "#EEEEEE";
+        c.arc(window.innerWidth / 2, window.innerHeight / 2, this.radius, 0, 7);
+        c.fill();
+        c.fillText("Ожидание противника...", this.textX, this.textY);
+        c.strokeStyle=this.color;
+        c.lineWidth = 5;
+    }
 
     this.textX = window.innerWidth/2 - c.measureText("Ожидание противника...").width/2;
     this.textY = window.innerHeight * 0.3;
-
-    this.renderLoadingText = function() {
-        c.fillStyle = "#EEEEEE";
-        c.fillText("Ожидание противника...", this.textX, this.textY);
-    }
 
     this.renderConfirmationButton = function() {
         let o = parseFloat(confirmationMenu.style.opacity)
@@ -108,6 +111,7 @@ loading = new function() {
     };
 
     this.startSpeedingUp = function() {
+        c.fillRect(0, 0, window.innerWidth, window.innerHeight);
         this.speedingUp = true;
         setInterval(() => this.waiting = false, 2500);
     }
@@ -126,6 +130,7 @@ render = function() {
 }
 
 
+loading.startRendering();
 render();
 setTimeout(function() {
     confirmationMenu.style.opacity = 0;
