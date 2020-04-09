@@ -4,6 +4,14 @@ canvas.width = window.innerWidth; canvas.height = window.innerHeight;
 var c = canvas.getContext("2d");
 c.font = (window.innerWidth + window.innerHeight) / 60 + "pt Neucha"
 
+var confirmationMenu = document.getElementById("loadingConfirmationScreen");
+confirmationMenu.style.display = "none";
+
+confirmationMenu.getElementsByClassName("acceptButton").item(0).addEventListener("click", function() {
+    confirmationMenu.style.display = "none";
+    loading.startSpeedingUp();
+});
+
 
 window.addEventListener("resize", function() {
     canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -26,7 +34,6 @@ loading = new function() {
 
     this.waiting = true;
     this.speedingUp = false;
-    this.confirming = false;
 
     this.render = function() {
         c.fillStyle = "#1300B1";
@@ -89,13 +96,21 @@ loading = new function() {
     }
 
     this.renderConfirmationButton = function() {
-        // TODO...
+        let o = parseFloat(confirmationMenu.style.opacity)
+        if (o != 1) {
+            confirmationMenu.style.opacity = o + 0.02;
+        }
     };
 
     this.speedUp = function() {
         loading.speed += 0.004;
         loading.radius *= 1.02;
     };
+
+    this.startSpeedingUp = function() {
+        this.speedingUp = true;
+        setInterval(() => this.waiting = false, 2500);
+    }
 
     this.renderOpeningAnimation = function() {
         if (this.betweenWallsWidth <= window.innerWidth) this.betweenWallsWidth += 10;
@@ -113,6 +128,7 @@ render = function() {
 
 render();
 setTimeout(function() {
-    loading.speedingUp = true;
-    setTimeout(() => loading.waiting = false, 2500);
+    confirmationMenu.style.opacity = 0;
+    confirmationMenu.style.display = "block";
+    loading.confirming = true;
 }, 6000);

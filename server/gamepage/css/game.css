@@ -6,4 +6,67 @@
     font-family: "Neucha";
     src: url("../fonts/Neucha-Regular.ttf")
 }
-body {margin: 0px;}
+body {
+    margin: 0px;
+    overflow: hidden;
+}
+
+#loadingConfirmationScreen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    font-size: 5vh;
+    color: #ccc;
+    text-align: center;
+    transition: 2000ms;
+    font-family: Neucha;
+    font-weight: 600;
+}
+
+#loadingConfirmationScreen a.acceptButton {
+    font-family: Russo;
+    font-size: 5vh;
+    font-weight: 600;
+    color: #595cff;
+    text-decoration: none;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 20px;
+    background-color: #ccf;
+    transition: 800ms;
+    box-shadow: -1px 1px 8px #ccf, 1px -1px 8px #fff;
+}
+
+#loadingConfirmationScreen a.acceptButton:hover {
+    color: #2b39ff;
+    box-shadow: -1px 1px 32px #ccf, 1px -1px 32px #fff;
+}
+
+#loadingConfirmationScreen a.declineButton {
+    font-family: Russo;
+    font-size: 5vh;
+    font-weight: 600;
+    color: #9c0000;
+    text-decoration: none;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 20px;
+    background-color: #ff0000;
+    transition: 800ms;
+    box-shadow: -1px 1px 8px #f66, 1px -1px 8px #f66;
+}
+
+#loadingConfirmationScreen a.declineButton:hover {
+    color: #720000;
+    box-shadow: -1px 1px 32px #f66, 1px -1px 32px #f66;
+}
+
+#loadingConfirmationScreen div.gui {
+    margin-top: 40vh;
+}

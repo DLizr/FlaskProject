@@ -6,7 +6,15 @@
     <link rel="stylesheet" href="css/game.css">
 </head>
 <body>
+    <div id="loadingConfirmationScreen">
+        <div class="gui">
+            <p>Подтвердите начало боя</p>
+            <p><a href="#" onclick="event.preventDefault()" class="acceptButton">Подтвердить</a></p>
+            <p><a href="#" onclick="event.preventDefault()" class="declineButton">Отказаться</a></p>
+        </div>
+    </div>
     <canvas></canvas>
+    
     <script src="js/graphic.js"></script>
 </body>
 </html>
