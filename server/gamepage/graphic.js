@@ -7,6 +7,8 @@ socket = new WebSocket("wss://localhost:31666");
 socket.onopen = function(event){console.log("Connection established."); let 
 send=function(){socket.send("Test")};;send();};
 
-socket.onmessage = function(event){console.log(event.data)};
+socket.onmessage = function(event){console.log(event.data);socket.send("Test!")};
 socket.onclose = function(event){console.log("Connection closed.")};
 socket.onerror = function(error){console.log(`Error: ${error.message}`)};
+
+window.addEventListener("mousedown", function() {socket.send("READY");socket.send("OK")})

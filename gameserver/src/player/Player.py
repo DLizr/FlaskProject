@@ -15,7 +15,11 @@ class Player:
         return self.__address
     
     async def sendMessage(self, msg: str):
-        await self.__websocket.send(msg)
+        try:
+            await self.__websocket.send(msg)
+        except websockets.exceptions.ConnectionClosed as e:
+            e.player = self
+            raise e
     
     async def sendMessageSafe(self, msg: str):
         """
@@ -34,5 +38,21 @@ class Player:
         except websockets.ConnectionClosed:  # Already closed, no need.
             return
     
+    def clearMessages(self):
+        self.__websocket.messages.clear()
+    
+    def getMessageIfReceived(self):
+        try:
+            return self.__websocket.messages.popleft()
+        except IndexError:
+            return None
+    
+    async def ping(self):
+        try:
+            await self.__websocket.ping()
+        except websockets.exceptions.ConnectionClosed as e:
+            e.player = self
+            raise e
+
     def __repr__(self):
         return "Player({}, address={})".format(self.__ID, self.__address)
