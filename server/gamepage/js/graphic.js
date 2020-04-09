@@ -4,12 +4,32 @@ canvas.width = window.innerWidth; canvas.height = window.innerHeight;
 var c = canvas.getContext("2d");
 c.font = (window.innerWidth + window.innerHeight) / 60 + "pt Neucha"
 
+
+var serverConnector = new Worker("js/serverConnector.js");
+serverConnector.postMessage("CONNECT");
+serverConnector.onmessage = function(e) {
+    let msg = e.data;
+    switch (msg) {
+        case "READY_CHECK":
+            confirmationMenu.style.opacity = 0;
+            confirmationMenu.style.display = "block";
+            loading.confirming = true;
+            break;
+        
+        case "PHASE_1":
+            confirmationMenu.style.display = "none";
+            loading.startSpeedingUp();
+            serverConnector.postMessage("OK");
+            break;
+    }
+};
+
+
 var confirmationMenu = document.getElementById("loadingConfirmationScreen");
 confirmationMenu.style.display = "none";
 
 confirmationMenu.getElementsByClassName("acceptButton").item(0).addEventListener("click", function() {
-    confirmationMenu.style.display = "none";
-    loading.startSpeedingUp();
+    serverConnector.postMessage("READY");
 });
 
 
@@ -132,8 +152,3 @@ render = function() {
 
 loading.startRendering();
 render();
-setTimeout(function() {
-    confirmationMenu.style.opacity = 0;
-    confirmationMenu.style.display = "block";
-    loading.confirming = true;
-}, 6000);
