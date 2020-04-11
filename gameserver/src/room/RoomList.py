@@ -37,4 +37,8 @@ class RoomList:
     
     @classmethod
     def removeRoom(cls, roomID: int):
-        cls.__rooms.pop(roomID)
+        try:
+            cls.__rooms.pop(roomID)
+        except KeyError:
+            logger.warning("Expected unexpected behavior, removed the room #{}, which was already removed.".format(roomID))
+            # In a very rare case it happens and does nothing except logs spam.
