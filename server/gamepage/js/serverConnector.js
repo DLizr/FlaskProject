@@ -12,7 +12,7 @@ function connect() {
     socket.onopen = function(event){console.log("Connection established.")};
 
     socket.onmessage = function(event){handleSignal(event.data)};
-    socket.onclose = function(event){console.log("Connection closed.")};
+    socket.onclose = function(event){console.log("Connection closed.");handleSignal("CLOSED")};
     socket.onerror = function(error){console.log(`Error: ${error.message}`)};
 }
 
