@@ -129,9 +129,15 @@ loading = {
     },
 
     renderOpeningAnimation() {
-        if (this.betweenWallsWidth <= window.innerWidth) this.betweenWallsWidth += 10;
-        c.fillStyle = "#DDDDDD";
-        c.fillRect(window.innerWidth/2-this.betweenWallsWidth, 0, 2*this.betweenWallsWidth, window.innerHeight);
+        if (this.betweenWallsWidth*2 <= window.innerWidth) {
+            this.betweenWallsWidth += 10;
+            c.fillStyle = "#DDDDDD";
+            c.fillRect(window.innerWidth/2-this.betweenWallsWidth, 0, 2*this.betweenWallsWidth, window.innerHeight);
+        }
+        else {
+            SCREEN = phase1;
+            SCREEN.start();
+        }
     },
 
     handleMessage(message) {
@@ -176,7 +182,25 @@ loading = {
 }
 
 
-var SCREEN = loading;
+phase1 = {
+    startRendering() {
+        window.addEventListener("click", this.onclick);
+        c.fillStyle = "#000000";
+        c.fillText("PHASE 1", 100, 100);
+        console.log("Phase 1")
+    },
+    
+    handleMessage(msg) {
+
+    },
+
+    update() {
+
+    }
+}
+
+
+var SCREEN = phase1;
 SCREEN.startRendering();
 render = function() {
     try {
