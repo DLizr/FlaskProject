@@ -40,6 +40,7 @@ class Messages:
             await asyncio.sleep(1)
         
         logger.error("{} received a PHASE_1 signal but didn't respond!".format(player.getAddress()))
+        await player.sendMessageSafe("KICKED:NO_RESPONSE")
         await player.disconnect()
         raise PlayerKickedException(player, "No response")
     
@@ -57,5 +58,6 @@ class Messages:
             await asyncio.sleep(1)
         
         logger.error("{} received a GET_BASE signal but didn't respond!".format(player.getAddress()))
+        await player.sendMessageSafe("KICKED:NO_RESPONSE")
         await player.disconnect()
         raise PlayerKickedException(player, "No response")

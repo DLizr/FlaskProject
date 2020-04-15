@@ -14,9 +14,11 @@ class Game:
     
     async def start(self, player1: Player, player2: Player):
         if not await Messages.askIfReady(player1):
+            await player1.sendMessageSafe("KICKED:AFK")
             await player1.disconnect()
             raise PlayerKickedException(player1, "Not ready for battle")
         if not await Messages.askIfReady(player2):
+            await player2.sendMessageSafe("KICKED:AFK")
             await player2.disconnect()
             raise PlayerKickedException(player2, "Not ready for battle")
         p1 = Phase1(player1, player2)
