@@ -4,4 +4,4 @@ from src.util.Logger import LogFormatter, logger
 
 if __name__ == "__main__":
     LogFormatter.debugMode(True)
-    Server.run(__file__)
+    Server.run()
