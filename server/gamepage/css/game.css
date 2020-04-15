@@ -85,3 +85,14 @@ body {
     max-height: 15vh;
     max-width: 10vw;
 }
+
+#phase1field div.cell {
+    display: inline-block;
+    vertical-align: top;
+    border: 2px solid gray;
+}
+
+#phase1field {
+    position: absolute;
+    border: 5px solid black;
+}

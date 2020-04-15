@@ -185,9 +185,7 @@ loading = {
 phase1 = {
     startRendering() {
         window.addEventListener("click", this.onclick);
-        c.fillStyle = "#000000";
-        c.fillText("PHASE 1", 100, 100);
-        console.log("Phase 1")
+        grid.create();
     },
     
     handleMessage(msg) {
@@ -196,6 +194,35 @@ phase1 = {
 
     update() {
 
+    }
+}
+
+grid = {
+    x: 50,
+    y: 50,
+    hTiles: 5,
+    vTiles: 5,
+    tileWidth: 100,
+    tileHeight: 100,
+
+    draw() {
+        
+    },
+
+    create() {
+        var field = document.getElementById("phase1field")
+        field.style.width = `${this.hTiles * (this.tileWidth + 4)}px`;
+        field.style.height = `${this.vTiles * (this.tileHeight + 4)}px`;
+        field.style.left = `${this.x}px`;
+        field.style.top = `${this.y}px`;
+
+        for (let i=0; i<this.hTiles * this.vTiles; i++) {
+            let cell = document.createElement("div");
+            cell.className = "cell";
+            cell.style.width = `${this.tileWidth}px`;
+            cell.style.height = `${this.tileHeight}px`;
+            field.appendChild(cell);
+        }
     }
 }
 
