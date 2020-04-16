@@ -92,6 +92,11 @@ body {
     border: 2px solid gray;
 }
 
+#phase1field div.cell * {
+    width: 100%;
+    height: 100;
+}
+
 #phase1field {
     position: absolute;
     border: 5px solid black;

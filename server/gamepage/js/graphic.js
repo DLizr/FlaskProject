@@ -194,8 +194,36 @@ phase1 = {
 
     update() {
 
+    },
+
+    resize() {
+
     }
 }
+
+
+class Cell {
+
+    isLocked = false;
+    tower = "0";
+    cell;
+
+    constructor(cell) {
+        this.cell = cell;
+    }
+
+    lock() {
+        this.isLocked = true;
+    }
+
+    setTower(tower) {
+        if (!this.isLocked) {
+            this.tower = tower;
+        }
+    }
+
+}
+
 
 grid = {
     x: 50,
@@ -204,25 +232,40 @@ grid = {
     vTiles: 5,
     tileWidth: 100,
     tileHeight: 100,
+    borderedWidth: 104,
+    borderedHeight: 104,
+    field: [],
 
     draw() {
         
     },
 
     create() {
-        var field = document.getElementById("phase1field")
-        field.style.width = `${this.hTiles * (this.tileWidth + 4)}px`;
-        field.style.height = `${this.vTiles * (this.tileHeight + 4)}px`;
+        var field = document.getElementById("phase1field");
+        field.style.width = `${this.hTiles * this.borderedWidth}px`;
+        field.style.height = `${this.vTiles * this.borderedHeight}px`;
         field.style.left = `${this.x}px`;
         field.style.top = `${this.y}px`;
-
+        field.addEventListener("click", this.onclick);
+        
         for (let i=0; i<this.hTiles * this.vTiles; i++) {
             let cell = document.createElement("div");
             cell.className = "cell";
             cell.style.width = `${this.tileWidth}px`;
             cell.style.height = `${this.tileHeight}px`;
+            this.field.push(new Cell(cell));
             field.appendChild(cell);
         }
+    },
+
+    onclick(e) {
+        let fieldX = Math.floor((e.clientX - grid.x) / grid.borderedWidth);
+        let fieldY = Math.floor((e.clientY - grid.y) / grid.borderedHeight);
+
+        let cell = grid.field[fieldY * grid.hTiles + fieldX];
+        let img = document.createElement("img");
+        img.src = "./img/wall.svg";
+        cell.cell.appendChild(img);
     }
 }
 
