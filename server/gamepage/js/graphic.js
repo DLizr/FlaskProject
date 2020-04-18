@@ -255,6 +255,8 @@ phase1 = {
                 phase1.menu.children[i].style.backgroundColor = "#00566B";
             }
         }
+
+        grid.onhover(x, y);
     }
 }
 
@@ -262,7 +264,8 @@ phase1 = {
 class Cell {
 
     isLocked = false;
-    tower = -1;
+    building = -1;
+    preview = -1;
     cell;
 
     constructor(cell) {
@@ -273,20 +276,34 @@ class Cell {
         this.isLocked = true;
     }
 
-    setTower(tower) {
+    setBuilding(building) {
         try {
             this.cell.removeChild(this.cell.lastChild);
         }
-        catch (TypeError) {/* No tower */}
+        catch (TypeError) {/* No building */}
 
-        if (tower != -1) {
+        if (building != -1) {
             let img = document.createElement("img");
-            img.src = Buildings._sources[tower];
+            img.src = Buildings._sources[building];
             this.cell.appendChild(img);
         }
-        this.tower = tower;
+        this.building = building;
     }
 
+    previewBuilding(building) {
+        if (this.building != -1) return;
+        try {
+            this.cell.removeChild(this.cell.lastChild);
+        } catch (TypeError) {/* No building */}
+        if (building != -1) {
+            let img = document.createElement("img");
+            img.src = Buildings._sources[building];
+            img.style.opacity = "0.5";
+            this.cell.appendChild(img);
+        }
+        this.preview = building;
+        
+    }
 }
 
 
@@ -300,6 +317,8 @@ grid = {
     borderedWidth: 104,
     borderedHeight: 104,
     field: [],
+
+    hovered: new Cell(),
 
     draw() {
         
@@ -330,7 +349,23 @@ grid = {
                 x = Math.floor(x / this.borderedWidth);
                 y = Math.floor(y / this.borderedHeight);
                 let cell = grid.field[y * this.hTiles + x];
-                cell.setTower(phase1.selected);
+                cell.setBuilding(phase1.selected);
+            }
+    },
+
+    onhover(x, y) {
+        x -= this.x;
+        y -= this.y;
+        if (0 <= x && x <= this.borderedWidth * this.hTiles &&
+            0 <= y && y <= this.borderedHeight * this.vTiles) {
+                x = Math.floor(x / this.borderedWidth);
+                y = Math.floor(y / this.borderedHeight);
+                let cell = grid.field[y * this.hTiles + x];
+                if (cell != this.hovered) {
+                    this.hovered.previewBuilding(-1);
+                    cell.previewBuilding(phase1.selected);
+                    this.hovered = cell;
+                }
             }
     }
 }
