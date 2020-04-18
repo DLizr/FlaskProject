@@ -182,10 +182,28 @@ loading = {
 }
 
 
+Buildings = {
+    _sources: ["./img/wall.svg"],
+    _shortcuts: ["W"],
+    EMPTY: -1,
+    WALL: 0
+}
+
+
 phase1 = {
+    menu: document.getElementById("phase1").getElementsByClassName("towerMenu")[0],
+
+    selected: -1,
+    buildingList: [Buildings.WALL],
+    tooltips: [
+        document.getElementById("phase1wallTooltip")
+    ],
+
     startRendering() {
         window.addEventListener("click", this.onclick);
+        window.addEventListener("mousemove", this.onmove);
         grid.create();
+        this.resize();
     },
     
     handleMessage(msg) {
@@ -197,7 +215,46 @@ phase1 = {
     },
 
     resize() {
+        
+    },
 
+    onclick(e) {
+        let x = e.clientX;
+        let y = e.clientY;
+
+        for (let i=0; i<phase1.menu.children.length; i++) {
+            let rect = phase1.menu.children[i].getBoundingClientRect();
+            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                if (i == phase1.selected) {
+                    phase1.selected = -1;
+                    phase1.menu.children[i].style.backgroundColor = "#00566B";
+                } else {
+                    phase1.selected = i;
+                    phase1.menu.children[i].style.backgroundColor = "#4096AB";
+                }
+                   
+                return;
+            }
+        }
+
+        grid.onclick(x, y);
+    },
+
+    onmove(e) {
+        let x = e.clientX;
+        let y = e.clientY;
+
+        for (let i=0; i<phase1.menu.children.length; i++) {
+            let rect = phase1.menu.children[i].getBoundingClientRect();
+            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                phase1.tooltips[i].style.display = "block";
+                phase1.menu.children[i].style.backgroundColor = "#4096AB";
+                return;
+            } else if (phase1.selected != i) {
+                phase1.tooltips[i].style.display = "none";
+                phase1.menu.children[i].style.backgroundColor = "#00566B";
+            }
+        }
     }
 }
 
@@ -205,7 +262,7 @@ phase1 = {
 class Cell {
 
     isLocked = false;
-    tower = "0";
+    tower = -1;
     cell;
 
     constructor(cell) {
@@ -217,9 +274,17 @@ class Cell {
     }
 
     setTower(tower) {
-        if (!this.isLocked) {
-            this.tower = tower;
+        try {
+            this.cell.removeChild(this.cell.lastChild);
         }
+        catch (TypeError) {/* No tower */}
+
+        if (tower != -1) {
+            let img = document.createElement("img");
+            img.src = Buildings._sources[tower];
+            this.cell.appendChild(img);
+        }
+        this.tower = tower;
     }
 
 }
@@ -246,7 +311,6 @@ grid = {
         field.style.height = `${this.vTiles * this.borderedHeight}px`;
         field.style.left = `${this.x}px`;
         field.style.top = `${this.y}px`;
-        field.addEventListener("click", this.onclick);
         
         for (let i=0; i<this.hTiles * this.vTiles; i++) {
             let cell = document.createElement("div");
@@ -258,14 +322,16 @@ grid = {
         }
     },
 
-    onclick(e) {
-        let fieldX = Math.floor((e.clientX - grid.x) / grid.borderedWidth);
-        let fieldY = Math.floor((e.clientY - grid.y) / grid.borderedHeight);
-
-        let cell = grid.field[fieldY * grid.hTiles + fieldX];
-        let img = document.createElement("img");
-        img.src = "./img/wall.svg";
-        cell.cell.appendChild(img);
+    onclick(x, y) {
+        x -= this.x;
+        y -= this.y;
+        if (0 <= x && x <= this.borderedWidth * this.hTiles &&
+            0 <= y && y <= this.borderedHeight * this.vTiles) {
+                x = Math.floor(x / this.borderedWidth);
+                y = Math.floor(y / this.borderedHeight);
+                let cell = grid.field[y * this.hTiles + x];
+                cell.setTower(phase1.selected);
+            }
     }
 }
 

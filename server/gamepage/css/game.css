@@ -6,6 +6,10 @@
     font-family: "Neucha";
     src: url("../fonts/Neucha-Regular.ttf")
 }
+@font-face {
+    font-family: "Play";
+    src: url("../fonts/Play-Regular.ttf")
+}
 body {
     margin: 0px;
     overflow: hidden;
@@ -100,4 +104,31 @@ body {
 #phase1field {
     position: absolute;
     border: 5px solid black;
+}
+
+.tooltip {
+    position: absolute;
+    text-align: center;
+    font-family: Play;
+    font-size: 2vw;
+    color: #f5f4ed;
+    background-color: #464322;
+    width: 25vw;
+    border: 5px solid black;
+    opacity: 70%;
+    display: none;
+    right: 0;
+    top: 0;
+}
+
+@media only screen and (max-device-width: 640px) {
+    .tooltip {
+        width: 100vw;
+        font-size: 4vw;
+        right: -5px;
+    }
+}
+
+.tooltip div {
+    margin: 5px;
 }
