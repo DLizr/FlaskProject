@@ -183,10 +183,11 @@ loading = {
 
 
 Buildings = {
-    _sources: ["./img/wall.svg"],
-    _shortcuts: ["W"],
+    _sources: ["./img/core.svg", "./img/wall.svg"],
+    _shortcuts: ["C", "W"],
     EMPTY: -1,
-    WALL: 0
+    CORE: 0,
+    WALL: 1
 }
 
 
@@ -196,7 +197,8 @@ phase1 = {
     selected: -1,
     buildingList: [Buildings.WALL],
     tooltips: [
-        document.getElementById("phase1wallTooltip")
+        document.getElementById("phase1wallTooltip"),
+        document.getElementById("phase1coreTooltip")
     ],
 
     startRendering() {
@@ -246,13 +248,13 @@ phase1 = {
 
         for (let i=0; i<phase1.menu.children.length; i++) {
             let rect = phase1.menu.children[i].getBoundingClientRect();
-            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+            if ((x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom)) {
                 phase1.tooltips[i].style.display = "block";
                 phase1.menu.children[i].style.backgroundColor = "#4096AB";
-                return;
-            } else if (phase1.selected != i) {
+            } else {
                 phase1.tooltips[i].style.display = "none";
-                phase1.menu.children[i].style.backgroundColor = "#00566B";
+                if (phase1.selected != i)
+                    phase1.menu.children[i].style.backgroundColor = "#00566B";
             }
         }
 
