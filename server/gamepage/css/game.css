@@ -15,6 +15,10 @@ body {
     overflow: hidden;
 }
 
+* {
+    user-select: none;
+}
+
 #loadingConfirmationScreen {
     position: absolute;
     width: 100%;
@@ -61,11 +65,21 @@ body {
     position: absolute;
     width: 100%;
     height: 100%;
+    display: none;
 }
 
 #phase1 div.bottom {
     position: absolute;
     bottom: 0;
+}
+
+#phase1 div.bottomOver {
+    position: absolute;
+    bottom: 16vh;
+    left: 1vw;
+    font-family: Russo;
+    font-weight: 100;
+    font-size: 2vw;
 }
 
 #phase1 div.towerMenu {
@@ -128,6 +142,11 @@ body {
         width: 100vw;
         font-size: 4vw;
         right: -5px;
+    }
+
+    #phase1 div.bottomOver {
+        font-size: 4vw;
+        bottom: 10vh
     }
 }
 

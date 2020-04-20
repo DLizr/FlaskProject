@@ -130,13 +130,14 @@ loading = {
 
     renderOpeningAnimation() {
         if (this.betweenWallsWidth*2 <= window.innerWidth) {
-            this.betweenWallsWidth += 10;
+            this.betweenWallsWidth += window.innerWidth / 120;
             c.fillStyle = "#DDDDDD";
             c.fillRect(window.innerWidth/2-this.betweenWallsWidth, 0, 2*this.betweenWallsWidth, window.innerHeight);
         }
         else {
             SCREEN = phase1;
-            SCREEN.start();
+            SCREEN.startRendering();
+            serverConnector.postMessage("OK");
         }
     },
 
@@ -151,7 +152,6 @@ loading = {
             case "PHASE_1":
                 confirmationMenu.style.display = "none";
                 loading.startSpeedingUp();
-                serverConnector.postMessage("OK");
                 break;
             
             case "CLOSED":
@@ -193,6 +193,7 @@ Buildings = {
 
 phase1 = {
     menu: document.getElementById("phase1").getElementsByClassName("towerMenu")[0],
+    timer: document.getElementById("phase1").getElementsByClassName("timer")[0],
 
     selected: -1,
     buildingList: [Buildings.WALL],
@@ -201,15 +202,30 @@ phase1 = {
         document.getElementById("phase1coreTooltip")
     ],
 
+    mouseX: 0,
+    mouseY: 0,
+    mouseDown: false,
+    mouseMoved: false,
+
     startRendering() {
-        window.addEventListener("click", this.onclick);
+        let p = document.getElementById("phase1");
+        p.style.display = "block";
         window.addEventListener("mousemove", this.onmove);
+        window.addEventListener("mousedown", this.ondown);
+        window.addEventListener("mouseup", this.onup);
         grid.create();
         this.resize();
     },
     
     handleMessage(msg) {
-
+        if (msg.startsWith("TIME:")) {
+            let time = parseInt(msg.split(":")[1]);
+            let m = Math.floor(time / 60).toString();
+            let s = time.toString()
+            if (m.length == 1) m = "0" + m;
+            if (s.length == 1) s = "0" + s;
+            phase1.timer.innerHTML = `${m}:${s}`
+        }
     },
 
     update() {
@@ -220,7 +236,9 @@ phase1 = {
         
     },
 
-    onclick(e) {
+    onup(e) {
+        phase1.mouseDown = false;
+
         let x = e.clientX;
         let y = e.clientY;
 
@@ -239,7 +257,9 @@ phase1 = {
             }
         }
 
-        grid.onclick(x, y);
+        if (!phase1.mouseMoved)
+            grid.onclick(x, y);
+        phase1.mouseMoved = false;
     },
 
     onmove(e) {
@@ -258,7 +278,21 @@ phase1 = {
             }
         }
 
+        if (phase1.mouseDown) {
+            grid.move(x - phase1.mouseX, y - phase1.mouseY);
+            phase1.mouseX = x;
+            phase1.mouseY = y;
+            phase1.mouseMoved = true;
+        }
+
         grid.onhover(x, y);
+        
+    },
+
+    ondown(e) {
+        phase1.mouseX = e.clientX;
+        phase1.mouseY = e.clientY;
+        phase1.mouseDown = true;
     }
 }
 
@@ -287,6 +321,7 @@ class Cell {
         if (building != -1) {
             let img = document.createElement("img");
             img.src = Buildings._sources[building];
+            img.ondragstart = () => {return false};
             this.cell.appendChild(img);
         }
         this.building = building;
@@ -301,6 +336,7 @@ class Cell {
             let img = document.createElement("img");
             img.src = Buildings._sources[building];
             img.style.opacity = "0.5";
+            img.ondragstart = () => {return false};
             this.cell.appendChild(img);
         }
         this.preview = building;
@@ -319,6 +355,7 @@ grid = {
     borderedWidth: 104,
     borderedHeight: 104,
     field: [],
+    grid: document.getElementById("phase1field"),
 
     hovered: new Cell(),
 
@@ -327,11 +364,10 @@ grid = {
     },
 
     create() {
-        var field = document.getElementById("phase1field");
-        field.style.width = `${this.hTiles * this.borderedWidth}px`;
-        field.style.height = `${this.vTiles * this.borderedHeight}px`;
-        field.style.left = `${this.x}px`;
-        field.style.top = `${this.y}px`;
+        this.grid.style.width = `${this.hTiles * this.borderedWidth}px`;
+        this.grid.style.height = `${this.vTiles * this.borderedHeight}px`;
+        this.grid.style.left = `${this.x}px`;
+        this.grid.style.top = `${this.y}px`;
         
         for (let i=0; i<this.hTiles * this.vTiles; i++) {
             let cell = document.createElement("div");
@@ -339,15 +375,23 @@ grid = {
             cell.style.width = `${this.tileWidth}px`;
             cell.style.height = `${this.tileHeight}px`;
             this.field.push(new Cell(cell));
-            field.appendChild(cell);
+            this.grid.appendChild(cell);
         }
+    },
+
+    move(dx, dy) {
+        this.x += dx;
+        this.y += dy;
+
+        this.grid.style.left = `${this.x}px`;
+        this.grid.style.top = `${this.y}px`;
     },
 
     onclick(x, y) {
         x -= this.x;
         y -= this.y;
-        if (0 <= x && x <= this.borderedWidth * this.hTiles &&
-            0 <= y && y <= this.borderedHeight * this.vTiles) {
+        if (0 < x && x < this.borderedWidth * this.hTiles &&
+            0 < y && y < this.borderedHeight * this.vTiles) {
                 x = Math.floor(x / this.borderedWidth);
                 y = Math.floor(y / this.borderedHeight);
                 let cell = grid.field[y * this.hTiles + x];
@@ -358,8 +402,8 @@ grid = {
     onhover(x, y) {
         x -= this.x;
         y -= this.y;
-        if (0 <= x && x <= this.borderedWidth * this.hTiles &&
-            0 <= y && y <= this.borderedHeight * this.vTiles) {
+        if (0 < x && x < this.borderedWidth * this.hTiles &&
+            0 < y && y < this.borderedHeight * this.vTiles) {
                 x = Math.floor(x / this.borderedWidth);
                 y = Math.floor(y / this.borderedHeight);
                 let cell = grid.field[y * this.hTiles + x];

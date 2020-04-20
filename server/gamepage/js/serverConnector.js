@@ -7,7 +7,7 @@ onmessage = function(e) {
 }
 
 function connect() {
-    socket = new WebSocket("wss://localhost:31666");
+    socket = new WebSocket("ws://localhost:31666");
 
     socket.onopen = function(event){console.log("Connection established.")};
 
