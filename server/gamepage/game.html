@@ -3,10 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Hello, World!</title>
+    <link rel="stylesheet" href="css/game.css">
 </head>
 <body>
-    <h1>Hello, World!</h1>
+    <div id="loadingConfirmationScreen">
+        <div class="gui">
+            <p>Подтвердите начало боя</p>
+            <p><a href="#" onclick="event.preventDefault()" class="acceptButton">Подтвердить</a></p>
+        </div>
+    </div>
+
+    <div id="phase1">
+        <div id="phase1field"></div>
+        <div class="bottomOver">
+            <div class="timer">
+                00:00
+            </div>
+        </div>
+        <div class="bottom">
+            <div class="towerMenu">
+                <div class="menuItem"><img src="./img/core.svg" alt="" ondragstart="return false"></div>
+                <div class="menuItem"><img src="./img/wall.svg" alt="" ondragstart="return false"></div>
+            </div>
+        </div>
+        <div id="phase1wallTooltip" class="tooltip">
+            <div>
+                <b>Ядро</b> <br/>
+                Генерирует энергию для базы. Если все ядра уничтожены, то база обесточивается и автоматически проигрывает.
+            </div>    
+        </div>
+        <div id="phase1coreTooltip" class="tooltip">
+            <div>
+                <b>Стена</b> <br/>
+                Защищает базу от снарядов.
+            </div>
+        </div>
+    </div>
     <canvas></canvas>
-    <script src="graphic.js"></script>
+    
+    <script src="js/graphic.js"></script>
 </body>
 </html>
