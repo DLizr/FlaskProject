@@ -184,7 +184,7 @@ loading = {
 
 Buildings = {
     _sources: ["./img/core.svg", "./img/wall.svg"],
-    _shortcuts: ["C", "W"],
+    _shortcuts: ["0", "C", "W"],
     EMPTY: -1,
     CORE: 0,
     WALL: 1
@@ -213,11 +213,21 @@ phase1 = {
         window.addEventListener("mousemove", this.onmove);
         window.addEventListener("mousedown", this.ondown);
         window.addEventListener("mouseup", this.onup);
+        window.addEventListener("wheel", this.onwheel);
         grid.create();
         this.resize();
     },
     
     handleMessage(msg) {
+        switch (msg) {
+            case "TIME:0":
+                phase1.timer.innerHTML = "00:00";
+                phase1.timer.style.color = "#FF0000";
+                break;
+            case "GET_BASE":
+                serverConnector.postMessage("OK");
+                phase1.onPhaseEnd();
+        }
         if (msg.startsWith("TIME:")) {
             let time = parseInt(msg.split(":")[1]);
             let m = Math.floor(time / 60).toString();
@@ -293,6 +303,23 @@ phase1 = {
         phase1.mouseX = e.clientX;
         phase1.mouseY = e.clientY;
         phase1.mouseDown = true;
+    },
+
+    onwheel(e) {
+        if (e.deltaY == -3) {
+            grid.zoomIn();
+        } else {
+            grid.zoomOut();
+        }
+    },
+
+    onPhaseEnd() {
+        grid.field.forEach(cell => {
+            if (!cell.isLocked) {
+                let c = Buildings._shortcuts[cell.building + 1];
+                serverConnector.postMessage(c);
+            }
+        });
     }
 }
 
@@ -379,12 +406,42 @@ grid = {
         }
     },
 
+    resize() {
+        for (let i=0; i<this.hTiles * this.vTiles; i++) {
+            let cell = this.field[i];
+            cell.cell.style.width = `${this.tileWidth}px`;
+            cell.cell.style.height = `${this.tileHeight}px`;
+        }
+        this.grid.style.width = `${this.hTiles * this.borderedWidth}px`;
+        this.grid.style.height = `${this.vTiles * this.borderedHeight}px`;
+    },
+
     move(dx, dy) {
         this.x += dx;
         this.y += dy;
 
         this.grid.style.left = `${this.x}px`;
         this.grid.style.top = `${this.y}px`;
+    },
+
+    zoomIn() {
+        this.tileWidth += 40;
+        this.borderedWidth += 40;
+        this.tileHeight += 40;
+        this.borderedHeight += 40;
+        
+        this.resize();
+    },
+
+    zoomOut() {
+        if (this.tileWidth > 49) {
+            this.tileWidth -= 40;
+            this.borderedWidth -= 40;
+            this.tileHeight -= 40;
+            this.borderedHeight -= 40;
+            
+            this.resize();
+        }
     },
 
     onclick(x, y) {
@@ -417,7 +474,7 @@ grid = {
 }
 
 
-var SCREEN = phase1;
+var SCREEN = loading;
 SCREEN.startRendering();
 render = function() {
     try {
