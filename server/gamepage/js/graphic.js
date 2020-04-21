@@ -191,29 +191,103 @@ Buildings = {
 }
 
 
-phase1 = {
-    menu: document.getElementById("phase1").getElementsByClassName("towerMenu")[0],
-    timer: document.getElementById("phase1").getElementsByClassName("timer")[0],
-
+gameScreen = {
     selected: -1,
-    buildingList: [Buildings.WALL],
-    tooltips: [
-        document.getElementById("phase1wallTooltip"),
-        document.getElementById("phase1coreTooltip")
-    ],
 
     mouseX: 0,
     mouseY: 0,
     mouseDown: false,
     mouseMoved: false,
 
+    tooltips: [
+        document.getElementById("phase1wallTooltip"),
+        document.getElementById("phase1coreTooltip")
+    ],
+
+    onup(e) {
+        gameScreen.mouseDown = false;
+
+        let x = e.clientX;
+        let y = e.clientY;
+
+        for (let i=0; i<gameScreen.menu.children.length; i++) {
+            let rect = gameScreen.menu.children[i].getBoundingClientRect();
+            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                if (i == gameScreen.selected) {
+                    gameScreen.selected = -1;
+                    gameScreen.menu.children[i].style.backgroundColor = "#00566B";
+                } else {
+                    gameScreen.selected = i;
+                    gameScreen.menu.children[i].style.backgroundColor = "#4096AB";
+                }
+                   
+                return;
+            }
+        }
+
+        if (!gameScreen.mouseMoved)
+            grid.onclick(x, y);
+        gameScreen.mouseMoved = false;
+    },
+
+    onmove(e) {
+        let x = e.clientX;
+        let y = e.clientY;
+
+        for (let i=0; i<gameScreen.menu.children.length; i++) {
+            let rect = gameScreen.menu.children[i].getBoundingClientRect();
+            if ((x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom)) {
+                gameScreen.tooltips[i].style.display = "block";
+                gameScreen.menu.children[i].style.backgroundColor = "#4096AB";
+            } else {
+                gameScreen.tooltips[i].style.display = "none";
+                if (gameScreen.selected != i)
+                    gameScreen.menu.children[i].style.backgroundColor = "#00566B";
+            }
+        }
+
+        if (gameScreen.mouseDown) {
+            grid.move(x - gameScreen.mouseX, y - gameScreen.mouseY);
+            gameScreen.mouseX = x;
+            gameScreen.mouseY = y;
+            gameScreen.mouseMoved = true;
+        }
+
+        grid.onhover(x, y);
+        
+    },
+
+    ondown(e) {
+        gameScreen.mouseX = e.clientX;
+        gameScreen.mouseY = e.clientY;
+        gameScreen.mouseDown = true;
+    },
+
+    onwheel(e) {
+        if (e.deltaY == -3) {
+            grid.zoomIn();
+        } else {
+            grid.zoomOut();
+        }
+    },
+}
+
+
+phase1 = {
+    timer: document.getElementById("phase1").getElementsByClassName("timer")[0],
+
+    selected: -1,
+    buildingList: [Buildings.WALL],
+
     startRendering() {
+        this.prototype = gameScreen;
+        this.prototype.menu = document.getElementById("phase1").getElementsByClassName("towerMenu")[0]
         let p = document.getElementById("phase1");
         p.style.display = "block";
-        window.addEventListener("mousemove", this.onmove);
-        window.addEventListener("mousedown", this.ondown);
-        window.addEventListener("mouseup", this.onup);
-        window.addEventListener("wheel", this.onwheel);
+        window.addEventListener("mousemove", this.prototype.onmove);
+        window.addEventListener("mousedown", this.prototype.ondown);
+        window.addEventListener("mouseup", this.prototype.onup);
+        window.addEventListener("wheel", this.prototype.onwheel);
         grid.create();
         this.resize();
     },
@@ -223,10 +297,16 @@ phase1 = {
             case "TIME:0":
                 phase1.timer.innerHTML = "00:00";
                 phase1.timer.style.color = "#FF0000";
+                phase1.onTimeEnd();
                 break;
             case "GET_BASE":
                 serverConnector.postMessage("OK");
                 phase1.onPhaseEnd();
+                break;
+            case "PHASE_2":
+                document.getElementById("phase1").style.display = "none";
+                SCREEN = phase2;
+                SCREEN.startRendering();
         }
         if (msg.startsWith("TIME:")) {
             let time = parseInt(msg.split(":")[1]);
@@ -246,71 +326,13 @@ phase1 = {
         
     },
 
-    onup(e) {
-        phase1.mouseDown = false;
-
-        let x = e.clientX;
-        let y = e.clientY;
-
-        for (let i=0; i<phase1.menu.children.length; i++) {
-            let rect = phase1.menu.children[i].getBoundingClientRect();
-            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-                if (i == phase1.selected) {
-                    phase1.selected = -1;
-                    phase1.menu.children[i].style.backgroundColor = "#00566B";
-                } else {
-                    phase1.selected = i;
-                    phase1.menu.children[i].style.backgroundColor = "#4096AB";
-                }
-                   
-                return;
-            }
-        }
-
-        if (!phase1.mouseMoved)
-            grid.onclick(x, y);
-        phase1.mouseMoved = false;
-    },
-
-    onmove(e) {
-        let x = e.clientX;
-        let y = e.clientY;
-
-        for (let i=0; i<phase1.menu.children.length; i++) {
-            let rect = phase1.menu.children[i].getBoundingClientRect();
-            if ((x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom)) {
-                phase1.tooltips[i].style.display = "block";
-                phase1.menu.children[i].style.backgroundColor = "#4096AB";
-            } else {
-                phase1.tooltips[i].style.display = "none";
-                if (phase1.selected != i)
-                    phase1.menu.children[i].style.backgroundColor = "#00566B";
-            }
-        }
-
-        if (phase1.mouseDown) {
-            grid.move(x - phase1.mouseX, y - phase1.mouseY);
-            phase1.mouseX = x;
-            phase1.mouseY = y;
-            phase1.mouseMoved = true;
-        }
-
-        grid.onhover(x, y);
-        
-    },
-
-    ondown(e) {
-        phase1.mouseX = e.clientX;
-        phase1.mouseY = e.clientY;
-        phase1.mouseDown = true;
-    },
-
-    onwheel(e) {
-        if (e.deltaY == -3) {
-            grid.zoomIn();
-        } else {
-            grid.zoomOut();
-        }
+    onTimeEnd() {
+        document.getElementById("phase1").style.opacity = 0.2;
+        document.getElementById("dataExchange").style.display = "block";
+        window.removeEventListener("mousedown", this.ondown);
+        window.removeEventListener("mousemove", this.onmove);
+        window.removeEventListener("mouseup", this.onup);
+        window.removeEventListener("wheel", this.onwheel);
     },
 
     onPhaseEnd() {
@@ -444,6 +466,11 @@ grid = {
         }
     },
 
+    clear() {
+        this.field.clear();
+        while (this.grid.firstChild) this.grid.removeChild(this.grid.lastChild);
+    },
+
     onclick(x, y) {
         x -= this.x;
         y -= this.y;
@@ -452,7 +479,7 @@ grid = {
                 x = Math.floor(x / this.borderedWidth);
                 y = Math.floor(y / this.borderedHeight);
                 let cell = grid.field[y * this.hTiles + x];
-                cell.setBuilding(phase1.selected);
+                cell.setBuilding(gameScreen.selected);
             }
     },
 
@@ -466,7 +493,7 @@ grid = {
                 let cell = grid.field[y * this.hTiles + x];
                 if (cell != this.hovered) {
                     this.hovered.previewBuilding(-1);
-                    cell.previewBuilding(phase1.selected);
+                    cell.previewBuilding(gameScreen.selected);
                     this.hovered = cell;
                 }
             }
@@ -474,7 +501,26 @@ grid = {
 }
 
 
-var SCREEN = loading;
+phase2 = {
+    startRendering() {
+        this.prototype = gameScreen;
+    },
+
+    handleMessage() {
+
+    },
+
+    resize() {
+
+    },
+
+    update() {
+
+    }
+}
+
+
+var SCREEN = phase2;
 SCREEN.startRendering();
 render = function() {
     try {

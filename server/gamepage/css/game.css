@@ -153,3 +153,15 @@ body {
 .tooltip div {
     margin: 5px;
 }
+
+
+#dataExchange {
+    position: absolute;
+    width: 100vw;
+    text-align: center;
+    top: 40vh;
+    font-family: Neucha;
+    font-weight: 900;
+    font-size: 5vw;
+    display: none;
+}
