@@ -20,7 +20,7 @@ class Phase1:
         await Messages.startPhase1(self.__player1)
         await Messages.startPhase1(self.__player2)
 
-        for i in range(self.__time):
+        for i in range(self.__time + 1):
             await self.__player1.sendMessage("TIME:{}".format(str(self.__time - i)))
             await self.__player2.sendMessage("TIME:{}".format(str(self.__time - i)))
             await asyncio.sleep(1)
