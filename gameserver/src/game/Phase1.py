@@ -1,7 +1,9 @@
 import asyncio
 
+from src.util.Logger import logger
 from src.player.Player import Player
 from src.player.Messages import Messages
+from src.exceptions.PlayerKickedException import PlayerKickedException
 
 
 class Phase1:
@@ -38,6 +40,8 @@ class Phase1:
 
                 await self.__player1.ping()
                 await asyncio.sleep(1)
+            else:
+                await self.__kick(self.__player1)
 
             self.__base1.append(msg)
 
@@ -51,8 +55,17 @@ class Phase1:
 
                 await self.__player2.ping()
                 await asyncio.sleep(1)
+            else:
+                await self.__kick(self.__player2)
 
             self.__base2.append(msg)
+    
+    @staticmethod
+    async def __kick(player):
+        logger.error("{} stopped responding during base getting!".format(player.getAddress()))
+        await player.sendMessageSafe("KICKED:NO_RESPONSE")
+        await player.disconnect()
+        raise PlayerKickedException(player, "No response")
 
     def getPlayer1Base(self):
         return self.__base1
