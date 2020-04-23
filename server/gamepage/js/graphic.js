@@ -208,6 +208,8 @@ gameScreen = {
     mouseDown: false,
     mouseMoved: false,
 
+    timer: document.getElementById("timer"),
+
     tooltips: [
         document.getElementById("phase1wallTooltip"),
         document.getElementById("phase1coreTooltip")
@@ -297,16 +299,18 @@ gameScreen = {
 
 
 phase1 = {
-    timer: document.getElementById("phase1").getElementsByClassName("timer")[0],
-
     selected: -1,
+    buildingIndex: 0,
 
     startRendering() {
         this.prototype = gameScreen;
         this.prototype.menu = document.getElementById("phase1").getElementsByClassName("towerMenu")[0]
         this.prototype.startListening();
+
         let p = document.getElementById("phase1");
         p.style.display = "block";
+        timer.style.display = "block";
+
         grid.create();
         this.resize();
     },
@@ -314,8 +318,8 @@ phase1 = {
     handleMessage(msg) {
         switch (msg) {
             case "TIME:0":
-                phase1.timer.innerHTML = "00:00";
-                phase1.timer.style.color = "#FF0000";
+                gameScreen.timer.innerHTML = "00:00";
+                gameScreen.timer.style.color = "#FF0000";
                 phase1.onTimeEnd();
                 break;
             case "GET_BASE":
@@ -323,6 +327,7 @@ phase1 = {
                 phase1.onPhaseEnd();
                 break;
             case "PHASE_2":
+                serverConnector.postMessage("OK")
                 document.getElementById("phase1").style.display = "none";
                 SCREEN = phase2;
                 SCREEN.startRendering();
@@ -333,7 +338,7 @@ phase1 = {
             let s = time.toString()
             if (m.length == 1) m = "0" + m;
             if (s.length == 1) s = "0" + s;
-            phase1.timer.innerHTML = `${m}:${s}`
+            gameScreen.timer.innerHTML = `${m}:${s}`
         }
     },
 
@@ -352,13 +357,17 @@ phase1 = {
     },
 
     onPhaseEnd() {
-        grid.field.forEach(cell => {
-            if (!cell.isLocked) {
-                let c = Buildings._shortcuts[cell.building + 1];
-                serverConnector.postMessage(c);
-            }
-        });
-    }
+        var cell = grid.field[phase1.buildingIndex];
+        if (!cell.isLocked) {
+            let c = Buildings._shortcuts[cell.building + 1];
+            serverConnector.postMessage(c); 
+        }
+        phase1.buildingIndex++;
+        if (phase1.buildingIndex < 49) {
+            setTimeout(phase1.onPhaseEnd);
+        }
+    },
+
 }
 
 
@@ -432,10 +441,14 @@ grid = {
     },
 
     create() {
+        this.borderedWidth = this.tileWidth + 4;
+        this.borderedHeight = this.tileHeight + 4;
         this.grid.style.width = `${this.hTiles * this.borderedWidth}px`;
         this.grid.style.height = `${this.vTiles * this.borderedHeight}px`;
         this.grid.style.left = `${this.x}px`;
         this.grid.style.top = `${this.y}px`;
+
+        this.grid.style.display = "block";
         
         for (let i=0; i<this.hTiles * this.vTiles; i++) {
             let cell = document.createElement("div");
@@ -526,6 +539,7 @@ grid = {
 phase2 = {
 
     gettingBase: false,
+    currentIndex: 24,
 
     tooltips: [
         document.getElementById("phase2cannonTooltip")
@@ -533,7 +547,6 @@ phase2 = {
 
     startRendering() {
         this.prototype = gameScreen;
-        this.prototype.startListening();
         this.prototype.tooltips = this.tooltips;
 
         let p = document.getElementById("phase2");
@@ -541,31 +554,46 @@ phase2 = {
         p.style.display = "block";
 
         grid.field = [];
+        while (grid.grid.firstChild) grid.grid.removeChild(grid.grid.lastChild);
         grid.hTiles += 4;
         grid.vTiles += 4;
         grid.create();
-        grid.field[24].setBuilding(0);
-        grid.field[25].setBuilding(1);
-        grid.field[24].lock();
-        grid.field[25].lock();
-
-        for (let i=2; i<9; i++) {
-            for (let i2=2; i2<9; i2++) {
-                grid.field[i * 11 + i2].lock();
-            }
-        }
-        currentBuildings = AttackBuildings;
     },
 
     handleMessage(msg) {
         if (phase2.gettingBase) {
+            let building = Buildings._shortcuts.indexOf(msg);
+            grid.field[phase2.currentIndex].setBuilding(building - 1);
+            grid.field[phase2.currentIndex].lock()
+            phase2.currentIndex++;
             
+            if (phase2.currentIndex == 97) {
+                this.onPhaseBeginning();
+            }
+            // Each row has 11 elements, 1st and 2nd rows are untouched, therefore 22 + (11 * 7) = 99 is the beggining of nondefending row.
+            // 99 - 2 is the first nondefending column.
+
+            if ((phase2.currentIndex + 2) % 11 == 0) phase2.currentIndex += 4;
+            // Reached the right corner.
+
         }
 
         switch (msg) {
             case "SEND_BASE":
+                serverConnector.postMessage("OK");
                 phase2.gettingBase = true;
+                gameScreen.timer.style.color = "#000000";
                 break;
+            
+            case "GET_BASE":
+                serverConnector.postMessage("OK");
+                phase2.onPhaseEnd();
+                break;
+            
+            case "TIME:0":
+                gameScreen.timer.innerHTML = "00:00";
+                gameScreen.timer.style.color = "#FF0000";
+                phase2.onTimeEnd();
         }
 
         if (msg.startsWith("TIME:")) {
@@ -574,7 +602,7 @@ phase2 = {
             let s = time.toString()
             if (m.length == 1) m = "0" + m;
             if (s.length == 1) s = "0" + s;
-            phase1.timer.innerHTML = `${m}:${s}`
+            gameScreen.timer.innerHTML = `${m}:${s}`
         }
     },
 
@@ -584,11 +612,34 @@ phase2 = {
 
     update() {
 
+    },
+
+    onPhaseBeginning() {
+        document.getElementById("dataExchange").style.display = "none";
+        this.prototype.startListening();
+        currentBuildings = AttackBuildings;
+
+        phase2.gettingBase = false;
+    },
+
+    onTimeEnd() {
+        document.getElementById("phase2").style.opacity = 0.2;
+        document.getElementById("dataExchange").style.display = "block";
+        this.prototype.stopListening();
+    },
+
+    onPhaseEnd() {
+        grid.field.forEach(cell => {
+            if (!cell.isLocked) {
+                let c = AttackBuildings._shortcuts[cell.building + 1];
+                serverConnector.postMessage(c);
+            }
+        });
     }
 }
 
 
-var SCREEN = phase2;
+var SCREEN = loading;
 SCREEN.startRendering();
 render = function() {
     try {

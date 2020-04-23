@@ -69,6 +69,7 @@ body {
     font-family: Russo;
     font-weight: 100;
     font-size: 2vw;
+    display: none;
 }
 
 #phase1 {
@@ -121,6 +122,7 @@ div.towerMenu div.menuItem * {
 #field {
     position: absolute;
     border: 5px solid black;
+    display: none;
 }
 
 .tooltip {
