@@ -4,30 +4,45 @@ from src.player.Player import Player
 from src.player.Messages import Messages
 
 
-class Phase1:
+class Phase2:
 
-    def __init__(self, player1: Player, player2: Player):
+    def __init__(self, player1: Player, player2: Player, base1: list, base2: list):
         self.__player1 = player1
         self.__player2 = player2
         self.__M = 10
         self.__N = 10
 
         self.__time = 30
-        self.__base1 = []
-        self.__base2 = []
+        self.__base1 = base1
+        self.__base2 = base2
+        self.__attackBase1 = []
+        self.__attackBase2 = []
 
     async def start(self):
-        await Messages.startPhase1(self.__player1)
-        await Messages.startPhase1(self.__player2)
+        await Messages.startPhase2(self.__player1)
+        await Messages.startPhase2(self.__player2)
+
+        await self.__sendBases()
 
         for i in range(self.__time + 1):
             await self.__player1.sendMessage("TIME:{}".format(str(self.__time - i)))
             await self.__player2.sendMessage("TIME:{}".format(str(self.__time - i)))
             await asyncio.sleep(1)
 
-        await self.__getBases()
+        await self.__getAttackBases()
 
-    async def __getBases(self):
+    async def __sendBases(self):
+        await Messages.sendBase(self.__player1)
+
+        for building in self.__base1:
+            self.__player1.sendMessage(building)
+
+        await Messages.sendBase(self.__player2)
+
+        for building in self.__base2:
+            self.__player2.sendMessage(building)
+
+    async def __getAttackBases(self):
         await Messages.getBase(self.__player1)
 
         for i in range(self.__M * self.__N):
@@ -39,7 +54,7 @@ class Phase1:
                 await self.__player1.ping()
                 await asyncio.sleep(1)
 
-            self.__base1.append(msg)
+            self.__attackBase1.append(msg)
 
         await Messages.getBase(self.__player2)
 
@@ -52,10 +67,4 @@ class Phase1:
                 await self.__player2.ping()
                 await asyncio.sleep(1)
 
-            self.__base2.append(msg)
-
-    def getPlayer1Base(self):
-        return self.__base1
-
-    def getPlayer2Base(self):
-        return self.__base2
+            self.__attackBase2.append(msg)
