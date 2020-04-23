@@ -190,30 +190,127 @@ Buildings = {
     WALL: 1
 }
 
+AttackBuildings = {
+    _sources: ["./img/cannon.svg"],
+    _shortcuts: ["0", "A"],
+    EMPTY: -1,
+    CANNON: 0
+}
 
-phase1 = {
-    menu: document.getElementById("phase1").getElementsByClassName("towerMenu")[0],
-    timer: document.getElementById("phase1").getElementsByClassName("timer")[0],
+currentBuildings = Buildings;
 
+
+gameScreen = {
     selected: -1,
-    buildingList: [Buildings.WALL],
-    tooltips: [
-        document.getElementById("phase1wallTooltip"),
-        document.getElementById("phase1coreTooltip")
-    ],
 
     mouseX: 0,
     mouseY: 0,
     mouseDown: false,
     mouseMoved: false,
 
-    startRendering() {
-        let p = document.getElementById("phase1");
-        p.style.display = "block";
+    timer: document.getElementById("timer"),
+
+    tooltips: [
+        document.getElementById("phase1wallTooltip"),
+        document.getElementById("phase1coreTooltip")
+    ],
+
+    startListening() {
         window.addEventListener("mousemove", this.onmove);
         window.addEventListener("mousedown", this.ondown);
         window.addEventListener("mouseup", this.onup);
         window.addEventListener("wheel", this.onwheel);
+    },
+
+    stopListening() {
+        window.removeEventListener("mousedown", this.ondown);
+        window.removeEventListener("mousemove", this.onmove);
+        window.removeEventListener("mouseup", this.onup);
+        window.removeEventListener("wheel", this.onwheel);
+    },
+
+    onup(e) {
+        gameScreen.mouseDown = false;
+
+        let x = e.clientX;
+        let y = e.clientY;
+
+        for (let i=0; i<gameScreen.menu.children.length; i++) {
+            let rect = gameScreen.menu.children[i].getBoundingClientRect();
+            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                if (i == gameScreen.selected) {
+                    gameScreen.selected = -1;
+                    gameScreen.menu.children[i].style.backgroundColor = "#00566B";
+                } else {
+                    gameScreen.selected = i;
+                    gameScreen.menu.children[i].style.backgroundColor = "#4096AB";
+                }
+                   
+                return;
+            }
+        }
+
+        if (!gameScreen.mouseMoved)
+            grid.onclick(x, y);
+        gameScreen.mouseMoved = false;
+    },
+
+    onmove(e) {
+        let x = e.clientX;
+        let y = e.clientY;
+
+        for (let i=0; i<gameScreen.menu.children.length; i++) {
+            let rect = gameScreen.menu.children[i].getBoundingClientRect();
+            if ((x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom)) {
+                gameScreen.tooltips[i].style.display = "block";
+                gameScreen.menu.children[i].style.backgroundColor = "#4096AB";
+            } else {
+                gameScreen.tooltips[i].style.display = "none";
+                if (gameScreen.selected != i)
+                    gameScreen.menu.children[i].style.backgroundColor = "#00566B";
+            }
+        }
+
+        if (gameScreen.mouseDown) {
+            grid.move(x - gameScreen.mouseX, y - gameScreen.mouseY);
+            gameScreen.mouseX = x;
+            gameScreen.mouseY = y;
+            gameScreen.mouseMoved = true;
+        }
+
+        grid.onhover(x, y);
+        
+    },
+
+    ondown(e) {
+        gameScreen.mouseX = e.clientX;
+        gameScreen.mouseY = e.clientY;
+        gameScreen.mouseDown = true;
+    },
+
+    onwheel(e) {
+        if (e.deltaY == -3) {
+            grid.zoomIn();
+        } else {
+            grid.zoomOut();
+        }
+    },
+}
+
+
+phase1 = {
+    selected: -1,
+    buildingIndex: 0,
+
+    startRendering() {
+        this.prototype = gameScreen;
+        this.prototype.menu = document.getElementById("phase1").getElementsByClassName("towerMenu")[0]
+        this.prototype.startListening();
+
+        let p = document.getElementById("phase1");
+        p.style.display = "block";
+        timer.style.display = "block";
+
         grid.create();
         this.resize();
     },
@@ -221,12 +318,19 @@ phase1 = {
     handleMessage(msg) {
         switch (msg) {
             case "TIME:0":
-                phase1.timer.innerHTML = "00:00";
-                phase1.timer.style.color = "#FF0000";
+                gameScreen.timer.innerHTML = "00:00";
+                gameScreen.timer.style.color = "#FF0000";
+                phase1.onTimeEnd();
                 break;
             case "GET_BASE":
                 serverConnector.postMessage("OK");
                 phase1.onPhaseEnd();
+                break;
+            case "PHASE_2":
+                serverConnector.postMessage("OK")
+                document.getElementById("phase1").style.display = "none";
+                SCREEN = phase2;
+                SCREEN.startRendering();
         }
         if (msg.startsWith("TIME:")) {
             let time = parseInt(msg.split(":")[1]);
@@ -234,7 +338,7 @@ phase1 = {
             let s = time.toString()
             if (m.length == 1) m = "0" + m;
             if (s.length == 1) s = "0" + s;
-            phase1.timer.innerHTML = `${m}:${s}`
+            gameScreen.timer.innerHTML = `${m}:${s}`
         }
     },
 
@@ -246,81 +350,24 @@ phase1 = {
         
     },
 
-    onup(e) {
-        phase1.mouseDown = false;
-
-        let x = e.clientX;
-        let y = e.clientY;
-
-        for (let i=0; i<phase1.menu.children.length; i++) {
-            let rect = phase1.menu.children[i].getBoundingClientRect();
-            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-                if (i == phase1.selected) {
-                    phase1.selected = -1;
-                    phase1.menu.children[i].style.backgroundColor = "#00566B";
-                } else {
-                    phase1.selected = i;
-                    phase1.menu.children[i].style.backgroundColor = "#4096AB";
-                }
-                   
-                return;
-            }
-        }
-
-        if (!phase1.mouseMoved)
-            grid.onclick(x, y);
-        phase1.mouseMoved = false;
-    },
-
-    onmove(e) {
-        let x = e.clientX;
-        let y = e.clientY;
-
-        for (let i=0; i<phase1.menu.children.length; i++) {
-            let rect = phase1.menu.children[i].getBoundingClientRect();
-            if ((x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom)) {
-                phase1.tooltips[i].style.display = "block";
-                phase1.menu.children[i].style.backgroundColor = "#4096AB";
-            } else {
-                phase1.tooltips[i].style.display = "none";
-                if (phase1.selected != i)
-                    phase1.menu.children[i].style.backgroundColor = "#00566B";
-            }
-        }
-
-        if (phase1.mouseDown) {
-            grid.move(x - phase1.mouseX, y - phase1.mouseY);
-            phase1.mouseX = x;
-            phase1.mouseY = y;
-            phase1.mouseMoved = true;
-        }
-
-        grid.onhover(x, y);
-        
-    },
-
-    ondown(e) {
-        phase1.mouseX = e.clientX;
-        phase1.mouseY = e.clientY;
-        phase1.mouseDown = true;
-    },
-
-    onwheel(e) {
-        if (e.deltaY == -3) {
-            grid.zoomIn();
-        } else {
-            grid.zoomOut();
-        }
+    onTimeEnd() {
+        document.getElementById("phase1").style.opacity = 0.2;
+        document.getElementById("dataExchange").style.display = "block";
+        this.prototype.stopListening();
     },
 
     onPhaseEnd() {
-        grid.field.forEach(cell => {
-            if (!cell.isLocked) {
-                let c = Buildings._shortcuts[cell.building + 1];
-                serverConnector.postMessage(c);
-            }
-        });
-    }
+        var cell = grid.field[phase1.buildingIndex];
+        if (!cell.isLocked) {
+            let c = Buildings._shortcuts[cell.building + 1];
+            serverConnector.postMessage(c); 
+        }
+        phase1.buildingIndex++;
+        if (phase1.buildingIndex < 49) {
+            setTimeout(phase1.onPhaseEnd);
+        }
+    },
+
 }
 
 
@@ -337,9 +384,12 @@ class Cell {
 
     lock() {
         this.isLocked = true;
+        this.cell.style.border = "2px solid red";
+        this.cell.style.backgroundColor = "#FFBBBB";
     }
 
     setBuilding(building) {
+        if (this.isLocked) return;
         try {
             this.cell.removeChild(this.cell.lastChild);
         }
@@ -347,7 +397,7 @@ class Cell {
 
         if (building != -1) {
             let img = document.createElement("img");
-            img.src = Buildings._sources[building];
+            img.src = currentBuildings._sources[building];
             img.ondragstart = () => {return false};
             this.cell.appendChild(img);
         }
@@ -355,14 +405,14 @@ class Cell {
     }
 
     previewBuilding(building) {
-        if (this.building != -1) return;
+        if (this.building != -1 || this.isLocked) return;
         try {
             this.cell.removeChild(this.cell.lastChild);
         } catch (TypeError) {/* No building */}
         if (building != -1) {
             let img = document.createElement("img");
-            img.src = Buildings._sources[building];
-            img.style.opacity = "0.5";
+            img.src = currentBuildings._sources[building];
+            img.style.opacity = "0.8";
             img.ondragstart = () => {return false};
             this.cell.appendChild(img);
         }
@@ -375,14 +425,14 @@ class Cell {
 grid = {
     x: 50,
     y: 50,
-    hTiles: 5,
-    vTiles: 5,
+    hTiles: 7,
+    vTiles: 7,
     tileWidth: 100,
     tileHeight: 100,
     borderedWidth: 104,
     borderedHeight: 104,
     field: [],
-    grid: document.getElementById("phase1field"),
+    grid: document.getElementById("field"),
 
     hovered: new Cell(),
 
@@ -391,10 +441,14 @@ grid = {
     },
 
     create() {
+        this.borderedWidth = this.tileWidth + 4;
+        this.borderedHeight = this.tileHeight + 4;
         this.grid.style.width = `${this.hTiles * this.borderedWidth}px`;
         this.grid.style.height = `${this.vTiles * this.borderedHeight}px`;
         this.grid.style.left = `${this.x}px`;
         this.grid.style.top = `${this.y}px`;
+
+        this.grid.style.display = "block";
         
         for (let i=0; i<this.hTiles * this.vTiles; i++) {
             let cell = document.createElement("div");
@@ -404,6 +458,7 @@ grid = {
             this.field.push(new Cell(cell));
             this.grid.appendChild(cell);
         }
+        this.hovered = this.field[0];
     },
 
     resize() {
@@ -444,6 +499,11 @@ grid = {
         }
     },
 
+    clear() {
+        this.field.clear();
+        while (this.grid.firstChild) this.grid.removeChild(this.grid.lastChild);
+    },
+
     onclick(x, y) {
         x -= this.x;
         y -= this.y;
@@ -452,7 +512,7 @@ grid = {
                 x = Math.floor(x / this.borderedWidth);
                 y = Math.floor(y / this.borderedHeight);
                 let cell = grid.field[y * this.hTiles + x];
-                cell.setBuilding(phase1.selected);
+                cell.setBuilding(gameScreen.selected);
             }
     },
 
@@ -466,10 +526,115 @@ grid = {
                 let cell = grid.field[y * this.hTiles + x];
                 if (cell != this.hovered) {
                     this.hovered.previewBuilding(-1);
-                    cell.previewBuilding(phase1.selected);
+                    this.hovered.cell.style.opacity = "1";
+                    cell.previewBuilding(gameScreen.selected);
+                    cell.cell.style.opacity = "0.5";
                     this.hovered = cell;
                 }
             }
+    }
+}
+
+
+phase2 = {
+
+    gettingBase: false,
+    currentIndex: 24,
+
+    tooltips: [
+        document.getElementById("phase2cannonTooltip")
+    ],
+
+    startRendering() {
+        this.prototype = gameScreen;
+        this.prototype.tooltips = this.tooltips;
+
+        let p = document.getElementById("phase2");
+        this.prototype.menu = p.getElementsByClassName("towerMenu")[0];
+        p.style.display = "block";
+
+        grid.field = [];
+        while (grid.grid.firstChild) grid.grid.removeChild(grid.grid.lastChild);
+        grid.hTiles += 4;
+        grid.vTiles += 4;
+        grid.create();
+    },
+
+    handleMessage(msg) {
+        if (phase2.gettingBase) {
+            let building = Buildings._shortcuts.indexOf(msg);
+            grid.field[phase2.currentIndex].setBuilding(building - 1);
+            grid.field[phase2.currentIndex].lock()
+            phase2.currentIndex++;
+            
+            if (phase2.currentIndex == 97) {
+                this.onPhaseBeginning();
+            }
+            // Each row has 11 elements, 1st and 2nd rows are untouched, therefore 22 + (11 * 7) = 99 is the beggining of nondefending row.
+            // 99 - 2 is the first nondefending column.
+
+            if ((phase2.currentIndex + 2) % 11 == 0) phase2.currentIndex += 4;
+            // Reached the right corner.
+
+        }
+
+        switch (msg) {
+            case "SEND_BASE":
+                serverConnector.postMessage("OK");
+                phase2.gettingBase = true;
+                gameScreen.timer.style.color = "#000000";
+                break;
+            
+            case "GET_BASE":
+                serverConnector.postMessage("OK");
+                phase2.onPhaseEnd();
+                break;
+            
+            case "TIME:0":
+                gameScreen.timer.innerHTML = "00:00";
+                gameScreen.timer.style.color = "#FF0000";
+                phase2.onTimeEnd();
+        }
+
+        if (msg.startsWith("TIME:")) {
+            let time = parseInt(msg.split(":")[1]);
+            let m = Math.floor(time / 60).toString();
+            let s = time.toString()
+            if (m.length == 1) m = "0" + m;
+            if (s.length == 1) s = "0" + s;
+            gameScreen.timer.innerHTML = `${m}:${s}`
+        }
+    },
+
+    resize() {
+
+    },
+
+    update() {
+
+    },
+
+    onPhaseBeginning() {
+        document.getElementById("dataExchange").style.display = "none";
+        this.prototype.startListening();
+        currentBuildings = AttackBuildings;
+
+        phase2.gettingBase = false;
+    },
+
+    onTimeEnd() {
+        document.getElementById("phase2").style.opacity = 0.2;
+        document.getElementById("dataExchange").style.display = "block";
+        this.prototype.stopListening();
+    },
+
+    onPhaseEnd() {
+        grid.field.forEach(cell => {
+            if (!cell.isLocked) {
+                let c = AttackBuildings._shortcuts[cell.building + 1];
+                serverConnector.postMessage(c);
+            }
+        });
     }
 }
 

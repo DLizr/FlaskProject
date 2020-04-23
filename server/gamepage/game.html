@@ -13,13 +13,15 @@
         </div>
     </div>
 
-    <div id="phase1">
-        <div id="phase1field"></div>
-        <div class="bottomOver">
-            <div class="timer">
-                00:00
-            </div>
+    <div id="game">
+        <div id="field"></div>
+        <div id="timer">
+            00:00
         </div>
+        
+    </div>
+
+    <div id="phase1">
         <div class="bottom">
             <div class="towerMenu">
                 <div class="menuItem"><img src="./img/core.svg" alt="" ondragstart="return false"></div>
@@ -37,6 +39,23 @@
                 <b>Стена</b> <br/>
                 Защищает базу от снарядов.
             </div>
+        </div>
+    </div>
+
+    <div id="dataExchange">
+        Идёт обмен данными с сервером...
+    </div>
+
+    <div id="phase2">
+        <div class="bottom">
+            <div class="towerMenu">
+                <div class="menuItem"><img src="./img/cannon.svg" alt="" ondragstart="return false"></div>
+            </div>
+        </div>
+
+        <div id="phase2cannonTooltip" class="tooltip">
+            <b>Пушка</b> <br/>
+            Базовая пушка. Стреляет в ближайшую цель.
         </div>
     </div>
     <canvas></canvas>
