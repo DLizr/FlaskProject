@@ -30,7 +30,7 @@ class Server:
     
     @classmethod
     def run(cls):
-        server = websockets.serve(Server.userHandler, "localhost", 31666)
+        server = websockets.serve(Server.userHandler, "localhost", 31666, max_queue=2000000)
         logger.info("Server started.")
         
         asyncio.get_event_loop().run_until_complete(server)
