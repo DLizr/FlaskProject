@@ -9,8 +9,8 @@ class Phase1:
     def __init__(self, player1: Player, player2: Player):
         self.__player1 = player1
         self.__player2 = player2
-        self.__M = 10
-        self.__N = 10
+        self.__M = 7
+        self.__N = 7
 
         self.__time = 30
         self.__base1 = []

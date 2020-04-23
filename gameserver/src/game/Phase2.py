@@ -9,8 +9,7 @@ class Phase2:
     def __init__(self, player1: Player, player2: Player, base1: list, base2: list):
         self.__player1 = player1
         self.__player2 = player2
-        self.__M = 10
-        self.__N = 10
+        self.__N = 72  # (7+4) * (7+4) - 7*7
 
         self.__time = 30
         self.__base1 = base1
@@ -34,18 +33,18 @@ class Phase2:
     async def __sendBases(self):
         await Messages.sendBase(self.__player1)
 
-        for building in self.__base1:
-            self.__player1.sendMessage(building)
+        for building in self.__base2:
+            await self.__player1.sendMessage(building)
 
         await Messages.sendBase(self.__player2)
 
-        for building in self.__base2:
-            self.__player2.sendMessage(building)
+        for building in self.__base1:
+            await self.__player2.sendMessage(building)
 
     async def __getAttackBases(self):
         await Messages.getBase(self.__player1)
 
-        for i in range(self.__M * self.__N):
+        for i in range(self.__N):
             for _ in range(2):
                 msg = self.__player1.getMessageIfReceived()
                 if msg:
@@ -58,7 +57,7 @@ class Phase2:
 
         await Messages.getBase(self.__player2)
 
-        for i in range(self.__M * self.__N):
+        for i in range(self.__N):
             for _ in range(2):
                 msg = self.__player2.getMessageIfReceived()
                 if msg:
