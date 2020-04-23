@@ -190,6 +190,15 @@ Buildings = {
     WALL: 1
 }
 
+AttackBuildings = {
+    _sources: ["./img/cannon.svg"],
+    _shortcuts: ["0", "A"],
+    EMPTY: -1,
+    CANNON: 0
+}
+
+currentBuildings = Buildings;
+
 
 gameScreen = {
     selected: -1,
@@ -203,6 +212,20 @@ gameScreen = {
         document.getElementById("phase1wallTooltip"),
         document.getElementById("phase1coreTooltip")
     ],
+
+    startListening() {
+        window.addEventListener("mousemove", this.onmove);
+        window.addEventListener("mousedown", this.ondown);
+        window.addEventListener("mouseup", this.onup);
+        window.addEventListener("wheel", this.onwheel);
+    },
+
+    stopListening() {
+        window.removeEventListener("mousedown", this.ondown);
+        window.removeEventListener("mousemove", this.onmove);
+        window.removeEventListener("mouseup", this.onup);
+        window.removeEventListener("wheel", this.onwheel);
+    },
 
     onup(e) {
         gameScreen.mouseDown = false;
@@ -277,17 +300,13 @@ phase1 = {
     timer: document.getElementById("phase1").getElementsByClassName("timer")[0],
 
     selected: -1,
-    buildingList: [Buildings.WALL],
 
     startRendering() {
         this.prototype = gameScreen;
         this.prototype.menu = document.getElementById("phase1").getElementsByClassName("towerMenu")[0]
+        this.prototype.startListening();
         let p = document.getElementById("phase1");
         p.style.display = "block";
-        window.addEventListener("mousemove", this.prototype.onmove);
-        window.addEventListener("mousedown", this.prototype.ondown);
-        window.addEventListener("mouseup", this.prototype.onup);
-        window.addEventListener("wheel", this.prototype.onwheel);
         grid.create();
         this.resize();
     },
@@ -329,10 +348,7 @@ phase1 = {
     onTimeEnd() {
         document.getElementById("phase1").style.opacity = 0.2;
         document.getElementById("dataExchange").style.display = "block";
-        window.removeEventListener("mousedown", this.ondown);
-        window.removeEventListener("mousemove", this.onmove);
-        window.removeEventListener("mouseup", this.onup);
-        window.removeEventListener("wheel", this.onwheel);
+        this.prototype.stopListening();
     },
 
     onPhaseEnd() {
@@ -359,9 +375,12 @@ class Cell {
 
     lock() {
         this.isLocked = true;
+        this.cell.style.border = "2px solid red";
+        this.cell.style.backgroundColor = "#FFBBBB";
     }
 
     setBuilding(building) {
+        if (this.isLocked) return;
         try {
             this.cell.removeChild(this.cell.lastChild);
         }
@@ -369,7 +388,7 @@ class Cell {
 
         if (building != -1) {
             let img = document.createElement("img");
-            img.src = Buildings._sources[building];
+            img.src = currentBuildings._sources[building];
             img.ondragstart = () => {return false};
             this.cell.appendChild(img);
         }
@@ -377,14 +396,14 @@ class Cell {
     }
 
     previewBuilding(building) {
-        if (this.building != -1) return;
+        if (this.building != -1 || this.isLocked) return;
         try {
             this.cell.removeChild(this.cell.lastChild);
         } catch (TypeError) {/* No building */}
         if (building != -1) {
             let img = document.createElement("img");
-            img.src = Buildings._sources[building];
-            img.style.opacity = "0.5";
+            img.src = currentBuildings._sources[building];
+            img.style.opacity = "0.8";
             img.ondragstart = () => {return false};
             this.cell.appendChild(img);
         }
@@ -397,14 +416,14 @@ class Cell {
 grid = {
     x: 50,
     y: 50,
-    hTiles: 5,
-    vTiles: 5,
+    hTiles: 7,
+    vTiles: 7,
     tileWidth: 100,
     tileHeight: 100,
     borderedWidth: 104,
     borderedHeight: 104,
     field: [],
-    grid: document.getElementById("phase1field"),
+    grid: document.getElementById("field"),
 
     hovered: new Cell(),
 
@@ -426,6 +445,7 @@ grid = {
             this.field.push(new Cell(cell));
             this.grid.appendChild(cell);
         }
+        this.hovered = this.field[0];
     },
 
     resize() {
@@ -493,7 +513,9 @@ grid = {
                 let cell = grid.field[y * this.hTiles + x];
                 if (cell != this.hovered) {
                     this.hovered.previewBuilding(-1);
+                    this.hovered.cell.style.opacity = "1";
                     cell.previewBuilding(gameScreen.selected);
+                    cell.cell.style.opacity = "0.5";
                     this.hovered = cell;
                 }
             }
@@ -502,12 +524,58 @@ grid = {
 
 
 phase2 = {
+
+    gettingBase: false,
+
+    tooltips: [
+        document.getElementById("phase2cannonTooltip")
+    ],
+
     startRendering() {
         this.prototype = gameScreen;
+        this.prototype.startListening();
+        this.prototype.tooltips = this.tooltips;
+
+        let p = document.getElementById("phase2");
+        this.prototype.menu = p.getElementsByClassName("towerMenu")[0];
+        p.style.display = "block";
+
+        grid.field = [];
+        grid.hTiles += 4;
+        grid.vTiles += 4;
+        grid.create();
+        grid.field[24].setBuilding(0);
+        grid.field[25].setBuilding(1);
+        grid.field[24].lock();
+        grid.field[25].lock();
+
+        for (let i=2; i<9; i++) {
+            for (let i2=2; i2<9; i2++) {
+                grid.field[i * 11 + i2].lock();
+            }
+        }
+        currentBuildings = AttackBuildings;
     },
 
-    handleMessage() {
+    handleMessage(msg) {
+        if (phase2.gettingBase) {
+            
+        }
 
+        switch (msg) {
+            case "SEND_BASE":
+                phase2.gettingBase = true;
+                break;
+        }
+
+        if (msg.startsWith("TIME:")) {
+            let time = parseInt(msg.split(":")[1]);
+            let m = Math.floor(time / 60).toString();
+            let s = time.toString()
+            if (m.length == 1) m = "0" + m;
+            if (s.length == 1) s = "0" + s;
+            phase1.timer.innerHTML = `${m}:${s}`
+        }
     },
 
     resize() {
