@@ -31,13 +31,7 @@ class Simulator:
         
         for observer in self.__observers:
             observer.setField(self.__base)
-            
-        print(self.__base)
     
     def update(self):
         for observer in self.__observers:
             observer.update()
-
-
-s = Simulator(["W", "C", "W", "C", "0", "0", "0", "0", "0", "0", "0", "A", "0", "0"] + ["0"] * 7 * 5)
-s.update()

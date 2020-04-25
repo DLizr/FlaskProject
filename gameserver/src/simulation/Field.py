@@ -10,6 +10,9 @@ class Field:
             return self.__base[y * self.__width + x]
         return None
     
+    def remove(self, x: int, y: int):
+        self.__base[y * self.__width + x] = None
+    
     def __str__(self):
         res = "Field:"
         for i in range(len(self.__base)):

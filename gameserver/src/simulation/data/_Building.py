@@ -6,7 +6,7 @@ class Building:
     def getHP(self):
         raise NotImplementedError
     
-    def onDamageReceived(self, dmg: int):
+    def dealDamage(self, dmg: int):
         raise NotImplementedError
     
     def getTeam(self):

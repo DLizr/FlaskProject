@@ -8,7 +8,7 @@ class Core(Building):
     def getHP(self):
         return self.__hp
     
-    def onDamageReceived(self, dmg: int):
+    def dealDamage(self, dmg: int):
         self.__hp -= dmg
     
     def getTeam(self):

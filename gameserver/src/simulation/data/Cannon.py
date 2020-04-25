@@ -5,28 +5,40 @@ from src.simulation.Field import Field
 class Cannon(InteractingBuilding):
     
     __hp = 10
+    __reloadSpeed = 5
+    __damage = 5
     
     def __init__(self, x: int, y: int):
         self.__lastTarget: tuple = None
         self.__x = x
         self.__y = y
         self.__field = None
+        
+        self.__noTargets = False
+        self.__reload = 0
     
     def getHP(self):
         return self.__hp
     
-    def onDamageReceived(self, dmg: int):
+    def dealDamage(self, dmg: int):
         self.__hp -= dmg
     
     def setField(self, field: Field):
         self.__field = field
     
     def update(self):
-        if (self.__lastTarget and self.__field[self.__lastTarget]):
-            return  # Shoot it.
+        if (self.__noTargets):
+            return
+        if (self.__lastTarget and self.__field.get(*self.__lastTarget)):
+            self.__shoot()
+            return
         
         self.__findTarget()
-        print(self.__lastTarget)
+        if (not self.__lastTarget or not self.__field.get(*self.__lastTarget)):
+            self.__noTargets = True
+            return
+        
+        self.__shoot()
     
     def __findTarget(self):
         x, y = self.__x, self.__y
@@ -76,6 +88,21 @@ class Cannon(InteractingBuilding):
             self.__lastTarget = (x, y)
             return True
         return False
+    
+    def __shoot(self):
+        if (self.__reloading()):
+            return
+        target = self.__field.get(*self.__lastTarget)
+        target.dealDamage(self.__damage)
+        if (target.getHP() <= 0):
+            self.__field.remove(*self.__lastTarget)
+    
+    def __reloading(self):
+        if (self.__reload == self.__reloadSpeed):
+            self.__reload = 0
+            return False
+        self.__reload += 1
+        return True
     
     def getTeam(self):
         return self.ATTACKING
