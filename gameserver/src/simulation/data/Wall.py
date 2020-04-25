@@ -10,3 +10,6 @@ class Wall(Building):
     
     def onDamageReceived(self, dmg: int):
         self.__hp -= dmg
+    
+    def getTeam(self):
+        return self.DEFENDING

@@ -3,6 +3,6 @@ from src.simulation.data._Building import Building
 
 class InteractingBuilding(Building):
 
-    def update(self, field):
+    def update(self):
         raise NotImplementedError
     

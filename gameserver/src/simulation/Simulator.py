@@ -1,3 +1,5 @@
+from src.simulation.Field import Field
+
 from src.simulation.data.Wall import Wall
 from src.simulation.data.Core import Core
 from src.simulation.data.Cannon import Cannon
@@ -6,25 +8,36 @@ from src.simulation.data.Cannon import Cannon
 class Simulator:
     
     def __init__(self, base: list):
-        self.__base = []
+        self.__base: Field = None
         self.__observers = set()
         
         self.__parseBase(base)
     
     def __parseBase(self, base):
-        for cell in base:
+        field = []
+        for i, cell in enumerate(base):
             if (cell == "0"):
-                self.__base.append(None)
+                field.append(None)
             elif (cell == "W"):
-                self.__base.append(Wall())
+                field.append(Wall())
             elif (cell == "C"):
-                self.__base.append(Core())
+                field.append(Core())
             elif (cell == "A"):
-                c = Cannon()
-                self.__base.append(c)
+                c = Cannon(i % 7, i // 7)
+                field.append(c)
                 self.__observers.add(c)
         
+        self.__base = Field(field, 7, 7)
+        
+        for observer in self.__observers:
+            observer.setField(self.__base)
+            
         print(self.__base)
+    
+    def update(self):
+        for observer in self.__observers:
+            observer.update()
 
 
-s = Simulator(["W", "C", "W", "C", "0", "0", "0", "0"])
+s = Simulator(["W", "C", "W", "C", "0", "0", "0", "0", "0", "0", "0", "A", "0", "0"] + ["0"] * 7 * 5)
+s.update()
