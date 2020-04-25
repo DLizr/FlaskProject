@@ -7,6 +7,7 @@ class Cannon(InteractingBuilding):
     __hp = 10
     __reloadSpeed = 5
     __damage = 5
+    __speed = 0.1
     
     def __init__(self, x: int, y: int):
         self.__lastTarget: tuple = None
@@ -16,6 +17,7 @@ class Cannon(InteractingBuilding):
         
         self.__noTargets = False
         self.__reload = 0
+        self.__hitQueue = []
     
     def getHP(self):
         return self.__hp
@@ -29,6 +31,8 @@ class Cannon(InteractingBuilding):
     def update(self):
         if (self.__noTargets):
             return
+        self.__handleQueue()
+        
         if (self.__lastTarget and self.__field.get(*self.__lastTarget)):
             self.__shoot()
             return
@@ -39,6 +43,10 @@ class Cannon(InteractingBuilding):
             return
         
         self.__shoot()
+        
+        if (self.__reload == 0):  # Just shot
+            return "S:{}:{}:{}:{}".format(str(self.__x), str(self.__y), str(self.__lastTarget[0]), str(self.__lastTarget[1]))
+
     
     def __findTarget(self):
         x, y = self.__x, self.__y
@@ -84,25 +92,51 @@ class Cannon(InteractingBuilding):
     
     def __checkCell(self, x: int, y: int):
         c = self.__field.get(x, y)
+        
         if (c and c.getTeam() == self.DEFENDING):
             self.__lastTarget = (x, y)
             return True
+        
         return False
     
     def __shoot(self):
         if (self.__reloading()):
             return
+        
         target = self.__field.get(*self.__lastTarget)
-        target.dealDamage(self.__damage)
-        if (target.getHP() <= 0):
-            self.__field.remove(*self.__lastTarget)
-    
+        targetX, targetY = self.__lastTarget
+        distance = ((targetX - self.__x) ** 2 + (targetY - self.__y) ** 2) ** 0.5
+        time = distance // self.__speed
+        
+        self.__hitQueue.append([self.__lastTarget, time])
+            
     def __reloading(self):
+        self.__reload += 1
+        
         if (self.__reload == self.__reloadSpeed):
             self.__reload = 0
             return False
-        self.__reload += 1
+        
         return True
+        
+    def __handleQueue(self):
+        for i in range(len(self.__hitQueue)):
+            coords = self.__hitQueue[i][0]
+            self.__hitQueue[i][1] -= 1
+            
+            if (self.__hitQueue[i][1] <= 0):
+                self.__hit(coords)
+                self.__hitQueue.pop(i)
+                break
+    
+    def __hit(self, coords):
+        target = self.__field.get(*coords)
+        target.dealDamage(self.__damage)
+        
+        if (target.getHP() <= 0):
+            self.__field.remove(*self.__lastTarget)
+            if (target.__class__.__name__ == "Core"):
+                self.__field.breakCore()
     
     def getTeam(self):
         return self.ATTACKING

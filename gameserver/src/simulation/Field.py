@@ -4,6 +4,18 @@ class Field:
         self.__base = base
         self.__width = width
         self.__height = height
+        
+        self.__coreCount = 0
+    
+    def setCoreCount(self, coreCount: int):
+        if (self.__coreCount == 0):
+            self.__coreCount = coreCount
+    
+    def noCores(self):
+        return self.__coreCount == 0
+    
+    def breakCore(self):
+        self.__coreCount -= 1
     
     def get(self, x: int, y: int):
         if (0 <= x < self.__width and 0 <= y < self.__height):
