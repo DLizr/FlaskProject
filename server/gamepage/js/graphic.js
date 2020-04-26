@@ -447,8 +447,8 @@ grid = {
     grid: document.getElementById("field"),
 
     hovered: new Cell(),
-    BORDER: 4,
-    TILE_BORDER: 2,
+    border: 4,
+    tileBorder: 2,
 
     draw() {
         
@@ -480,9 +480,11 @@ grid = {
             let cell = this.field[i];
             cell.cell.style.width = `${this.tileWidth}px`;
             cell.cell.style.height = `${this.tileHeight}px`;
+            cell.cell.style.border = `${this.tileBorder}px solid gray`;
         }
         this.grid.style.width = `${this.hTiles * this.borderedWidth}px`;
         this.grid.style.height = `${this.vTiles * this.borderedHeight}px`;
+        this.grid.style.border = `${this.border}px solid black`;
     },
 
     move(dx, dy) {
@@ -494,20 +496,20 @@ grid = {
     },
 
     zoomIn() {
-        this.tileWidth += 40;
-        this.borderedWidth += 40;
-        this.tileHeight += 40;
-        this.borderedHeight += 40;
+        this.tileWidth *= 2;
+        this.borderedWidth = this.borderedWidth * 2 - 4;
+        this.tileHeight *= 2;
+        this.borderedHeight = this.borderedHeight * 2 - 4;
         
         this.resize();
     },
 
     zoomOut() {
-        if (this.tileWidth > 49) {
-            this.tileWidth -= 40;
-            this.borderedWidth -= 40;
-            this.tileHeight -= 40;
-            this.borderedHeight -= 40;
+        if (this.tileWidth > 50) {
+            this.tileWidth /= 2;
+            this.borderedWidth = this.borderedWidth / 2 + 2;
+            this.tileHeight /= 2;
+            this.borderedHeight = this.borderedHeight / 2 + 2;
             
             this.resize();
         }
@@ -519,11 +521,11 @@ grid = {
     },
 
     getAbsoluteX(x) {
-        return this.x + this.borderedWidth * (x + 0.5) + this.BORDER - this.TILE_BORDER;
+        return this.x + this.borderedWidth * (x + 0.5) + this.border - this.tileBorder;
     },
 
     getAbsoluteY(y) {
-        return this.y + this.borderedHeight * (y + 0.5) + this.BORDER - this.TILE_BORDER;
+        return this.y + this.borderedHeight * (y + 0.5) + this.border - this.tileBorder;
     },
 
     onclick(x, y) {
@@ -692,11 +694,16 @@ phase3 = {
         this.prototype.readOnly = true;
         this.prototype.startListening();
 
+        window.addEventListener("wheel", this.onwheel);
+
         currentBuildings = AllBuildings;
 
         grid.field = [];
         while (grid.grid.firstChild) grid.grid.removeChild(grid.grid.lastChild);
         grid.create();
+
+        grid.field[5].setBuilding(2);
+        this.shoot(5, 0, 0, 0), 500;
     },
 
     handleMessage(msg) {
@@ -751,7 +758,9 @@ phase3 = {
         let bullet = document.createElement("div");
 
         let bulletWidth = grid.tileWidth / 4;
-        bullet.style.width = `${bulletWidth}px`
+        let bulletHeight = grid.tileHeight / 4;
+        bullet.style.width = `${bulletWidth}px`;
+        bullet.style.height = `${bulletHeight}px`;
 
         let absoluteXFrom = grid.getAbsoluteX(xFrom) - bulletWidth/2;
         let absoluteYFrom = grid.getAbsoluteY(yFrom) - bulletWidth/2;
@@ -772,7 +781,7 @@ phase3 = {
     },
 
     resize() {
-        
+
     },
 
     update() {
@@ -805,6 +814,38 @@ phase3 = {
         } else {
             setTimeout(() => cell.setBuilding(-1), 120);
         }
+    },
+
+    onwheel(event) {
+        if (event.deltaY == -3) {
+            phase3.bullets.forEach(element => {
+                let cell = element[0];
+                let x = parseFloat(cell.style.left);
+                let y = parseFloat(cell.style.top);
+                cell.style.top = `${grid.y + (y - grid.y) * 2}px`;
+                cell.style.left = `${grid.x + (x - grid.x) * 2}px`;
+                cell.style.width = `${grid.tileWidth / 4}px`;
+                cell.style.height = `${grid.tileHeight / 4}px`;
+                
+                element[1] *= 2;
+                element[2] *= 2;
+            });
+        } else {
+            phase3.bullets.forEach(element => {
+                let cell = element[0];
+                if (parseFloat(cell.style.width) == 12.5) return;
+                let x = parseFloat(cell.style.left);
+                let y = parseFloat(cell.style.top);
+                cell.style.top = `${grid.y + (y - grid.y) / 2}px`;
+                cell.style.left = `${grid.x + (x - grid.x) / 2}px`;
+                cell.style.width = `${grid.tileWidth / 4}px`;
+                cell.style.height = `${grid.tileHeight / 4}px`;
+
+                element[1] /= 2;
+                element[2] /= 2;
+            });
+        }
+        
     }
 }
 
