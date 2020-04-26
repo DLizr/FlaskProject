@@ -174,3 +174,15 @@ div.towerMenu div.menuItem * {
 #phase2 {
     display: none;
 }
+
+
+.cannonBullet {
+    position: absolute;
+    top: 200px;
+    left: 1000px;
+    background-color: #107203;
+    width: 25px;
+    height: 25px;
+    border: 2px solid black;
+    border-radius: 100%;
+}

@@ -445,6 +445,8 @@ grid = {
     grid: document.getElementById("field"),
 
     hovered: new Cell(),
+    BORDER: 4,
+    TILE_BORDER: 2,
 
     draw() {
         
@@ -512,6 +514,14 @@ grid = {
     clear() {
         this.field.clear();
         while (this.grid.firstChild) this.grid.removeChild(this.grid.lastChild);
+    },
+
+    getAbsoluteX(x) {
+        return this.x + this.borderedWidth * (x + 0.5) + this.BORDER - this.TILE_BORDER;
+    },
+
+    getAbsoluteY(y) {
+        return this.y + this.borderedHeight * (y + 0.5) + this.BORDER - this.TILE_BORDER;
     },
 
     onclick(x, y) {
@@ -655,12 +665,12 @@ phase3 = {
     currentIndex: 0,
 
     bullets: [],
+    phaseElement: document.getElementById("phase3"),
 
     startRendering() {
         this.prototype = gameScreen;
 
-        let p = document.getElementById("phase3");
-        this.prototype.menu = p.getElementsByClassName("towerMenu")[0];
+        this.prototype.menu = this.phaseElement.getElementsByClassName("towerMenu")[0];
         this.prototype.readOnly = true;
         this.prototype.startListening();
 
@@ -669,6 +679,9 @@ phase3 = {
         grid.field = [];
         while (grid.grid.firstChild) grid.grid.removeChild(grid.grid.lastChild);
         grid.create();
+        grid.field[22].setBuilding(2);
+
+        phase3.shoot(1, 3, 1, 1);
     },
 
     handleMessage(msg) {
@@ -715,6 +728,22 @@ phase3 = {
             phase3.shoot(xFrom, yFrom, xTo, yTo);
         }
     
+    },
+
+    shoot(xFrom, yFrom, xTo, yTo) {
+        let shooter = grid.field[xFrom + yFrom * 11].building;
+        let bullet = document.createElement("div");
+
+        let bulletWidth = grid.tileWidth / 4;
+        bullet.style.width = `${bulletWidth}px`
+
+        let absoluteXFrom = grid.getAbsoluteX(xFrom) - bulletWidth/2;
+        let absoluteYFrom = grid.getAbsoluteY(yFrom) - bulletWidth/2;
+        bullet.style.left = `${absoluteXFrom}px`;
+        bullet.style.top = `${absoluteYFrom}px`;
+
+        bullet.classList.add(["cannonBullet"]);
+        phase3.phaseElement.appendChild(bullet);
     },
 
     resize() {
