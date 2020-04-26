@@ -444,6 +444,7 @@ grid = {
     borderedWidth: 104,
     borderedHeight: 104,
     field: [],
+    fieldObjects: [],
     grid: document.getElementById("field"),
 
     hovered: new Cell(),
@@ -493,6 +494,13 @@ grid = {
 
         this.grid.style.left = `${this.x}px`;
         this.grid.style.top = `${this.y}px`;
+
+        this.fieldObjects.forEach(obj => {
+            let x = parseFloat(obj.style.left);
+            let y = parseFloat(obj.style.top);
+            obj.style.left = `${x + dx}px`;
+            obj.style.top = `${y + dy}px`;
+        });
     },
 
     zoomIn() {
@@ -702,8 +710,6 @@ phase3 = {
         while (grid.grid.firstChild) grid.grid.removeChild(grid.grid.lastChild);
         grid.create();
 
-        grid.field[5].setBuilding(2);
-        this.shoot(5, 0, 0, 0), 500;
     },
 
     handleMessage(msg) {
@@ -769,6 +775,7 @@ phase3 = {
 
         bullet.classList.add("cannonBullet");
         phase3.phaseElement.appendChild(bullet);
+        grid.fieldObjects.push(bullet);
 
         let time = Math.sqrt((xTo - xFrom) ** 2 + (yTo - yFrom) ** 2) // distance
                    / BulletSpeeds.get(shooter) // time
@@ -797,6 +804,7 @@ phase3 = {
                 this.hitBuilding(bullet, phase3.bullets[i][5]);
                 phase3.bullets.splice(i, 1);
                 this.phaseElement.removeChild(bullet);
+                grid.fieldObjects.splice(grid.fieldObjects.indexOf(bullet), 1);
                 break;
             }
         }
