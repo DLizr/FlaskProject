@@ -380,7 +380,6 @@ phase1 = {
 
 }
 
-
 class Cell {
 
     isLocked = false;
@@ -659,6 +658,11 @@ phase2 = {
     }
 }
 
+BulletSpeeds = new Map([  // In tiles/second.
+    [AllBuildings.CANNON, 0.4],
+]);
+
+
 phase3 = {
 
     gettingBase: false,
@@ -679,9 +683,6 @@ phase3 = {
         grid.field = [];
         while (grid.grid.firstChild) grid.grid.removeChild(grid.grid.lastChild);
         grid.create();
-        grid.field[22].setBuilding(2);
-
-        phase3.shoot(1, 3, 1, 1);
     },
 
     handleMessage(msg) {
@@ -742,8 +743,19 @@ phase3 = {
         bullet.style.left = `${absoluteXFrom}px`;
         bullet.style.top = `${absoluteYFrom}px`;
 
-        bullet.classList.add(["cannonBullet"]);
+        bullet.classList.add("cannonBullet");
         phase3.phaseElement.appendChild(bullet);
+
+        let time = Math.sqrt((xTo - xFrom) ** 2 + (yTo - yFrom) ** 2) // distance
+                   / BulletSpeeds.get(shooter) // time
+                   * 60; // time in frames with 60 fps
+        
+                   console.log(time);
+        
+        let dX = (xTo - xFrom) * grid.borderedWidth / time;
+        let dY = (yTo - yFrom) * grid.borderedWidth / time;
+
+        phase3.bullets.push([bullet, dX, dY, 0, time]);
     },
 
     resize() {
@@ -751,7 +763,20 @@ phase3 = {
     },
 
     update() {
+        for (let i=0; i < phase3.bullets.length; i++) {
+            let bullet = phase3.bullets[i][0];
+            let x = parseFloat(bullet.style.left);
+            let y = parseFloat(bullet.style.top);
+            bullet.style.left = `${x + phase3.bullets[i][1]}px`;
+            bullet.style.top = `${y + phase3.bullets[i][2]}px`;
 
+            phase3.bullets[i][3]++;
+            if (phase3.bullets[i][3] >= phase3.bullets[i][4]) {
+                phase3.bullets.splice(i, 1);
+                this.phaseElement.removeChild(bullet);
+                break;
+            }
+        }
     }
 }
 
