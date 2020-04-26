@@ -197,6 +197,15 @@ AttackBuildings = {
     CANNON: 0
 }
 
+AllBuildings = {
+    _sources: ["./img/core.svg", "./img/wall.svg", "./img/cannon.svg"],
+    _shortcuts: ["0", "C", "W", "A"],
+    EMPTY: -1,
+    CORE: 0,
+    WALL: 1,
+    CANNON: 2
+}
+
 currentBuildings = Buildings;
 
 
@@ -207,6 +216,7 @@ gameScreen = {
     mouseY: 0,
     mouseDown: false,
     mouseMoved: false,
+    readOnly: false,
 
     timer: document.getElementById("timer"),
 
@@ -250,7 +260,7 @@ gameScreen = {
             }
         }
 
-        if (!gameScreen.mouseMoved)
+        if (!gameScreen.mouseMoved && !gameScreen.readOnly)
             grid.onclick(x, y);
         gameScreen.mouseMoved = false;
     },
@@ -576,6 +586,7 @@ phase2 = {
             if ((phase2.currentIndex + 2) % 11 == 0) phase2.currentIndex += 4;
             // Reached the right corner.
 
+            return;
         }
 
         switch (msg) {
@@ -638,8 +649,85 @@ phase2 = {
     }
 }
 
+phase3 = {
 
-var SCREEN = loading;
+    gettingBase: false,
+    currentIndex: 0,
+
+    bullets: [],
+
+    startRendering() {
+        this.prototype = gameScreen;
+
+        let p = document.getElementById("phase3");
+        this.prototype.menu = p.getElementsByClassName("towerMenu")[0];
+        this.prototype.readOnly = true;
+        this.prototype.startListening();
+
+        currentBuildings = AllBuildings;
+
+        grid.field = [];
+        while (grid.grid.firstChild) grid.grid.removeChild(grid.grid.lastChild);
+        grid.create();
+    },
+
+    handleMessage(msg) {
+        if (phase3.gettingBase) {
+            let building = Buildings._shortcuts.indexOf(msg);
+            grid.field[phase3.currentIndex].setBuilding(building - 1);
+            grid.field[phase3.currentIndex].lock()
+            phase3.currentIndex++;
+            
+            if (phase3.currentIndex == 121) {
+                this.onPhaseBeginning();
+            }
+            return;
+        }
+
+        switch (msg) {
+            case "SEND_BASE":
+                serverConnector.postMessage("OK");
+                phase3.gettingBase = true;
+                gameScreen.timer.style.color = "#000000";
+                break;
+            
+            case "TIME:0":
+                gameScreen.timer.innerHTML = "00:00";
+                gameScreen.timer.style.color = "#FF0000";
+                phase3.onTimeEnd();
+        }
+
+        if (msg.startsWith("TIME:")) {
+            let time = parseInt(msg.split(":")[1]);
+            let m = Math.floor(time / 60).toString();
+            let s = time.toString();
+            if (m.length == 1) m = "0" + m;
+            if (s.length == 1) s = "0" + s;
+            gameScreen.timer.innerHTML = `${m}:${s}`;
+        }
+        else if (msg.startsWith("S:")) {
+            let args = msg.split(":");
+            let xFrom = parseInt(args[1]);
+            let yFrom = parseInt(args[2]);
+            let xTo = parseInt(args[3]);
+            let yTo = parseInt(args[4]);
+
+            phase3.shoot(xFrom, yFrom, xTo, yTo);
+        }
+    
+    },
+
+    resize() {
+
+    },
+
+    update() {
+
+    }
+}
+
+
+var SCREEN = phase3;
 SCREEN.startRendering();
 render = function() {
     try {
