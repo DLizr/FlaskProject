@@ -385,6 +385,7 @@ class Cell {
     isLocked = false;
     building = -1;
     preview = -1;
+    hp = 0;
     cell;
 
     constructor(cell) {
@@ -401,6 +402,7 @@ class Cell {
         if (this.isLocked) return;
         try {
             this.cell.removeChild(this.cell.lastChild);
+            this.hp = 0;
         }
         catch (TypeError) {/* No building */}
 
@@ -411,6 +413,7 @@ class Cell {
             this.cell.appendChild(img);
         }
         this.building = building;
+        this.hp = Hitpoints.get(building);
     }
 
     previewBuilding(building) {
@@ -524,18 +527,25 @@ grid = {
     },
 
     onclick(x, y) {
-        x -= this.x;
-        y -= this.y;
-        if (0 < x && x < this.borderedWidth * this.hTiles &&
-            0 < y && y < this.borderedHeight * this.vTiles) {
-                x = Math.floor(x / this.borderedWidth);
-                y = Math.floor(y / this.borderedHeight);
-                let cell = grid.field[y * this.hTiles + x];
-                cell.setBuilding(gameScreen.selected);
-            }
+        let cell = this.getCellByAbsoluteCoords(x, y);
+        if (cell != undefined)
+            cell.setBuilding(gameScreen.selected);
     },
 
     onhover(x, y) {
+        let cell = this.getCellByAbsoluteCoords(x, y);
+        if (cell == undefined) return;
+        if (cell != this.hovered) {
+            this.hovered.previewBuilding(-1);
+            this.hovered.cell.style.opacity = "1";
+            cell.previewBuilding(gameScreen.selected);
+            cell.cell.style.opacity = "0.5";
+            this.hovered = cell;
+        }
+    
+    },
+
+    getCellByAbsoluteCoords(x, y) {
         x -= this.x;
         y -= this.y;
         if (0 < x && x < this.borderedWidth * this.hTiles &&
@@ -543,13 +553,7 @@ grid = {
                 x = Math.floor(x / this.borderedWidth);
                 y = Math.floor(y / this.borderedHeight);
                 let cell = grid.field[y * this.hTiles + x];
-                if (cell != this.hovered) {
-                    this.hovered.previewBuilding(-1);
-                    this.hovered.cell.style.opacity = "1";
-                    cell.previewBuilding(gameScreen.selected);
-                    cell.cell.style.opacity = "0.5";
-                    this.hovered = cell;
-                }
+                return cell;
             }
     }
 }
@@ -659,7 +663,17 @@ phase2 = {
 }
 
 BulletSpeeds = new Map([  // In tiles/second.
-    [AllBuildings.CANNON, 0.4],
+    [AllBuildings.CANNON, 0.8],
+]);
+
+Hitpoints = new Map([
+    [AllBuildings.CORE, 15],
+    [AllBuildings.WALL, 20],
+    [AllBuildings.CANNON, 10]
+]);
+
+Damages = new Map([
+    [AllBuildings.CANNON, 5]
 ]);
 
 
@@ -733,6 +747,7 @@ phase3 = {
 
     shoot(xFrom, yFrom, xTo, yTo) {
         let shooter = grid.field[xFrom + yFrom * 11].building;
+        let damage = Damages.get(shooter);
         let bullet = document.createElement("div");
 
         let bulletWidth = grid.tileWidth / 4;
@@ -750,16 +765,14 @@ phase3 = {
                    / BulletSpeeds.get(shooter) // time
                    * 60; // time in frames with 60 fps
         
-                   console.log(time);
-        
         let dX = (xTo - xFrom) * grid.borderedWidth / time;
         let dY = (yTo - yFrom) * grid.borderedWidth / time;
 
-        phase3.bullets.push([bullet, dX, dY, 0, time]);
+        phase3.bullets.push([bullet, dX, dY, 0 /* Time passed */, time /* Total time */, damage]);
     },
 
     resize() {
-
+        
     },
 
     update() {
@@ -772,10 +785,25 @@ phase3 = {
 
             phase3.bullets[i][3]++;
             if (phase3.bullets[i][3] >= phase3.bullets[i][4]) {
+                this.hitBuilding(bullet, phase3.bullets[i][5]);
                 phase3.bullets.splice(i, 1);
                 this.phaseElement.removeChild(bullet);
                 break;
             }
+        }
+    },
+
+    hitBuilding(bullet, damage) {
+        let x = parseFloat(bullet.style.left);
+        let y = parseFloat(bullet.style.top);
+        let cell = grid.getCellByAbsoluteCoords(x, y);
+
+        cell.hp -= damage;
+        cell.cell.style.opacity = 0.5;
+        if (cell.hp > 0) {
+            setTimeout(() => cell.cell.style.opacity = 1, 120);
+        } else {
+            setTimeout(() => cell.setBuilding(-1), 120);
         }
     }
 }
