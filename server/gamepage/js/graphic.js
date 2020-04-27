@@ -628,6 +628,13 @@ phase2 = {
                 gameScreen.timer.innerHTML = "00:00";
                 gameScreen.timer.style.color = "#FF0000";
                 phase2.onTimeEnd();
+                break;
+            
+            case "PHASE_3":
+                serverConnector.postMessage("OK");
+                document.getElementById("phase2").style.display = "none";
+                SCREEN = phase3;
+                SCREEN.startRendering();
         }
 
         if (msg.startsWith("TIME:")) {
@@ -714,13 +721,13 @@ phase3 = {
 
     handleMessage(msg) {
         if (phase3.gettingBase) {
-            let building = Buildings._shortcuts.indexOf(msg);
+            let building = AllBuildings._shortcuts.indexOf(msg);
             grid.field[phase3.currentIndex].setBuilding(building - 1);
-            grid.field[phase3.currentIndex].lock()
             phase3.currentIndex++;
             
             if (phase3.currentIndex == 121) {
-                this.onPhaseBeginning();
+                this.gettingBase = false;
+                document.getElementById("dataExchange").style.display = "none";
             }
             return;
         }
@@ -729,6 +736,7 @@ phase3 = {
             case "SEND_BASE":
                 serverConnector.postMessage("OK");
                 phase3.gettingBase = true;
+                phase3.currentIndex = 0;
                 gameScreen.timer.style.color = "#000000";
                 break;
             
@@ -820,7 +828,10 @@ phase3 = {
         if (cell.hp > 0) {
             setTimeout(() => cell.cell.style.opacity = 1, 120);
         } else {
-            setTimeout(() => cell.setBuilding(-1), 120);
+            setTimeout(function() {
+                cell.setBuilding(-1);
+                cell.cell.style.opacity = 1;
+            }, 120);
         }
     },
 
@@ -858,7 +869,7 @@ phase3 = {
 }
 
 
-var SCREEN = phase3;
+var SCREEN = loading;
 SCREEN.startRendering();
 render = function() {
     try {
