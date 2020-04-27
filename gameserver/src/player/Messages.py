@@ -63,6 +63,24 @@ class Messages:
         raise PlayerKickedException(player, "No response")
 
     @staticmethod
+    async def startPhase3(player: Player):
+
+        player.clearMessages()
+        await player.sendMessage("PHASE_3")
+
+        for _ in range(5):
+            msg = player.getMessageIfReceived()
+            if msg == "OK":
+                return
+            await player.ping()
+            await asyncio.sleep(1)
+
+        logger.error("{} received a PHASE_3 signal but didn't respond!".format(player.getAddress()))
+        await player.sendMessageSafe("KICKED:NO_RESPONSE")
+        await player.disconnect()
+        raise PlayerKickedException(player, "No response")
+
+    @staticmethod
     async def getBase(player: Player):
 
         player.clearMessages()

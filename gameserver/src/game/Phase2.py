@@ -80,3 +80,9 @@ class Phase2:
         await player.sendMessageSafe("KICKED:NO_RESPONSE")
         await player.disconnect()
         raise PlayerKickedException(player, "No response")
+    
+    def getAttackBase1(self):
+        return self.__attackBase1
+    
+    def getAttackBase2(self):
+        return self.__attackBase2
