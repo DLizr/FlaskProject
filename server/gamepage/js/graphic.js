@@ -197,6 +197,15 @@ AttackBuildings = {
     CANNON: 0
 }
 
+AllBuildings = {
+    _sources: ["./img/core.svg", "./img/wall.svg", "./img/cannon.svg"],
+    _shortcuts: ["0", "C", "W", "A"],
+    EMPTY: -1,
+    CORE: 0,
+    WALL: 1,
+    CANNON: 2
+}
+
 currentBuildings = Buildings;
 
 
@@ -207,6 +216,7 @@ gameScreen = {
     mouseY: 0,
     mouseDown: false,
     mouseMoved: false,
+    readOnly: false,
 
     timer: document.getElementById("timer"),
 
@@ -250,7 +260,7 @@ gameScreen = {
             }
         }
 
-        if (!gameScreen.mouseMoved)
+        if (!gameScreen.mouseMoved && !gameScreen.readOnly)
             grid.onclick(x, y);
         gameScreen.mouseMoved = false;
     },
@@ -335,7 +345,7 @@ phase1 = {
         if (msg.startsWith("TIME:")) {
             let time = parseInt(msg.split(":")[1]);
             let m = Math.floor(time / 60).toString();
-            let s = time.toString()
+            let s = (time % 60).toString()
             if (m.length == 1) m = "0" + m;
             if (s.length == 1) s = "0" + s;
             gameScreen.timer.innerHTML = `${m}:${s}`
@@ -370,12 +380,12 @@ phase1 = {
 
 }
 
-
 class Cell {
 
     isLocked = false;
     building = -1;
     preview = -1;
+    hp = 0;
     cell;
 
     constructor(cell) {
@@ -392,6 +402,7 @@ class Cell {
         if (this.isLocked) return;
         try {
             this.cell.removeChild(this.cell.lastChild);
+            this.hp = 0;
         }
         catch (TypeError) {/* No building */}
 
@@ -402,6 +413,7 @@ class Cell {
             this.cell.appendChild(img);
         }
         this.building = building;
+        this.hp = Hitpoints.get(building);
     }
 
     previewBuilding(building) {
@@ -432,9 +444,12 @@ grid = {
     borderedWidth: 104,
     borderedHeight: 104,
     field: [],
+    fieldObjects: [],
     grid: document.getElementById("field"),
 
     hovered: new Cell(),
+    border: 4,
+    tileBorder: 2,
 
     draw() {
         
@@ -466,9 +481,11 @@ grid = {
             let cell = this.field[i];
             cell.cell.style.width = `${this.tileWidth}px`;
             cell.cell.style.height = `${this.tileHeight}px`;
+            cell.cell.style.border = `${this.tileBorder}px solid gray`;
         }
         this.grid.style.width = `${this.hTiles * this.borderedWidth}px`;
         this.grid.style.height = `${this.vTiles * this.borderedHeight}px`;
+        this.grid.style.border = `${this.border}px solid black`;
     },
 
     move(dx, dy) {
@@ -477,23 +494,30 @@ grid = {
 
         this.grid.style.left = `${this.x}px`;
         this.grid.style.top = `${this.y}px`;
+
+        this.fieldObjects.forEach(obj => {
+            let x = parseFloat(obj.style.left);
+            let y = parseFloat(obj.style.top);
+            obj.style.left = `${x + dx}px`;
+            obj.style.top = `${y + dy}px`;
+        });
     },
 
     zoomIn() {
-        this.tileWidth += 40;
-        this.borderedWidth += 40;
-        this.tileHeight += 40;
-        this.borderedHeight += 40;
+        this.tileWidth *= 2;
+        this.borderedWidth = this.borderedWidth * 2 - 4;
+        this.tileHeight *= 2;
+        this.borderedHeight = this.borderedHeight * 2 - 4;
         
         this.resize();
     },
 
     zoomOut() {
-        if (this.tileWidth > 49) {
-            this.tileWidth -= 40;
-            this.borderedWidth -= 40;
-            this.tileHeight -= 40;
-            this.borderedHeight -= 40;
+        if (this.tileWidth > 50) {
+            this.tileWidth /= 2;
+            this.borderedWidth = this.borderedWidth / 2 + 2;
+            this.tileHeight /= 2;
+            this.borderedHeight = this.borderedHeight / 2 + 2;
             
             this.resize();
         }
@@ -504,19 +528,34 @@ grid = {
         while (this.grid.firstChild) this.grid.removeChild(this.grid.lastChild);
     },
 
+    getAbsoluteX(x) {
+        return this.x + this.borderedWidth * (x + 0.5) + this.border - this.tileBorder;
+    },
+
+    getAbsoluteY(y) {
+        return this.y + this.borderedHeight * (y + 0.5) + this.border - this.tileBorder;
+    },
+
     onclick(x, y) {
-        x -= this.x;
-        y -= this.y;
-        if (0 < x && x < this.borderedWidth * this.hTiles &&
-            0 < y && y < this.borderedHeight * this.vTiles) {
-                x = Math.floor(x / this.borderedWidth);
-                y = Math.floor(y / this.borderedHeight);
-                let cell = grid.field[y * this.hTiles + x];
-                cell.setBuilding(gameScreen.selected);
-            }
+        let cell = this.getCellByAbsoluteCoords(x, y);
+        if (cell != undefined)
+            cell.setBuilding(gameScreen.selected);
     },
 
     onhover(x, y) {
+        let cell = this.getCellByAbsoluteCoords(x, y);
+        if (cell == undefined) return;
+        if (cell != this.hovered) {
+            this.hovered.previewBuilding(-1);
+            this.hovered.cell.style.opacity = "1";
+            cell.previewBuilding(gameScreen.selected);
+            cell.cell.style.opacity = "0.5";
+            this.hovered = cell;
+        }
+    
+    },
+
+    getCellByAbsoluteCoords(x, y) {
         x -= this.x;
         y -= this.y;
         if (0 < x && x < this.borderedWidth * this.hTiles &&
@@ -524,13 +563,7 @@ grid = {
                 x = Math.floor(x / this.borderedWidth);
                 y = Math.floor(y / this.borderedHeight);
                 let cell = grid.field[y * this.hTiles + x];
-                if (cell != this.hovered) {
-                    this.hovered.previewBuilding(-1);
-                    this.hovered.cell.style.opacity = "1";
-                    cell.previewBuilding(gameScreen.selected);
-                    cell.cell.style.opacity = "0.5";
-                    this.hovered = cell;
-                }
+                return cell;
             }
     }
 }
@@ -558,6 +591,7 @@ phase2 = {
         grid.hTiles += 4;
         grid.vTiles += 4;
         grid.create();
+        gameScreen.selected = -1;
     },
 
     handleMessage(msg) {
@@ -576,6 +610,7 @@ phase2 = {
             if ((phase2.currentIndex + 2) % 11 == 0) phase2.currentIndex += 4;
             // Reached the right corner.
 
+            return;
         }
 
         switch (msg) {
@@ -594,12 +629,19 @@ phase2 = {
                 gameScreen.timer.innerHTML = "00:00";
                 gameScreen.timer.style.color = "#FF0000";
                 phase2.onTimeEnd();
+                break;
+            
+            case "PHASE_3":
+                serverConnector.postMessage("OK");
+                document.getElementById("phase2").style.display = "none";
+                SCREEN = phase3;
+                SCREEN.startRendering();
         }
 
         if (msg.startsWith("TIME:")) {
             let time = parseInt(msg.split(":")[1]);
             let m = Math.floor(time / 60).toString();
-            let s = time.toString()
+            let s = (time % 60).toString()
             if (m.length == 1) m = "0" + m;
             if (s.length == 1) s = "0" + s;
             gameScreen.timer.innerHTML = `${m}:${s}`
@@ -635,6 +677,288 @@ phase2 = {
                 serverConnector.postMessage(c);
             }
         });
+    }
+}
+
+BulletSpeeds = new Map([  // In tiles/second.
+    [AllBuildings.CANNON, 0.8],
+]);
+
+Hitpoints = new Map([
+    [AllBuildings.CORE, 15],
+    [AllBuildings.WALL, 20],
+    [AllBuildings.CANNON, 10]
+]);
+
+Damages = new Map([
+    [AllBuildings.CANNON, 5]
+]);
+
+
+phase3 = {
+
+    gettingBase: false,
+    currentIndex: 0,
+    wins: 0,
+    loses: 0,
+
+    bullets: [],
+    phaseElement: document.getElementById("phase3"),
+
+    startRendering() {
+        this.prototype = gameScreen;
+
+        this.prototype.menu = this.phaseElement.getElementsByClassName("towerMenu")[0];
+        this.prototype.readOnly = true;
+        this.prototype.startListening();
+
+        window.addEventListener("wheel", this.onwheel);
+
+        currentBuildings = AllBuildings;
+
+        grid.field = [];
+        while (grid.grid.firstChild) grid.grid.removeChild(grid.grid.lastChild);
+        grid.create();
+        gameScreen.selected = -1;
+    },
+
+    handleMessage(msg) {
+        if (phase3.gettingBase) {
+            let building = AllBuildings._shortcuts.indexOf(msg);
+            grid.field[phase3.currentIndex].setBuilding(building - 1);
+            phase3.currentIndex++;
+            
+            if (phase3.currentIndex == 121) {
+                this.gettingBase = false;
+                document.getElementById("dataExchange").style.display = "none";
+            }
+            return;
+        }
+
+        switch (msg) {
+            case "SEND_BASE":
+                serverConnector.postMessage("OK");
+                phase3.gettingBase = true;
+                phase3.currentIndex = 0;
+                gameScreen.timer.style.color = "#000000";
+                break;
+            
+            case "TIME:0":
+                gameScreen.timer.innerHTML = "00:00";
+                gameScreen.timer.style.color = "#FF0000";
+                phase3.onTimeEnd();
+        }
+
+        if (msg.startsWith("TIME:")) {
+            let time = parseInt(msg.split(":")[1]);
+            let m = Math.floor(time / 60).toString();
+            let s = (time % 60).toString();
+            if (m.length == 1) m = "0" + m;
+            if (s.length == 1) s = "0" + s;
+            gameScreen.timer.innerHTML = `${m}:${s}`;
+        }
+        else if (msg.startsWith("S:")) {
+            let args = msg.split(":");
+            let xFrom = parseInt(args[1]);
+            let yFrom = parseInt(args[2]);
+            let xTo = parseInt(args[3]);
+            let yTo = parseInt(args[4]);
+
+            phase3.shoot(xFrom, yFrom, xTo, yTo);
+        }
+        else if (msg.startsWith("L:")) {
+            let time = parseInt(msg.split(":")[1]);
+            let s = (time % 60).toString();
+            let m = Math.floor(time/60).toString();
+            if (s.length == 1) s = "0" + s;
+            if (m.length == 1) m = "0" + m;
+
+            phase3.loses++;
+            let strTime = `${m}:${s}`;
+            let message = `Счёт: ${phase3.wins}:${phase3.loses} <br/> Время: ${strTime}`;
+            
+            let mos = document.getElementById("messageOnScreen");
+            mos.innerHTML = message;
+            mos.style.display = "block";
+            let game = document.getElementById("game")
+            game.style.opacity = 0.5;
+            phase3.phaseElement.style.opacity = 0.4;
+
+            setTimeout(function() {
+                mos.style.display = "none";
+                phase3.phaseElement.style.opacity = 1;
+                game.style.opacity = 1;
+            } , 4000);
+            
+        }
+        else if (msg.startsWith("W:")) {
+            let time = parseInt(msg.split(":")[1]);
+            let s = (time % 60).toString();
+            let m = Math.floor(time/60).toString();
+            if (s.length == 1) s = "0" + s;
+            if (m.length == 1) m = "0" + m;
+
+            phase3.wins++;
+            let strTime = `${m}:${s}`;
+            let message = `Счёт: ${phase3.wins}:${phase3.loses} <br/> Время: ${strTime}`;
+            
+            let mos = document.getElementById("messageOnScreen");
+            mos.innerHTML = message;
+            mos.style.display = "block";
+            let game = document.getElementById("game")
+            game.style.opacity = 0.4;
+            phase3.phaseElement.style.opacity = 0.4;
+
+            setTimeout(function() {
+                mos.style.display = "none";
+                phase3.phaseElement.style.opacity = 1;
+                game.style.opacity = 1;
+            } , 4000);
+
+            
+        }
+        else if (msg.startsWith("R:")) {
+            let args = msg.split(":");
+
+            let time = parseInt(args[2]);
+            let s = (time % 60).toString();
+            let m = Math.floor(time/60).toString();
+            if (s.length == 1) s = "0" + s;
+            if (m.length == 1) m = "0" + m;
+
+            let defTime = `${m}:${s}`;
+
+            time = parseInt(args[4]);
+            s = (time % 60).toString();
+            m = Math.floor(time/60).toString();
+            if (s.length == 1) s = "0" + s;
+            if (m.length == 1) m = "0" + m;
+
+            let atkTime = `${m}:${s}`;
+
+            let gos = document.getElementById("gameOverScreen");
+            document.getElementById("whiteBackground").style.display = "block";
+            let rounds = document.getElementById("gameStats");
+
+            let message = "Защита: ";
+            message += defTime;
+
+            if (args[1] == "L") {
+                message += " — Поражение";
+            } else message += " — Победа";
+
+            message += "<br/>";
+
+            message += `Атака: ${atkTime}`;
+            if (args[3] == "L") {
+                message += " — Поражение";
+            } else message += " — Победа";
+
+            rounds.innerHTML = message;
+            gos.style.display = "block";
+        }
+    },
+
+    shoot(xFrom, yFrom, xTo, yTo) {
+        let shooter = grid.field[xFrom + yFrom * 11].building;
+        let damage = Damages.get(shooter);
+        let bullet = document.createElement("div");
+
+        let bulletWidth = grid.tileWidth / 4;
+        let bulletHeight = grid.tileHeight / 4;
+        bullet.style.width = `${bulletWidth}px`;
+        bullet.style.height = `${bulletHeight}px`;
+
+        let absoluteXFrom = grid.getAbsoluteX(xFrom) - bulletWidth/2;
+        let absoluteYFrom = grid.getAbsoluteY(yFrom) - bulletWidth/2;
+        bullet.style.left = `${absoluteXFrom}px`;
+        bullet.style.top = `${absoluteYFrom}px`;
+
+        bullet.classList.add("cannonBullet");
+        phase3.phaseElement.appendChild(bullet);
+        grid.fieldObjects.push(bullet);
+
+        let time = Math.sqrt((xTo - xFrom) ** 2 + (yTo - yFrom) ** 2) // distance
+                   / BulletSpeeds.get(shooter) // time
+                   * 60; // time in frames with 60 fps
+        
+        let dX = (xTo - xFrom) * grid.borderedWidth / time;
+        let dY = (yTo - yFrom) * grid.borderedWidth / time;
+
+        phase3.bullets.push([bullet, dX, dY, 0 /* Time passed */, time /* Total time */, damage]);
+    },
+
+    resize() {
+
+    },
+
+    update() {
+        for (let i=0; i < phase3.bullets.length; i++) {
+            let bullet = phase3.bullets[i][0];
+            let x = parseFloat(bullet.style.left);
+            let y = parseFloat(bullet.style.top);
+            bullet.style.left = `${x + phase3.bullets[i][1]}px`;
+            bullet.style.top = `${y + phase3.bullets[i][2]}px`;
+
+            phase3.bullets[i][3]++;
+            if (phase3.bullets[i][3] >= phase3.bullets[i][4]) {
+                this.hitBuilding(bullet, phase3.bullets[i][5]);
+                phase3.bullets.splice(i, 1);
+                this.phaseElement.removeChild(bullet);
+                grid.fieldObjects.splice(grid.fieldObjects.indexOf(bullet), 1);
+                break;
+            }
+        }
+    },
+
+    hitBuilding(bullet, damage) {
+        let x = parseFloat(bullet.style.left);
+        let y = parseFloat(bullet.style.top);
+        let cell = grid.getCellByAbsoluteCoords(x, y);
+        if (cell.building == -1) return;
+
+        cell.hp -= damage;
+        cell.cell.style.opacity = 0.5;
+        if (cell.hp > 0) {
+            setTimeout(() => cell.cell.style.opacity = 1, 120);
+        } else {
+            setTimeout(function() {
+                cell.setBuilding(-1);
+                cell.cell.style.opacity = 1;
+            }, 120);
+        }
+    },
+
+    onwheel(event) {
+        if (event.deltaY == -3) {
+            phase3.bullets.forEach(element => {
+                let cell = element[0];
+                let x = parseFloat(cell.style.left);
+                let y = parseFloat(cell.style.top);
+                cell.style.top = `${grid.y + (y - grid.y) * 2}px`;
+                cell.style.left = `${grid.x + (x - grid.x) * 2}px`;
+                cell.style.width = `${grid.tileWidth / 4}px`;
+                cell.style.height = `${grid.tileHeight / 4}px`;
+                
+                element[1] *= 2;
+                element[2] *= 2;
+            });
+        } else {
+            phase3.bullets.forEach(element => {
+                let cell = element[0];
+                if (parseFloat(cell.style.width) == 12.5) return;
+                let x = parseFloat(cell.style.left);
+                let y = parseFloat(cell.style.top);
+                cell.style.top = `${grid.y + (y - grid.y) / 2}px`;
+                cell.style.left = `${grid.x + (x - grid.x) / 2}px`;
+                cell.style.width = `${grid.tileWidth / 4}px`;
+                cell.style.height = `${grid.tileHeight / 4}px`;
+
+                element[1] /= 2;
+                element[2] /= 2;
+            });
+        }
+        
     }
 }
 
