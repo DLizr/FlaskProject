@@ -591,6 +591,7 @@ phase2 = {
         grid.hTiles += 4;
         grid.vTiles += 4;
         grid.create();
+        gameScreen.selected = -1;
     },
 
     handleMessage(msg) {
@@ -718,7 +719,7 @@ phase3 = {
         grid.field = [];
         while (grid.grid.firstChild) grid.grid.removeChild(grid.grid.lastChild);
         grid.create();
-
+        gameScreen.selected = -1;
     },
 
     handleMessage(msg) {
@@ -773,7 +774,8 @@ phase3 = {
             if (m.length == 1) m = "0" + m;
 
             phase3.loses++;
-            let message = `Счёт: ${phase3.wins}:${phase3.loses} <br/> Время: ${m}:${s}`;
+            let strTime = `${m}:${s}`;
+            let message = `Счёт: ${phase3.wins}:${phase3.loses} <br/> Время: ${strTime}`;
             
             let mos = document.getElementById("messageOnScreen");
             mos.innerHTML = message;
@@ -787,6 +789,7 @@ phase3 = {
                 phase3.phaseElement.style.opacity = 1;
                 game.style.opacity = 1;
             } , 4000);
+            
         }
         else if (msg.startsWith("W:")) {
             let time = parseInt(msg.split(":")[1]);
@@ -796,7 +799,8 @@ phase3 = {
             if (m.length == 1) m = "0" + m;
 
             phase3.wins++;
-            let message = `Счёт: ${phase3.wins}:${phase3.loses} <br/> Время: ${m}:${s}`;
+            let strTime = `${m}:${s}`;
+            let message = `Счёт: ${phase3.wins}:${phase3.loses} <br/> Время: ${strTime}`;
             
             let mos = document.getElementById("messageOnScreen");
             mos.innerHTML = message;
@@ -810,8 +814,49 @@ phase3 = {
                 phase3.phaseElement.style.opacity = 1;
                 game.style.opacity = 1;
             } , 4000);
+
+            
         }
-    
+        else if (msg.startsWith("R:")) {
+            let args = msg.split(":");
+
+            let time = parseInt(args[2]);
+            let s = (time % 60).toString();
+            let m = Math.floor(time/60).toString();
+            if (s.length == 1) s = "0" + s;
+            if (m.length == 1) m = "0" + m;
+
+            let defTime = `${m}:${s}`;
+
+            time = parseInt(args[4]);
+            s = (time % 60).toString();
+            m = Math.floor(time/60).toString();
+            if (s.length == 1) s = "0" + s;
+            if (m.length == 1) m = "0" + m;
+
+            let atkTime = `${m}:${s}`;
+
+            let gos = document.getElementById("gameOverScreen");
+            document.getElementById("whiteBackground").style.display = "block";
+            let rounds = document.getElementById("gameStats");
+
+            let message = "Защита: ";
+            message += defTime;
+
+            if (args[1] == "L") {
+                message += " — Поражение";
+            } else message += " — Победа";
+
+            message += "<br/>";
+
+            message += `Атака: ${atkTime}`;
+            if (args[3] == "L") {
+                message += " — Поражение";
+            } else message += " — Победа";
+
+            rounds.innerHTML = message;
+            gos.style.display = "block";
+        }
     },
 
     shoot(xFrom, yFrom, xTo, yTo) {
@@ -870,6 +915,7 @@ phase3 = {
         let x = parseFloat(bullet.style.left);
         let y = parseFloat(bullet.style.top);
         let cell = grid.getCellByAbsoluteCoords(x, y);
+        if (cell.building == -1) return;
 
         cell.hp -= damage;
         cell.cell.style.opacity = 0.5;
