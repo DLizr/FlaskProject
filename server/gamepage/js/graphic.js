@@ -345,7 +345,7 @@ phase1 = {
         if (msg.startsWith("TIME:")) {
             let time = parseInt(msg.split(":")[1]);
             let m = Math.floor(time / 60).toString();
-            let s = time.toString()
+            let s = (time % 60).toString()
             if (m.length == 1) m = "0" + m;
             if (s.length == 1) s = "0" + s;
             gameScreen.timer.innerHTML = `${m}:${s}`
@@ -640,7 +640,7 @@ phase2 = {
         if (msg.startsWith("TIME:")) {
             let time = parseInt(msg.split(":")[1]);
             let m = Math.floor(time / 60).toString();
-            let s = time.toString()
+            let s = (time % 60).toString()
             if (m.length == 1) m = "0" + m;
             if (s.length == 1) s = "0" + s;
             gameScreen.timer.innerHTML = `${m}:${s}`
@@ -698,6 +698,8 @@ phase3 = {
 
     gettingBase: false,
     currentIndex: 0,
+    wins: 0,
+    loses: 0,
 
     bullets: [],
     phaseElement: document.getElementById("phase3"),
@@ -749,7 +751,7 @@ phase3 = {
         if (msg.startsWith("TIME:")) {
             let time = parseInt(msg.split(":")[1]);
             let m = Math.floor(time / 60).toString();
-            let s = time.toString();
+            let s = (time % 60).toString();
             if (m.length == 1) m = "0" + m;
             if (s.length == 1) s = "0" + s;
             gameScreen.timer.innerHTML = `${m}:${s}`;
@@ -762,6 +764,52 @@ phase3 = {
             let yTo = parseInt(args[4]);
 
             phase3.shoot(xFrom, yFrom, xTo, yTo);
+        }
+        else if (msg.startsWith("L:")) {
+            let time = parseInt(msg.split(":")[1]);
+            let s = (time % 60).toString();
+            let m = Math.floor(time/60).toString();
+            if (s.length == 1) s = "0" + s;
+            if (m.length == 1) m = "0" + m;
+
+            phase3.loses++;
+            let message = `Счёт: ${phase3.wins}:${phase3.loses} <br/> Время: ${m}:${s}`;
+            
+            let mos = document.getElementById("messageOnScreen");
+            mos.innerHTML = message;
+            mos.style.display = "block";
+            let game = document.getElementById("game")
+            game.style.opacity = 0.5;
+            phase3.phaseElement.style.opacity = 0.4;
+
+            setTimeout(function() {
+                mos.style.display = "none";
+                phase3.phaseElement.style.opacity = 1;
+                game.style.opacity = 1;
+            } , 4000);
+        }
+        else if (msg.startsWith("W:")) {
+            let time = parseInt(msg.split(":")[1]);
+            let s = (time % 60).toString();
+            let m = Math.floor(time/60).toString();
+            if (s.length == 1) s = "0" + s;
+            if (m.length == 1) m = "0" + m;
+
+            phase3.wins++;
+            let message = `Счёт: ${phase3.wins}:${phase3.loses} <br/> Время: ${m}:${s}`;
+            
+            let mos = document.getElementById("messageOnScreen");
+            mos.innerHTML = message;
+            mos.style.display = "block";
+            let game = document.getElementById("game")
+            game.style.opacity = 0.4;
+            phase3.phaseElement.style.opacity = 0.4;
+
+            setTimeout(function() {
+                mos.style.display = "none";
+                phase3.phaseElement.style.opacity = 1;
+                game.style.opacity = 1;
+            } , 4000);
         }
     
     },
