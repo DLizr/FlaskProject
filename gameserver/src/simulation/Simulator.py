@@ -17,6 +17,7 @@ class Simulator:
         
         self.__observers = set()
         self.__time = 0
+        self.__winner = 0
         
         self.__parseBase(base)
     
@@ -52,15 +53,19 @@ class Simulator:
             if (self.__base.noCores()):
                 if (self.__player == 1):
                     await self.__gameOver(player2, player1)
+                    self.__winner = 2
                 else:
                     await self.__gameOver(player1, player2)
+                    self.__winner = 1
                 break
             
             if (self.__noObservers()):
                 if (self.__player == 1):
                     await self.__gameOver(player1, player2)
+                    self.__winner = 1
                 else:
                     await self.__gameOver(player2, player1)
+                    self.__winner = 2
                 break
             
             await asyncio.sleep(0.25)
@@ -86,4 +91,7 @@ class Simulator:
         await winner.sendMessage("W:{}".format(str(self.__time // 4)))
     
     def getTime(self):
-        return self.__time
+        return self.__time // 4
+    
+    def getWinner(self):
+        return self.__winner

@@ -34,7 +34,30 @@ class Phase3:
         await asyncio.sleep(5)
         
         t1 = s1.getTime()
-        t2 = s2.getTime()  # TODO
+        t2 = s2.getTime()
+        
+        msg1 = "R:"
+        msg2 = "R:"
+        
+        if (s1.getWinner() == 1):
+            msg1 += "W:{}:".format(t1)
+        else:
+            msg1 += "L:{}:".format(t1)
+        
+        if (s2.getWinner() == 2):
+            msg2 += "W:{}:".format(t2)
+            msg1 += "L:{}".format(t2)
+        else:
+            msg2 += "L:{}:".format(t2)
+            msg1 += "W:{}".format(t2)
+
+        if (s1.getWinner() == 2):
+            msg2 += "W:{}".format(t1)
+        else:
+            msg2 += "L:{}".format(t1)
+        
+        await self.__player1.sendMessage(msg1)
+        await self.__player2.sendMessage(msg2)
     
     async def __sendBase(self, base):
         await Messages.sendBase(self.__player1)

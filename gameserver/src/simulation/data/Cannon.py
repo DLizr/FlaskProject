@@ -1,3 +1,5 @@
+import random
+
 from src.simulation.data._InteractingBuilding import InteractingBuilding
 from src.simulation.Field import Field
 
@@ -16,7 +18,7 @@ class Cannon(InteractingBuilding):
         self.__field = None
         
         self.__noTargets = False
-        self.__reload = 0
+        self.__reload = random.randint(0, 4)
         self.__hitQueue = []
     
     def getHP(self):
