@@ -82,8 +82,8 @@ class Simulator:
         return True
     
     async def __gameOver(self, winner: Player, loser: Player):
-        await loser.sendMessage("L:{}".format(self.__time // 4))
-        await winner.sendMessage("W:{}".format(self.__time // 4))
+        await loser.sendMessage("L:{}".format(str(self.__time // 4)))
+        await winner.sendMessage("W:{}".format(str(self.__time // 4)))
     
     def getTime(self):
         return self.__time

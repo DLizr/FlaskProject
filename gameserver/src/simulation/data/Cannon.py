@@ -7,7 +7,7 @@ class Cannon(InteractingBuilding):
     __hp = 10
     __reloadSpeed = 5
     __damage = 5
-    __speed = 0.8
+    __speed = 0.2
     
     def __init__(self, x: int, y: int):
         self.__lastTarget: tuple = None
@@ -29,9 +29,9 @@ class Cannon(InteractingBuilding):
         self.__field = field
     
     def update(self):
+        self.__handleQueue()
         if (self.__noTargets):
             return
-        self.__handleQueue()
         
         if (not (self.__lastTarget and self.__field.get(*self.__lastTarget))):
             self.__findTarget()
@@ -137,7 +137,7 @@ class Cannon(InteractingBuilding):
                 self.__field.breakCore()
     
     def hasTarget(self):
-        return not self.__noTargets
+        return not self.__noTargets or self.__hitQueue
     
     def getTeam(self):
         return self.ATTACKING
