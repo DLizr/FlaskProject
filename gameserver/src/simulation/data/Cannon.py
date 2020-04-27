@@ -7,7 +7,7 @@ class Cannon(InteractingBuilding):
     __hp = 10
     __reloadSpeed = 5
     __damage = 5
-    __speed = 0.1
+    __speed = 0.8
     
     def __init__(self, x: int, y: int):
         self.__lastTarget: tuple = None
@@ -33,14 +33,11 @@ class Cannon(InteractingBuilding):
             return
         self.__handleQueue()
         
-        if (self.__lastTarget and self.__field.get(*self.__lastTarget)):
-            self.__shoot()
-            return
-        
-        self.__findTarget()
-        if (not self.__lastTarget or not self.__field.get(*self.__lastTarget)):
-            self.__noTargets = True
-            return
+        if (not (self.__lastTarget and self.__field.get(*self.__lastTarget))):
+            self.__findTarget()
+            if (not self.__lastTarget or not self.__field.get(*self.__lastTarget)):
+                self.__noTargets = True
+                return
         
         self.__shoot()
         
@@ -59,7 +56,7 @@ class Cannon(InteractingBuilding):
                     return
                 if (self.__checkCell(x - i2, y + i2 - i)):
                     return
-                if (self.__checkCell(x + i2, x + i - i2)):
+                if (self.__checkCell(x + i2, y + i - i2)):
                     return
                 
             for i2 in range(i//2 + 1, i):
@@ -69,7 +66,7 @@ class Cannon(InteractingBuilding):
                     return
                 if (self.__checkCell(x + i2, y + i2 - i)):
                     return
-                if (self.__checkCell(x - i2, x + i - i2)):
+                if (self.__checkCell(x - i2, y + i - i2)):
                     return
                 
                 if (self.__checkCell(x + i2 - i, y + i2)):
@@ -78,16 +75,16 @@ class Cannon(InteractingBuilding):
                     return
                 if (self.__checkCell(x - i2, y + i2 - i)):
                     return
-                if (self.__checkCell(x + i2, x + i - i2)):
+                if (self.__checkCell(x + i2, y + i - i2)):
                     return
                 
-            if (self.__checkCell(x, 0)):
+            if (self.__checkCell(x - i, y)):
                 return
-            if (self.__checkCell(-x, 0)):
+            if (self.__checkCell(x + i, y)):
                 return
-            if (self.__checkCell(0, -y)):
+            if (self.__checkCell(x, y - i)):
                 return
-            if (self.__checkCell(0, y)):
+            if (self.__checkCell(x, y + i)):
                 return
     
     def __checkCell(self, x: int, y: int):
@@ -103,7 +100,6 @@ class Cannon(InteractingBuilding):
         if (self.__reloading()):
             return
         
-        target = self.__field.get(*self.__lastTarget)
         targetX, targetY = self.__lastTarget
         distance = ((targetX - self.__x) ** 2 + (targetY - self.__y) ** 2) ** 0.5
         time = distance // self.__speed
@@ -131,12 +127,17 @@ class Cannon(InteractingBuilding):
     
     def __hit(self, coords):
         target = self.__field.get(*coords)
+        if (not target):
+            return
         target.dealDamage(self.__damage)
         
         if (target.getHP() <= 0):
             self.__field.remove(*self.__lastTarget)
             if (target.__class__.__name__ == "Core"):
                 self.__field.breakCore()
+    
+    def hasTarget(self):
+        return not self.__noTargets
     
     def getTeam(self):
         return self.ATTACKING

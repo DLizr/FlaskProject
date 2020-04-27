@@ -50,10 +50,17 @@ class Simulator:
                 await player2.sendMessage(msg)
             
             if (self.__base.noCores()):
-                winner = abs(self.__player - 3)
-                s = self.__time // 4
-                await player1.sendMessage("W:{}:{}".format(str(winner), str(s)))
-                await player2.sendMessage("W:{}:{}".format(str(winner), str(s)))
+                if (self.__player == 1):
+                    await self.__gameOver(player2, player1)
+                else:
+                    await self.__gameOver(player1, player2)
+                break
+            
+            if (self.__noObservers()):
+                if (self.__player == 1):
+                    await self.__gameOver(player1, player2)
+                else:
+                    await self.__gameOver(player2, player1)
                 break
             
             await asyncio.sleep(0.25)
@@ -67,6 +74,16 @@ class Simulator:
             if msg:
                 messages.add(msg)
         return messages
+    
+    def __noObservers(self):
+        for observer in self.__observers:
+            if (observer.hasTarget()):
+                return False
+        return True
+    
+    async def __gameOver(self, winner: Player, loser: Player):
+        await loser.sendMessage("L:{}".format(self.__time // 4))
+        await winner.sendMessage("W:{}".format(self.__time // 4))
     
     def getTime(self):
         return self.__time
