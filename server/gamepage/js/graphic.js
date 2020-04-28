@@ -183,11 +183,12 @@ loading = {
 
 
 Buildings = {
-    _sources: ["./img/core.svg", "./img/wall.svg"],
-    _shortcuts: ["0", "C", "W"],
+    _sources: ["./img/core.svg", "./img/wall.svg", "./img/mortar.svg"],
+    _shortcuts: ["0", "C", "W", "M"],
     EMPTY: -1,
     CORE: 0,
-    WALL: 1
+    WALL: 1,
+    MORTAR: 2
 }
 
 AttackBuildings = {
@@ -198,12 +199,13 @@ AttackBuildings = {
 }
 
 AllBuildings = {
-    _sources: ["./img/core.svg", "./img/wall.svg", "./img/cannon.svg"],
-    _shortcuts: ["0", "C", "W", "A"],
+    _sources: ["./img/core.svg", "./img/wall.svg", "./img/mortar.svg", "./img/cannon.svg"],
+    _shortcuts: ["0", "C", "W", "M", "A"],
     EMPTY: -1,
     CORE: 0,
     WALL: 1,
-    CANNON: 2
+    MORTAR: 2,
+    CANNON: 3,
 }
 
 currentBuildings = Buildings;
@@ -222,7 +224,8 @@ gameScreen = {
 
     tooltips: [
         document.getElementById("phase1wallTooltip"),
-        document.getElementById("phase1coreTooltip")
+        document.getElementById("phase1coreTooltip"),
+        document.getElementById("phase1mortarTooltip")
     ],
 
     startListening() {
@@ -682,16 +685,19 @@ phase2 = {
 
 BulletSpeeds = new Map([  // In tiles/second.
     [AllBuildings.CANNON, 0.8],
+    [AllBuildings.MORTAR, 0.5]
 ]);
 
 Hitpoints = new Map([
     [AllBuildings.CORE, 15],
     [AllBuildings.WALL, 20],
+    [AllBuildings.MORTAR, 15],
     [AllBuildings.CANNON, 10]
 ]);
 
 Damages = new Map([
-    [AllBuildings.CANNON, 5]
+    [AllBuildings.CANNON, 5],
+    [AllBuildings.MORTAR, 10]
 ]);
 
 
@@ -740,6 +746,9 @@ phase3 = {
                 serverConnector.postMessage("OK");
                 phase3.gettingBase = true;
                 phase3.currentIndex = 0;
+                while (phase3.bullets.length > 0) {
+                    phase3.phaseElement.removeChild(phase3.bullets.pop()[0]);
+                }
                 gameScreen.timer.style.color = "#000000";
                 break;
             
@@ -861,6 +870,7 @@ phase3 = {
 
     shoot(xFrom, yFrom, xTo, yTo) {
         let shooter = grid.field[xFrom + yFrom * 11].building;
+        if (shooter == -1) return;
         let damage = Damages.get(shooter);
         let bullet = document.createElement("div");
 
