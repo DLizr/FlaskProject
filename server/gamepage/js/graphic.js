@@ -759,6 +759,7 @@ phase3 = {
         while (grid.grid.firstChild) grid.grid.removeChild(grid.grid.lastChild);
         grid.create();
         gameScreen.selected = -1;
+        gameScreen.timer.style.display = "none";
     },
 
     handleMessage(msg) {
@@ -784,22 +785,8 @@ phase3 = {
                 }
                 gameScreen.timer.style.color = "#000000";
                 break;
-            
-            case "TIME:0":
-                gameScreen.timer.innerHTML = "00:00";
-                gameScreen.timer.style.color = "#FF0000";
-                phase3.onTimeEnd();
         }
-
-        if (msg.startsWith("TIME:")) {
-            let time = parseInt(msg.split(":")[1]);
-            let m = Math.floor(time / 60).toString();
-            let s = (time % 60).toString();
-            if (m.length == 1) m = "0" + m;
-            if (s.length == 1) s = "0" + s;
-            gameScreen.timer.innerHTML = `${m}:${s}`;
-        }
-        else if (msg.startsWith("S:")) {
+        if (msg.startsWith("S:")) {
             let args = msg.split(":");
             let xFrom = parseInt(args[1]);
             let yFrom = parseInt(args[2]);
