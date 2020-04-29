@@ -4,12 +4,12 @@ from src.simulation.data._InteractingBuilding import InteractingBuilding
 from src.simulation.Field import Field
 
 
-class Cannon(InteractingBuilding):
+class Mortar(InteractingBuilding):
     
     __hp = 10
-    __reloadSpeed = 5
-    __damage = 5
-    __speed = 0.2
+    __reloadSpeed = 8
+    __damage = 15
+    __speed = 0.125
     
     def __init__(self, x: int, y: int):
         self.__lastTarget: tuple = None
@@ -18,7 +18,7 @@ class Cannon(InteractingBuilding):
         self.__field = None
         
         self.__noTargets = False
-        self.__reload = random.randint(0, 4)
+        self.__reload = random.randint(0, 7)
         self.__hitQueue = []
     
     def getHP(self):
@@ -51,7 +51,7 @@ class Cannon(InteractingBuilding):
     
     def __findTarget(self):
         x, y = self.__x, self.__y
-        for i in range(1, 6):  # Breadth-first search optimized for finding the closest target first, holy boilerplate.
+        for i in range(1, 9):  # Breadth-first search optimized for finding the closest target first, holy boilerplate.
             if (i % 2 == 0):
                 i2 = i // 2
                 if (self.__checkCell(x + i2 - i, y + i2)):
@@ -94,7 +94,7 @@ class Cannon(InteractingBuilding):
     def __checkCell(self, x: int, y: int):
         c = self.__field.get(x, y)
         
-        if (c and c.getTeam() == self.DEFENDING):
+        if (c and c.getTeam() == self.ATTACKING):
             self.__lastTarget = (x, y)
             return True
         
@@ -144,4 +144,4 @@ class Cannon(InteractingBuilding):
         return not self.__noTargets or self.__hitQueue
     
     def getTeam(self):
-        return self.ATTACKING
+        return self.DEFENDING
