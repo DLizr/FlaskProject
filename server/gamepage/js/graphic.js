@@ -192,20 +192,22 @@ Buildings = {
 }
 
 AttackBuildings = {
-    _sources: ["./img/cannon.svg"],
-    _shortcuts: ["0", "A"],
+    _sources: ["./img/cannon.svg", "./img/crossbow.svg"],
+    _shortcuts: ["0", "A", "R"],
     EMPTY: -1,
-    CANNON: 0
+    CANNON: 0,
+    CROSSBOW: 1
 }
 
 AllBuildings = {
-    _sources: ["./img/core.svg", "./img/wall.svg", "./img/mortar.svg", "./img/cannon.svg"],
-    _shortcuts: ["0", "C", "W", "M", "A"],
+    _sources: ["./img/core.svg", "./img/wall.svg", "./img/mortar.svg", "./img/cannon.svg", "./img/crossbow.svg"],
+    _shortcuts: ["0", "C", "W", "M", "A", "R"],
     EMPTY: -1,
     CORE: 0,
     WALL: 1,
     MORTAR: 2,
     CANNON: 3,
+    CROSSBOW: 4
 }
 
 currentBuildings = Buildings;
@@ -526,6 +528,26 @@ grid = {
         }
     },
 
+    setBuilding(n, building) {
+        let cell = this.field[n];
+        if (cell == undefined) return;
+
+        cell.setBuilding(building);
+        if (currentBuildings._shortcuts[building + 1] == "R") {
+            if (n % this.hTiles < 2) cell.cell.firstChild.style.transform = "rotate(270deg)";
+            else if (n % this.hTiles > 8) cell.cell.firstChild.style.transform = "rotate(90deg)";
+            else if (n / this.vTiles > 8) cell.cell.firstChild.style.transform = "rotate(180deg)";
+        }
+    },
+
+    setBuildingByAbsolute(x, y, building) {
+        let rX = this.getRelativeX(x);
+        let rY = this.getRelativeY(y);
+
+        let n = rY * this.hTiles + rX;
+        this.setBuilding(n, building);
+    },
+
     clear() {
         this.field.clear();
         while (this.grid.firstChild) this.grid.removeChild(this.grid.lastChild);
@@ -539,10 +561,17 @@ grid = {
         return this.y + this.borderedHeight * (y + 0.5) + this.border - this.tileBorder;
     },
 
+    getRelativeX(x) {
+        return Math.floor((x - this.x - this.border) / this.borderedWidth);
+    },
+
+    getRelativeY(y) {
+        return Math.floor((y - this.y - this.border) / this.borderedHeight);
+    },
+
     onclick(x, y) {
-        let cell = this.getCellByAbsoluteCoords(x, y);
-        if (cell != undefined)
-            cell.setBuilding(gameScreen.selected);
+        this.setBuildingByAbsolute(x, y, gameScreen.selected);
+            
     },
 
     onhover(x, y) {
@@ -578,7 +607,8 @@ phase2 = {
     currentIndex: 24,
 
     tooltips: [
-        document.getElementById("phase2cannonTooltip")
+        document.getElementById("phase2cannonTooltip"),
+        document.getElementById("phase2crossbowTooltip")
     ],
 
     startRendering() {
@@ -685,19 +715,22 @@ phase2 = {
 
 BulletSpeeds = new Map([  // In tiles/second.
     [AllBuildings.CANNON, 0.8],
-    [AllBuildings.MORTAR, 0.5]
+    [AllBuildings.MORTAR, 0.5],
+    [AllBuildings.CROSSBOW, 1.6]
 ]);
 
 Hitpoints = new Map([
     [AllBuildings.CORE, 15],
     [AllBuildings.WALL, 20],
     [AllBuildings.MORTAR, 15],
-    [AllBuildings.CANNON, 10]
+    [AllBuildings.CANNON, 10],
+    [AllBuildings.CROSSBOW, 10]
 ]);
 
 Damages = new Map([
     [AllBuildings.CANNON, 5],
-    [AllBuildings.MORTAR, 10]
+    [AllBuildings.MORTAR, 10],
+    [AllBuildings.CROSSBOW, 2]
 ]);
 
 
@@ -731,7 +764,7 @@ phase3 = {
     handleMessage(msg) {
         if (phase3.gettingBase) {
             let building = AllBuildings._shortcuts.indexOf(msg);
-            grid.field[phase3.currentIndex].setBuilding(building - 1);
+            grid.setBuilding(phase3.currentIndex, building-1);
             phase3.currentIndex++;
             
             if (phase3.currentIndex == 121) {
@@ -871,6 +904,10 @@ phase3 = {
     shoot(xFrom, yFrom, xTo, yTo) {
         let shooter = grid.field[xFrom + yFrom * 11].building;
         if (shooter == -1) return;
+
+        let target = grid.field[xTo + yTo * 11].building
+        if (target == -1) return;
+
         let damage = Damages.get(shooter);
         let bullet = document.createElement("div");
 
@@ -904,6 +941,8 @@ phase3 = {
 
     update() {
         for (let i=0; i < phase3.bullets.length; i++) {
+            let element = phase3.bullets[i];
+            if (element == undefined) break; // 
             let bullet = phase3.bullets[i][0];
             let x = parseFloat(bullet.style.left);
             let y = parseFloat(bullet.style.top);
@@ -916,7 +955,7 @@ phase3 = {
                 phase3.bullets.splice(i, 1);
                 this.phaseElement.removeChild(bullet);
                 grid.fieldObjects.splice(grid.fieldObjects.indexOf(bullet), 1);
-                break;
+                i--;
             }
         }
     },

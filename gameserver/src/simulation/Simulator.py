@@ -8,6 +8,7 @@ from src.simulation.data.Wall import Wall
 from src.simulation.data.Core import Core
 from src.simulation.data.Cannon import Cannon
 from src.simulation.data.Mortar import Mortar
+from src.simulation.data.Crossbow import Crossbow
 
 
 class Simulator:
@@ -41,6 +42,10 @@ class Simulator:
                 m = Mortar(i % 11, i // 11)
                 field.append(m)
                 self.__observers.append(m)
+            elif (cell == "R"):
+                c = Crossbow(i % 11, i // 11)
+                field.append(c)
+                self.__observers.append(c)
         
         self.__base = Field(field, 11, 11)
         self.__base.setCoreCount(cores)
