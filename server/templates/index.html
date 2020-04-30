@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body class="H">
+    {% extends "base.html" %}
+
+    {% block content %}
+    <h1>Новости последних обновлений</h1>
+    {% for item in news%}
+    <br></br>
+    <div class="news">
+        <h2>{{item.title}}</h2>
+        <div>
+            {{item.content}}
+        </div>
+        <div>
+            Автор - {{item.user.name}}, Дата написания - {{item.created_date}}
+        </div>
+        {% if current_user.is_authenticated and current_user == item.user %}
+    <div>
+        <a href="/news/{{ item.id }}" class="btn-secondary">Изменить</a>
+        <a href="/news_delete/{{ item.id }}" class="btn-primary">Удалить</a>
+    </div>
+
+    {% endif %}
+    </div>
+    {% endfor %}
+    <br></br>
+    {% endblock %}
+</body>
+</html>
+

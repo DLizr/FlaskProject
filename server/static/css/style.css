@@ -1,0 +1,208 @@
+@font-face {
+    font-family: "Russo";
+    src: url("../fonts/RussoOne-Regular.ttf");
+}
+@font-face {
+    font-family: "Neucha";
+    src: url("../fonts/Neucha-Regular.ttf")
+}
+@font-face {
+    font-family: "Play";
+    src: url("../fonts/Play-Regular.ttf")
+}
+body {
+    background-color: #f5f5f5;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-width: 1024px;
+    max-width: 1920px;
+}
+
+.F {
+    font-size: 2vw;
+    color: #f5f4ed;
+    background-color: #40514e;
+    width: 25vw;
+    opacity: 70%;
+    padding-left: 1%;
+    padding-right: 83%;
+    text-decoration: none;
+    font-family: "Neucha";
+}
+
+#leftContent {
+    background-color: #2f89fc;
+    font-size: 1vw;
+    width: 50vw;
+    height: 100%;
+    margin-left: 20vh;
+    font-family: "Russo";
+    text-decoration: none;
+}
+
+.rightContent {
+    background-color: #30e3ca;
+    width: 20vw;
+    font-size: 1vw;
+    justify-content: flex-end;
+    height: 100%;
+    text-decoration: none;
+    text-align: center;
+}
+
+#RegisterLogin {
+    transition: 2s all;
+    width: 25;
+    text-decoration: none;
+    background-color: #40514e;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    justify-content: flex-end;
+    font-size: 2hw;
+    text-decoration: none;
+    font-family: "Play";
+}
+
+.playButton {
+    margin-left: 42vh;
+    transform: scale(0.3);
+    transition: 2s all;
+    text-decoration: none;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border: 2px solid black;
+    border-radius: 17px;
+    font-size: 2vw;
+    background-color: #ccf;
+    color: red;
+    color: #595cff;
+    width: 30vw;
+    opacity: 70%;
+    font-family: "Russo";
+}
+
+.non-playButton {
+    margin-left: 42vh;
+    transform: scale(0.3);
+    transition: 2s all;
+    text-decoration: none;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border: 2px solid black;
+    border-radius: 17px;
+    font-size: 1vw;
+    background-color: #ccf;
+    color: red;
+    color: #595cff;
+    width: 30vw;
+    opacity: 70%;
+    font-family: "Russo";
+}
+.non-playButton:hover {
+    transform: rotate(45deg);
+    background-color: #AD0000;
+    color: red;
+}
+.playButton:hover {
+    transform: rotate(45deg);
+    background-color: #f5f4ed;
+    color: #595cff;
+}
+
+.btn-secondary {
+    color: blue;
+}
+
+.news {
+    padding-left: 5%;
+    padding-right: 5%;
+    padding-top: 5%;
+    padding-bottom: 5%;
+    border: 1px solid black;
+}
+
+.btn-secondary {
+    background-color: #2f89fc;
+    border: 2px solid black;
+    border-radius: 17px;
+    text-decoration: none;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+.btn-success {
+    background-color: red;
+    border: 2px solid black;
+    border-radius: 17px;
+    text-decoration: none;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+.btn-primary {
+    background-color: green;
+    border: 2px solid black;
+    border-radius: 17px;
+    text-decoration: none;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.body {
+    background-image: url(static/images/death.jpg);
+}
+
+table {
+  font-size: 14px;
+  max-width: 70%;
+  width: 70%;
+  text-align: center;
+  margin-left: 15%;
+  border-collapse: collapse;
+  border-top: 7px solid #9baff1;
+  border-bottom: 7px solid #9baff1;
+}
+th {
+  font-size: 13px;
+  font-weight: normal;
+  background: #e8edff;
+  border-right: 1px solid #9baff1;
+  border-left: 1px solid #9baff1;
+  border-bottom: 2px dashed #9baff1;
+  color: #039;
+  padding: 8px;
+}
+td {
+  background: #e8edff;
+  border-right: 1px solid #aabcfe;
+  border-left: 1px solid #aabcfe;
+  color: #669;
+  padding: 8px;
+}
+
+.H {
+    font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+}
+
+#nick {
+    border: 2px solid black;
+    background-color: #80cae0;
+    text-decoration: none;
+    color: black;
+    font-size: 3wh;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
