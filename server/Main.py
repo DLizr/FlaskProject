@@ -13,29 +13,25 @@ from data.news import News
 
 from data.users import User
 import sqlite3
-global users
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandex_secret_key'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
 login_manager = LoginManager()
 login_manager.init_app(app)
-con = sqlite3.connect("db/blogs.sqlite")
-cur = con.cursor()
-users = sorted(cur.execute("""SELECT * FROM users""").fetchall(), key=lambda x: x[-1])
+if not os.path.exists("db/blogs.sqlite"):
+    os.mkdir("db")
+    with open("db/blogs.sqlite", mode='w'):
+        pass
 
 def main():
+    global users
     db_session.global_init("db/blogs.sqlite")
     app.register_blueprint(news_api.blueprint)
     session = db_session.create_session()
-    # news = News(title='Первая новость', content='Privet!', user_id=1, is_private=False)
-    # session.add(news)
-    # user = session.query(User).filter(User.id == 1).first()
-    # news = News(title='Первый сиквел-новости', content='Снова привет!', user=user, is_private=False)
-    # session.add(news)
-    # news = News(title='Top secret', content='Summer is coming!', is_private=True)
-    # user.news.append(news)
-    # session.commit()
+    con = sqlite3.connect("db/blogs.sqlite")
+    cur = con.cursor()
+    users = sorted(cur.execute("""SELECT * FROM users""").fetchall(), key=lambda x: x[-1])
     app.run()
 
 
