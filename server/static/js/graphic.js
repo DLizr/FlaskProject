@@ -5,7 +5,7 @@ var c = canvas.getContext("2d");
 c.font = (window.innerWidth + window.innerHeight) / 60 + "pt Neucha"
 
 
-var serverConnector = new Worker("js/serverConnector.js");
+var serverConnector = new Worker("/static/js/serverConnector.js");
 serverConnector.postMessage("CONNECT");
 serverConnector.onmessage = (e) => SCREEN.handleMessage(e.data);
 
@@ -183,7 +183,7 @@ loading = {
 
 
 Buildings = {
-    _sources: ["./img/core.svg", "./img/wall.svg", "./img/mortar.svg"],
+    _sources: ["/static/svg/core.svg", "/static/svg/wall.svg", "/static/svg/mortar.svg"],
     _shortcuts: ["0", "C", "W", "M"],
     EMPTY: -1,
     CORE: 0,
@@ -192,7 +192,7 @@ Buildings = {
 }
 
 AttackBuildings = {
-    _sources: ["./img/cannon.svg", "./img/crossbow.svg"],
+    _sources: ["/static/svg/cannon.svg", "/static/svg/crossbow.svg"],
     _shortcuts: ["0", "A", "R"],
     EMPTY: -1,
     CANNON: 0,
@@ -200,7 +200,7 @@ AttackBuildings = {
 }
 
 AllBuildings = {
-    _sources: ["./img/core.svg", "./img/wall.svg", "./img/mortar.svg", "./img/cannon.svg", "./img/crossbow.svg"],
+    _sources: ["/static/svg/core.svg", "/static/svg/wall.svg", "/static/svg/mortar.svg", "/static/svg/cannon.svg", "/static/svg/crossbow.svg"],
     _shortcuts: ["0", "C", "W", "M", "A", "R"],
     EMPTY: -1,
     CORE: 0,

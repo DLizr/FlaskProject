@@ -1,3 +1,4 @@
+
 onmessage = function(e) {
     message = e.data;
     if (message == "CONNECT") connect();

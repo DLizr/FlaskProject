@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Hello, World!</title>
-    <link rel="stylesheet" href="css/game.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
 </head>
 <body>
     <div id="loadingConfirmationScreen">
@@ -24,9 +24,9 @@
     <div id="phase1">
         <div class="bottom">
             <div class="towerMenu">
-                <div class="menuItem"><img src="./img/core.svg" alt="" ondragstart="return false"></div>
-                <div class="menuItem"><img src="./img/wall.svg" alt="" ondragstart="return false"></div>
-                <div class="menuItem"><img src="./img/mortar.svg" alt="" ondragstart="return false"></div>
+                <div class="menuItem"><img src="{{ url_for('static', filename='svg/core.svg') }}" alt="" ondragstart="return false"></div>
+                <div class="menuItem"><img src="{{ url_for('static', filename='svg/wall.svg') }}" alt="" ondragstart="return false"></div>
+                <div class="menuItem"><img src="{{ url_for('static', filename='svg/mortar.svg') }}" alt="" ondragstart="return false"></div>
             </div>
         </div>
         <div id="phase1wallTooltip" class="tooltip">
@@ -56,8 +56,8 @@
     <div id="phase2">
         <div class="bottom">
             <div class="towerMenu">
-                <div class="menuItem"><img src="./img/cannon.svg" alt="" ondragstart="return false"></div>
-                <div class="menuItem"><img src="./img/crossbow.svg" alt="" ondragstart="return false"></div>
+                <div class="menuItem"><img src="{{ url_for('static', filename='svg/cannon.svg') }}" alt="" ondragstart="return false"></div>
+                <div class="menuItem"><img src="{{ url_for('static', filename='svg/crossbow.svg') }}" alt="" ondragstart="return false"></div>
             </div>
         </div>
 
@@ -92,6 +92,6 @@
     </div>
     <canvas></canvas>
     
-    <script src="js/graphic.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/graphic.js') }}"></script>
 </body>
 </html>
