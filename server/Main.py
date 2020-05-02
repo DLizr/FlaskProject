@@ -1,6 +1,8 @@
 import datetime
 import os
+import random
 
+import requests
 from flask import Flask, render_template, request, make_response, session, jsonify, send_from_directory
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.exceptions import abort
@@ -24,6 +26,7 @@ if not os.path.exists("db/blogs.sqlite"):
     with open("db/blogs.sqlite", mode='w'):
         pass
 
+
 def main():
     global users
     db_session.global_init("db/blogs.sqlite")
@@ -31,8 +34,19 @@ def main():
     session = db_session.create_session()
     con = sqlite3.connect("db/blogs.sqlite")
     cur = con.cursor()
-    users = sorted(cur.execute("""SELECT * FROM users""").fetchall(), key=lambda x: x[-1])
+    users = sorted(cur.execute("""SELECT * FROM users WHERE banned_from_table = 0""").fetchall(), key=lambda x: x[-1])
     app.run()
+
+
+@app.route('/stealth/<int:id>')
+def stealthButton(id):
+    global users
+    con = sqlite3.connect("db/blogs.sqlite")
+    cur = con.cursor()
+    cur.execute(f'''Update users SET banned_from_table = 1 WHERE id = {id}''')
+    con.commit()
+    users = sorted(cur.execute("""SELECT * FROM users WHERE banned_from_table = 0""").fetchall(), key=lambda x: x[-1])
+    return redirect('/')
 
 
 @app.route('/favicon.img')
@@ -186,12 +200,6 @@ def news_delete(id):
     else:
         abort(404)
     return redirect('/')
-
-
-@app.route("/game")
-@login_required
-def game():
-    return render_template("game.html")
 
 
 @app.errorhandler(404)
