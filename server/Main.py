@@ -38,6 +38,8 @@ def main():
 
 @app.route('/stealth/<int:id>')
 def stealthbutton(id):
+    if current_user.is_authenticated != 1:
+        return render_template('Error.html', number=403)
     if current_user.is_admin == 0:
         return render_template('Error.html', number=403)
     global users
@@ -149,6 +151,8 @@ def logout():
 @app.route('/news', methods=['GET', 'POST'])
 @login_required
 def add_news():
+    if current_user.is_authenticated != 1:
+        return render_template('Error.html', number=403)
     if current_user.is_admin == 0:
         return render_template('Error.html', number=403)
     form = NewsForm()
@@ -169,6 +173,8 @@ def add_news():
 @app.route('/news/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_news(id):
+    if current_user.is_authenticated != 1:
+        return render_template('Error.html', number=403)
     if current_user.is_admin == 0:
         return render_template('Error.html', number=403)
     form = NewsForm()
@@ -199,6 +205,8 @@ def edit_news(id):
 @app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
 @login_required
 def news_delete(id):
+    if current_user.is_authenticated != 1:
+        return render_template('Error.html', number=403)
     if current_user.is_admin == 0:
         return render_template('Error.html', number=403)
     session = db_session.create_session()
