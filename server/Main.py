@@ -32,20 +32,18 @@ def main():
     db_session.global_init("db/blogs.sqlite")
     app.register_blueprint(news_api.blueprint)
     session = db_session.create_session()
-    con = sqlite3.connect("db/blogs.sqlite")
-    cur = con.cursor()
-    users = sorted(cur.execute("""SELECT * FROM users WHERE banned_from_table = 0""").fetchall(), key=lambda x: x[-1])
+    users = sorted(session.query(User).filter(User.banned_from_table == 0).all(), key=lambda x: -x.wins)
     app.run()
 
 
 @app.route('/stealth/<int:id>')
-def stealthButton(id):
+def stealthbutton(id):
     global users
-    con = sqlite3.connect("db/blogs.sqlite")
-    cur = con.cursor()
-    cur.execute(f'''Update users SET banned_from_table = 1 WHERE id = {id}''')
-    con.commit()
-    users = sorted(cur.execute("""SELECT * FROM users WHERE banned_from_table = 0""").fetchall(), key=lambda x: x[-1])
+    session = db_session.create_session()
+    banned = session.query(User).filter(User.id == id).first()
+    banned.banned_from_table = 1
+    session.commit()
+    users = sorted(session.query(User).filter(User.banned_from_table == 0).all(), key=lambda x: -x.wins)
     return redirect('/')
 
 

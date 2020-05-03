@@ -29,13 +29,15 @@
         <tr><th>Никнейм</th><th>Кол-во побед</th></tr>
         {% for i in users %}
             {% if current_user.is_admin == 1 and current_user.id != i%}
-                <tr><td><a class="nicks" href="/stealth/{{ i[0] }}">{{ i[1] }}</a></td><td>{{ i[-1] }}</td></tr>
-            {% elif i[0] == 1%}
-                <tr><td>Наш самый лучший игрок: {{ i[1] }}</td><td>{{ i[-1] }}</td></tr>
-            {% elif current_user.is_authenticated and current_user.id == i[0] %}
-                <tr><td>--> Вы <--</td><td>{{ i[-1] }}</td></tr>
+                <tr><td><a class="nicks" href="/stealth/{{ i.id }}">{{ i.name }}</a></td><td>{{ i.wins }}</td></tr>
             {% else %}
-                <tr><td>{{ i[1] }}</td><td>{{ i[-1] }}</td></tr>
+                {% if loop.first %}
+                    <tr><td>Наш лучший игрок: {{ i.name }}</td><td>{{ i.wins }}</td></tr>
+                {% elif current_user.is_authenticated and current_user.id == i.id %}
+                    <tr><td>--> Вы <--</td><td>{{ i.wins }}</td></tr>
+                {% else %}
+                    <tr><td>{{ i.name }}</td><td>{{ i.wins }}</td></tr>
+            {% endif %}
             {% endif %}
         {% endfor %}
     </table>
@@ -45,11 +47,10 @@
     <div id="RegisterLogin">
     {% if current_user.is_authenticated %}
         <div id="nick">{{ current_user.name }}</div>
+        <a href="/logout" id="logout">Выйти</a>
         {% if current_user.is_admin %}
         <a href="news" class="btn-secondary">Добавить новость</a>
-        <a href="/logout" id="logout">Выйти</a>
-    {% endif %}
-
+        {% endif %}
     {% else %}
         <a class="btn-primary" href="/register">Зарегистрироваться</a>
         <a class="btn-success" href="/login">Войти</a>
