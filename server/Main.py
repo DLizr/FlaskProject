@@ -220,6 +220,12 @@ def news_delete(id):
     return redirect('/')
 
 
+@app.route("/game")
+@login_required
+def game():
+    return render_template("game.html")
+
+
 @app.errorhandler(404)
 def not_found(error):
     return render_template('Error.html', number=error)
