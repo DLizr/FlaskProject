@@ -223,7 +223,9 @@ def news_delete(id):
 @app.route("/game")
 @login_required
 def game():
-    return render_template("game.html")
+    hash = random.randint(0, 2 ** 32)
+    requests.post("http://localhost:5000", json={"user": [hash, current_user.id]})
+    return render_template("game.html", hash=hash)
 
 
 @app.errorhandler(404)
