@@ -249,3 +249,8 @@ td {
 .nicks {
     color: red;
 }
+
+.errorimg {
+    height: 100%;
+    width: 100%;
+}

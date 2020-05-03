@@ -38,6 +38,8 @@ def main():
 
 @app.route('/stealth/<int:id>')
 def stealthbutton(id):
+    if current_user.is_admin == 0:
+        return render_template('Error.html', number=403)
     global users
     session = db_session.create_session()
     banned = session.query(User).filter(User.id == id).first()
@@ -65,6 +67,8 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
+    if current_user.is_authenticated == 1:
+        return render_template('Error.html', number=403)
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -120,6 +124,8 @@ def load_user(user_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated == 1:
+        return render_template('Error.html', number=403)
     form = LoginForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -143,6 +149,8 @@ def logout():
 @app.route('/news', methods=['GET', 'POST'])
 @login_required
 def add_news():
+    if current_user.is_admin == 0:
+        return render_template('Error.html', number=403)
     form = NewsForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -161,6 +169,8 @@ def add_news():
 @app.route('/news/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_news(id):
+    if current_user.is_admin == 0:
+        return render_template('Error.html', number=403)
     form = NewsForm()
     if request.method == "GET":
         session = db_session.create_session()
@@ -189,6 +199,8 @@ def edit_news(id):
 @app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
 @login_required
 def news_delete(id):
+    if current_user.is_admin == 0:
+        return render_template('Error.html', number=403)
     session = db_session.create_session()
     news = session.query(News).filter(News.id == id,
                                       News.user == current_user).first()
