@@ -16,6 +16,8 @@ class Game:
 
     def __init__(self, ID: int):
         self.__ID = ID
+        
+        self.__winner = 0
 
     async def start(self, player1: Player, player2: Player):
         if not await Messages.askIfReady(player1):
@@ -49,6 +51,8 @@ class Game:
         logger.debug("Game #{}: phase 3 begins.".format(self.__ID))
         await p3.start()
         
+        self.__winner = p3.getWinner()
+        
     @staticmethod
     def __mergeBase(attack: list, defend: list):
         final = []
@@ -61,3 +65,6 @@ class Game:
                 final.append(defend.pop(0))
         
         return final
+    
+    def getWinner(self):
+        return self.__winner
