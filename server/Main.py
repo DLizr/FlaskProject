@@ -1,5 +1,7 @@
 import datetime
 import os
+import random
+import requests
 
 from flask import Flask, render_template, request, make_response, session, jsonify, send_from_directory
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -191,7 +193,9 @@ def news_delete(id):
 @app.route("/game")
 @login_required
 def game():
-    return render_template("game.html")
+    code = str(random.randint(0, 2 ** 32))
+    requests.post("http://localhost:5001/post/adduser", json={"user": [code, current_user.id]})
+    return render_template("game.html", code=code)
 
 
 @app.errorhandler(404)

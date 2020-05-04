@@ -6,6 +6,8 @@ from src.util.Logger import logger
 from src.room.RoomList import RoomList
 from src.player.Player import Player
 
+from src.website import HttpPipe
+
 
 class Server:
     __ID = 0
@@ -13,7 +15,10 @@ class Server:
     
     @classmethod
     async def userHandler(cls, websocket: websockets.WebSocketClientProtocol, _):  # _ is path.
-        player = Player(cls.__ID, websocket)
+        player = Player(websocket)
+        if (not await cls.__verifyPlayer(player)):
+            await player.sendMessageSafe("BAD_CODE")
+            return
         
         cls.__cooldown += 4
         await asyncio.sleep(cls.__cooldown)  # Players can join once per 4 seconds.
@@ -33,5 +38,25 @@ class Server:
         server = websockets.serve(Server.userHandler, "localhost", 31666, max_queue=2000000)
         logger.info("Server started.")
         
+        HttpPipe.run()
+        
         asyncio.get_event_loop().run_until_complete(server)
         asyncio.get_event_loop().run_forever()
+    
+    @staticmethod
+    async def __verifyPlayer(player: Player):
+        for _ in range(5):
+            code = player.getMessageIfReceived()
+            if code:
+                break
+            await asyncio.sleep(1)
+        else:
+            return False
+        
+        try:
+            playerId = HttpPipe.players.pop(code)
+        except KeyError:
+            return False
+        
+        player.setId(playerId)
+        return True
