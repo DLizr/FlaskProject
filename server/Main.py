@@ -14,7 +14,6 @@ from data.RegisterForm import RegisterForm
 from data.news import News
 
 from data.users import User
-import sqlite3
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandex_secret_key'
@@ -26,15 +25,29 @@ if not os.path.exists("db/blogs.sqlite"):
     with open("db/blogs.sqlite", mode='w'):
         pass
 
+
 def main():
     global users
     db_session.global_init("db/blogs.sqlite")
     app.register_blueprint(news_api.blueprint)
     session = db_session.create_session()
-    con = sqlite3.connect("db/blogs.sqlite")
-    cur = con.cursor()
-    users = sorted(cur.execute("""SELECT * FROM users""").fetchall(), key=lambda x: x[-1])
+    users = sorted(session.query(User).filter(User.banned_from_table == 0).all(), key=lambda x: -x.wins)
     app.run()
+
+
+@app.route('/stealth/<int:id>')
+def stealthbutton(id):
+    if current_user.is_authenticated != 1:
+        return render_template('Error.html', number=403)
+    if current_user.is_admin == 0:
+        return render_template('Error.html', number=403)
+    global users
+    session = db_session.create_session()
+    banned = session.query(User).filter(User.id == id).first()
+    banned.banned_from_table = 1
+    session.commit()
+    users = sorted(session.query(User).filter(User.banned_from_table == 0).all(), key=lambda x: -x.wins)
+    return redirect('/')
 
 
 @app.route('/favicon.img')
@@ -55,6 +68,8 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
+    if current_user.is_authenticated == 1:
+        return render_template('Error.html', number=403)
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -110,6 +125,8 @@ def load_user(user_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated == 1:
+        return render_template('Error.html', number=403)
     form = LoginForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -133,6 +150,10 @@ def logout():
 @app.route('/news', methods=['GET', 'POST'])
 @login_required
 def add_news():
+    if current_user.is_authenticated != 1:
+        return render_template('Error.html', number=403)
+    if current_user.is_admin == 0:
+        return render_template('Error.html', number=403)
     form = NewsForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -151,6 +172,10 @@ def add_news():
 @app.route('/news/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_news(id):
+    if current_user.is_authenticated != 1:
+        return render_template('Error.html', number=403)
+    if current_user.is_admin == 0:
+        return render_template('Error.html', number=403)
     form = NewsForm()
     if request.method == "GET":
         session = db_session.create_session()
@@ -179,6 +204,10 @@ def edit_news(id):
 @app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
 @login_required
 def news_delete(id):
+    if current_user.is_authenticated != 1:
+        return render_template('Error.html', number=403)
+    if current_user.is_admin == 0:
+        return render_template('Error.html', number=403)
     session = db_session.create_session()
     news = session.query(News).filter(News.id == id,
                                       News.user == current_user).first()

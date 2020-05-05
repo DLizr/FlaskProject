@@ -9,7 +9,12 @@
     <title>Error {{ number }}</title>
 </head>
 <body class="body">
-    <img src="/static/img/death.jpg"/>
-    <a>Error {{ number }}</a>
+    {% if number == 404 %}
+        <img class="errorimg" src="/static/img/death.jpg"/>
+    {% elif number == 403 %}
+        <img class="errorimg" src="/static/img/403.png"/>
+    {% else %}
+        <img class="errorimg" src="/static/img/500.jpg"/>
+    {% endif %}
 </body>
 </html>
