@@ -1,8 +1,8 @@
 import datetime
 import os
 import random
-
 import requests
+
 from flask import Flask, render_template, request, make_response, session, jsonify, send_from_directory
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.exceptions import abort
@@ -14,7 +14,6 @@ from data.RegisterForm import RegisterForm
 from data.news import News
 
 from data.users import User
-import sqlite3
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandex_secret_key'
@@ -223,7 +222,50 @@ def news_delete(id):
 @app.route("/game")
 @login_required
 def game():
-    return render_template("game.html")
+    code = str(random.randint(0, 2 ** 32))
+    requests.post("http://localhost:5001/post/adduser", json={"user": [code, current_user.id]})
+    return render_template("game.html", code=code)
+
+
+def localhostOnly(func):
+    def localhostOnlyRoute(*args, **kwargs):
+        senderIp = request.headers.get('X-Forwarded-For', request.remote_addr)
+        
+        if (senderIp != "127.0.0.1"):
+            return jsonify({"error": "Unauthorized sender"}), 403
+        
+        return func(*args, **kwargs)
+    localhostOnlyRoute.__name__ = func.__name__
+    return localhostOnlyRoute
+
+
+@app.route("/post/addgame/<int:playerId>", methods=["POST"])
+@localhostOnly
+def addGame(playerId):
+    session = db_session.create_session()
+    user = session.query(User).get(playerId)
+    if (not user):
+        return jsonify({"error": "Invalid user"}), 404
+    
+    user.gamesCount += 1
+    session.commit()
+    
+    return jsonify({"success": "ok"})
+
+
+@app.route("/post/addwin/<int:playerId>", methods=["POST"])
+@localhostOnly
+def addWin(playerId):
+    session = db_session.create_session()
+    user = session.query(User).get(playerId)
+    if (not user):
+        return jsonify({"error": "Invalid user"}), 404
+    
+    user.gamesCount += 1
+    user.wins += 1
+    session.commit()
+    
+    return jsonify({"success": "ok"})
 
 
 @app.errorhandler(404)

@@ -7,6 +7,8 @@ from src.exceptions.PlayerKickedException import PlayerKickedException
 from src.player.Player import Player
 from src.game.Game import Game
 
+from src.website import HttpPipe
+
 
 class Room:
     def __init__(self, size: int):
@@ -42,12 +44,15 @@ class Room:
         await self.__start()
     
     async def __start(self):
+        
         if self.__started:                # Player 1 comes here and starts the game,
             await self.__keepConnected()  # Player 2 goes to __keepConnected() to avoid doing all the tasks twice.
         self.__started = True
         logger.info("The game in room #{} has started.".format(str(self.__ID)))
+        
         player1, player2 = self.__players
         game = Game(self.__ID)
+        
         try:
             await game.start(player1, player2)
         except ConnectionClosedOK as e:
@@ -59,6 +64,16 @@ class Room:
         except ConnectionClosedError as e:
             logger.error("{}: Connection with {} has beed terminated. Reason: {}".format(e.code, e.player, e.reason))  # Ignore this error.
             await self.__onConnectionError()
+        
+        winner = game.getWinner()
+        if (winner == 1):
+            await self.__gameOver(player1, player2)
+        elif (winner == 2):
+            await self.__gameOver(player2, player1)
+        elif (winner == 3):
+            await self.__onDraw()
+        else:
+            await self.__onConnectionError()  # Theoretically it will never happen.
     
     async def __onConnectionClose(self, player: Player):
         self.__players.remove(player)
@@ -68,16 +83,19 @@ class Room:
 
     async def __onConnectionError(self):
         for player in self.__players:
-            player.sendMessageSafe("Server-side connection error. Draw.")
-            player.disconnect()
+            await player.disconnect()
     
     @staticmethod
     async def __gameOver(winner: Player, loser: Player):
-        await winner.sendMessageSafe("You win!")
-        await winner.disconnect()  # TODO: congratulate winner.
-
-        await loser.sendMessageSafe("You lose!")
-        await loser.disconnect()  # TODO: roast loser.
+        HttpPipe.addWin(winner.getId())
+        await winner.disconnect()
+        HttpPipe.addGame(loser.getId())
+        await loser.disconnect()
+    
+    async def __onDraw(self):
+        for player in self.__players:
+            await player.disconnect()
+            HttpPipe.addGame(player.getId())
         
     async def __keepConnected(self):
         while not self.__finished:

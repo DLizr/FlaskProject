@@ -6,10 +6,11 @@ from src.util.Logger import logger
 
 
 class Player:
-    def __init__(self, ID: int, websocket: websockets.WebSocketClientProtocol):
-        self.__ID = ID
+    def __init__(self, websocket: websockets.WebSocketClientProtocol):
         self.__address: str = websocket.remote_address[0] + ":" + str(websocket.remote_address[1])
         self.__websocket = websocket
+        
+        self.__ID = 0
     
     def getAddress(self) -> str:
         return self.__address
@@ -53,6 +54,13 @@ class Player:
         except websockets.exceptions.ConnectionClosed as e:
             e.player = self
             raise e
+    
+    def setId(self, ID: int):
+        if (self.__ID == 0):
+            self.__ID = ID
+    
+    def getId(self):
+        return self.__ID
 
     def __repr__(self):
         return "Player({}, address={})".format(self.__ID, self.__address)

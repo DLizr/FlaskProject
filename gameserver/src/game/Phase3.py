@@ -16,6 +16,7 @@ class Phase3:
         self.__base2 = base2
         
         self.__time = 120
+        self.__winner = 0
     
     async def start(self):
         await Messages.startPhase3(self.__player1)
@@ -58,6 +59,33 @@ class Phase3:
         
         await self.__player1.sendMessage(msg1)
         await self.__player2.sendMessage(msg2)
+        
+        self.__getWinner(s1, s2)
+    
+    def __getWinner(self, s1: Simulator, s2: Simulator):
+        """
+        Winner is the player who either won in both rounds 
+        or won in a shorter time than his opponent.
+        """
+        w1, w2 = s1.getWinner(), s2.getWinner()
+        
+        if (w1 == w2):
+            self.__winner = w1
+            return
+        
+        if (w1 == 1):
+            victoryTime1 = s1.getTime()
+            victoryTime2 = s2.getTime()
+        else:
+            victoryTime2 = s1.getTime()
+            victoryTime1 = s2.getTime()
+        
+        if (victoryTime1 < victoryTime2):
+            self.__winner = 1
+        elif (victoryTime1 > victoryTime2):
+            self.__winner = 2
+        else:
+            self.__winner = 3
     
     async def __sendBase(self, base):
         await Messages.sendBase(self.__player1)
@@ -66,3 +94,6 @@ class Phase3:
         for building in base:
             await self.__player1.sendMessage(building)
             await self.__player2.sendMessage(building)
+    
+    def getWinner(self):
+        return self.__winner

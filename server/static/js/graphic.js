@@ -9,6 +9,8 @@ var serverConnector = new Worker("/static/js/serverConnector.js");
 serverConnector.postMessage("CONNECT");
 serverConnector.onmessage = (e) => SCREEN.handleMessage(e.data);
 
+serverConnector.postMessage(code.toString());
+
 
 var confirmationMenu = document.getElementById("loadingConfirmationScreen");
 confirmationMenu.style.display = "none";
