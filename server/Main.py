@@ -176,6 +176,9 @@ def content(id):
     new = session.query(News).filter(News.id == id).first()
     return render_template("right.html", new=new, count=len([i for i in session.query(News)]))
 
+@app.route("/about")
+def about():
+    return render_template("about.html")
 
 @app.errorhandler(404)
 def not_found(error):

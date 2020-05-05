@@ -13,19 +13,17 @@
     <div id="leftContent">
     <nav class="F">
         <a href="/" class="F1">Protectivio</a>
-        <a href="/content/10000" class="F2">Об авторах</a>
+        <a href="/about" class="F2">Об авторах</a>
     </nav>
         <br></br>
-        <div id="newtitle">{{ new.title }}</div>
-        <div id="new">{{ new.content }}</div>
+        <div id="newtitle">Об авторах</div>
+        <div id="new">https://github.com/DLizr/Protectivio - ссылка на репозиторий GitHub.
+            Игра сделана двумя яндекс-лицеистами как финальный проект web: Димой и Артёмом.
+            Главной причиной было то, что нам было скучно на карантине.
+            Дима сделал ядро игры и её интерфейс, а Артём сделал сайт.
+            Мы смогли, и вы сможете! Добро пожаловать в Protectivio!</div>
         <div id="back">
-            {% if count >= new.id - 1 >= 1 %}
-                <a href="{{ new.id - 1 }}" class="btn-success"><</a>
-            {% endif %}
             <a href="/" class="btn-primary">Вернуться</a>
-            {% if new.id + 1 <= count %}
-                <a href="{{ new.id + 1 }}" class="btn-success">></a>
-            {% endif %}
         </div>
     </div>
 </header>
