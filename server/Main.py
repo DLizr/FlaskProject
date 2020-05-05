@@ -198,6 +198,47 @@ def game():
     return render_template("game.html", code=code)
 
 
+def localhostOnly(func):
+    def localhostOnlyRoute(*args, **kwargs):
+        senderIp = request.headers.get('X-Forwarded-For', request.remote_addr)
+        
+        if (senderIp != "127.0.0.1"):
+            return jsonify({"error": "Unauthorized sender"}), 403
+        
+        return func(*args, **kwargs)
+    localhostOnlyRoute.__name__ = func.__name__
+    return localhostOnlyRoute
+
+
+@app.route("/post/addgame/<int:playerId>", methods=["POST"])
+@localhostOnly
+def addGame(playerId):
+    session = db_session.create_session()
+    user = session.query(User).get(playerId)
+    if (not user):
+        return jsonify({"error": "Invalid user"}), 404
+    
+    user.gamesCount += 1
+    session.commit()
+    
+    return jsonify({"success": "ok"})
+
+
+@app.route("/post/addwin/<int:playerId>", methods=["POST"])
+@localhostOnly
+def addWin(playerId):
+    session = db_session.create_session()
+    user = session.query(User).get(playerId)
+    if (not user):
+        return jsonify({"error": "Invalid user"}), 404
+    
+    user.gamesCount += 1
+    user.wins += 1
+    session.commit()
+    
+    return jsonify({"success": "ok"})
+
+
 @app.errorhandler(404)
 def not_found(error):
     return render_template('Error.html', number=error)

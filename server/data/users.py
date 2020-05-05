@@ -22,7 +22,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                                      default=datetime.datetime.now)
     is_admin = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     wins = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=0)
-    # gamesCount = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=0)
+    gamesCount = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=0)
     news = orm.relation("News", back_populates='user')
 
     def __repr__(self):

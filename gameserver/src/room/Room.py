@@ -7,6 +7,8 @@ from src.exceptions.PlayerKickedException import PlayerKickedException
 from src.player.Player import Player
 from src.game.Game import Game
 
+from src.website import HttpPipe
+
 
 class Room:
     def __init__(self, size: int):
@@ -85,12 +87,15 @@ class Room:
     
     @staticmethod
     async def __gameOver(winner: Player, loser: Player):
-        await winner.disconnect()  # TODO: congratulate winner.
-        await loser.disconnect()  # TODO: roast loser.
+        HttpPipe.addWin(winner.getId())
+        await winner.disconnect()
+        HttpPipe.addGame(loser.getId())
+        await loser.disconnect()
     
     async def __onDraw(self):
         for player in self.__players:
             await player.disconnect()
+            HttpPipe.addGame(player.getId())
         
     async def __keepConnected(self):
         while not self.__finished:

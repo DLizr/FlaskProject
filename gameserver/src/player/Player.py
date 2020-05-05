@@ -58,6 +58,9 @@ class Player:
     def setId(self, ID: int):
         if (self.__ID == 0):
             self.__ID = ID
+    
+    def getId(self):
+        return self.__ID
 
     def __repr__(self):
         return "Player({}, address={})".format(self.__ID, self.__address)
