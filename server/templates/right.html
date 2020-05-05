@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet"  href="/static/css/style.css">
+    <title>Protectivio</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon"/>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon"/>
+    <meta name="viewport" content="width=device-width">
+</head>
+<body>
+<header>
+    <div id="leftContent">
+    <nav>
+        <a href="/" class="F">Protectivio</a>
+    </nav>
+        <br></br>
+        <div id="newtitle">{{ new.title }}</div>
+        <div id="new">{{ new.content }}</div>
+        <div id="back">
+            {% if new.id - 1 >= 1 %}
+                <a href="{{ new.id - 1 }}" class="btn-success"><</a>
+            {% endif %}
+            <a href="/" class="btn-primary">Вернуться</a>
+            {% if new.id + 1 <= count %}
+                <a href="{{ new.id + 1 }}" class="btn-success">></a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+<div class="rightContent">
+    <div id="RegisterLogin">
+    {% if current_user.is_authenticated %}
+        <div id="nick">{{ current_user.name }}</div>
+        <a href="/logout" id="logout">Выйти</a>
+        {% if current_user.is_admin %}
+        <a href="news" class="btn-secondary">Добавить новость</a>
+        {% endif %}
+    {% else %}
+        <a class="btn-primary" href="/register">Зарегистрироваться</a>
+        <a class="btn-success" href="/login">Войти</a>
+    {% endif %}
+    </div>
+</div>
+</body>
+</html>

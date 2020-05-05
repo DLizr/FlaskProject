@@ -44,11 +44,8 @@ def favicon():
 @app.route("/")
 def index():
     session = db_session.create_session()
-    # news = session.query(News).filter(News.is_private != True)
     news = session.query(News)
-    res = make_response(render_template("index.html", news=news))
-    res.set_cookie("visits_count", '1', max_age=60 * 60 * 24 * 365 * 2)
-    return render_template("index.html", news=news, users=users)
+    return render_template("index.html", news=reversed([i for i in news]), users=users)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -74,30 +71,6 @@ def reqister():
         session.commit()
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form, users=users)
-
-
-@app.route("/cookie_test")
-def cookie_test():
-    visits_count = int(request.cookies.get("visits_count", 0))
-    if visits_count:
-        res = make_response(f"Вы пришли на эту страницу {visits_count + 1} раз")
-        res.set_cookie("visits_count", str(visits_count + 1),
-                       max_age=60 * 60 * 24 * 365 * 2)
-    else:
-        res = make_response(
-            "Вы пришли на эту страницу в первый раз за последние 2 года")
-        res.set_cookie("visits_count", '1',
-                       max_age=60 * 60 * 24 * 365 * 2)
-    return res
-
-
-@app.route('/session_test/')
-def session_test():
-    if 'visits_count' in session:
-        session['visits_count'] = session.get('visits_count') + 1
-    else:
-        session['visits_count'] = 1
-    # дальше - код для вывода страницы
 
 
 @login_manager.user_loader
@@ -192,6 +165,16 @@ def news_delete(id):
 @login_required
 def game():
     return render_template("game.html")
+
+
+@app.route("/content/<int:id>")
+def content(id):
+    session = db_session.create_session()
+    ids = [i.id for i in session.query(News)]
+    if id not in ids:
+        return redirect('/404')
+    new = session.query(News).filter(News.id == id).first()
+    return render_template("right.html", new=new, count=len([i for i in session.query(News)]))
 
 
 @app.errorhandler(404)
