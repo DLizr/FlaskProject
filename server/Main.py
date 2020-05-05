@@ -26,12 +26,16 @@ if not os.path.exists("db/blogs.sqlite"):
         pass
 
 
-def main():
+def updateUsers(session):
     global users
+    users = sorted(session.query(User).filter(User.banned_from_table == 0).all(), key=lambda x: -x.wins)
+
+
+def main():
     db_session.global_init("db/blogs.sqlite")
     app.register_blueprint(news_api.blueprint)
     session = db_session.create_session()
-    users = sorted(session.query(User).filter(User.banned_from_table == 0).all(), key=lambda x: -x.wins)
+    updateUsers(session)
     app.run()
 
 
@@ -41,12 +45,11 @@ def stealthbutton(id):
         return render_template('Error.html', number=403)
     if current_user.is_admin == 0:
         return render_template('Error.html', number=403)
-    global users
     session = db_session.create_session()
     banned = session.query(User).filter(User.id == id).first()
     banned.banned_from_table = 1
     session.commit()
-    users = sorted(session.query(User).filter(User.banned_from_table == 0).all(), key=lambda x: -x.wins)
+    updateUsers(session)
     return redirect('/')
 
 
@@ -89,6 +92,7 @@ def reqister():
         user.set_password(form.password.data)
         session.add(user)
         session.commit()
+        updateUsers(session)
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form, users=users)
 
@@ -264,6 +268,7 @@ def addWin(playerId):
     user.gamesCount += 1
     user.wins += 1
     session.commit()
+    updateUsers(session)
     
     return jsonify({"success": "ok"})
 
