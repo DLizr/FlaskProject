@@ -31,7 +31,7 @@ def main():
     session = db_session.create_session()
     con = sqlite3.connect("db/blogs.sqlite")
     cur = con.cursor()
-    users = sorted(cur.execute("""SELECT * FROM users""").fetchall(), key=lambda x: x[-1])
+    users = [i for i in sorted(cur.execute("""SELECT * FROM users""").fetchall(), key=lambda x: x[-1])][::-1]
     app.run()
 
 
@@ -174,11 +174,14 @@ def content(id):
     if id not in ids:
         return redirect('/404')
     new = session.query(News).filter(News.id == id).first()
-    return render_template("right.html", new=new, count=len([i for i in session.query(News)]))
+    news = session.query(News)
+    return render_template("right.html", new=new, count=len([i for i in session.query(News)]), news=news)
 
 @app.route("/about")
 def about():
-    return render_template("about.html")
+    session = db_session.create_session()
+    news = session.query(News)
+    return render_template("about.html", news=news)
 
 @app.errorhandler(404)
 def not_found(error):
