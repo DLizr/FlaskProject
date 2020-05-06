@@ -62,11 +62,8 @@ def favicon():
 @app.route("/")
 def index():
     session = db_session.create_session()
-    # news = session.query(News).filter(News.is_private != True)
     news = session.query(News)
-    res = make_response(render_template("index.html", news=news))
-    res.set_cookie("visits_count", '1', max_age=60 * 60 * 24 * 365 * 2)
-    return render_template("index.html", news=news, users=users)
+    return render_template("index.html", news=reversed([i for i in news]), users=users)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -95,30 +92,6 @@ def reqister():
         updateUsers(session)
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form, users=users)
-
-
-@app.route("/cookie_test")
-def cookie_test():
-    visits_count = int(request.cookies.get("visits_count", 0))
-    if visits_count:
-        res = make_response(f"Вы пришли на эту страницу {visits_count + 1} раз")
-        res.set_cookie("visits_count", str(visits_count + 1),
-                       max_age=60 * 60 * 24 * 365 * 2)
-    else:
-        res = make_response(
-            "Вы пришли на эту страницу в первый раз за последние 2 года")
-        res.set_cookie("visits_count", '1',
-                       max_age=60 * 60 * 24 * 365 * 2)
-    return res
-
-
-@app.route('/session_test/')
-def session_test():
-    if 'visits_count' in session:
-        session['visits_count'] = session.get('visits_count') + 1
-    else:
-        session['visits_count'] = 1
-    # дальше - код для вывода страницы
 
 
 @login_manager.user_loader
@@ -234,10 +207,10 @@ def game():
 def localhostOnly(func):
     def localhostOnlyRoute(*args, **kwargs):
         senderIp = request.headers.get('X-Forwarded-For', request.remote_addr)
-        
+
         if (senderIp != "127.0.0.1"):
             return jsonify({"error": "Unauthorized sender"}), 403
-        
+
         return func(*args, **kwargs)
     localhostOnlyRoute.__name__ = func.__name__
     return localhostOnlyRoute
@@ -250,10 +223,10 @@ def addGame(playerId):
     user = session.query(User).get(playerId)
     if (not user):
         return jsonify({"error": "Invalid user"}), 404
-    
+
     user.gamesCount += 1
     session.commit()
-    
+
     return jsonify({"success": "ok"})
 
 
@@ -264,14 +237,30 @@ def addWin(playerId):
     user = session.query(User).get(playerId)
     if (not user):
         return jsonify({"error": "Invalid user"}), 404
-    
+
     user.gamesCount += 1
     user.wins += 1
     session.commit()
     updateUsers(session)
-    
+
     return jsonify({"success": "ok"})
 
+
+@app.route("/content/<int:id>")
+def content(id):
+    session = db_session.create_session()
+    ids = [i.id for i in session.query(News)]
+    if id not in ids:
+        return redirect('/404')
+    new = session.query(News).filter(News.id == id).first()
+    news = session.query(News)
+    return render_template("right.html", new=new, count=len([i for i in session.query(News)]), news=news)
+
+@app.route("/about")
+def about():
+    session = db_session.create_session()
+    news = session.query(News)
+    return render_template("about.html", news=news)
 
 @app.errorhandler(404)
 def not_found(error):
