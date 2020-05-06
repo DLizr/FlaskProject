@@ -126,6 +126,7 @@ body {
     background-color: #32f3cf;
 }
 .news-modded {
+    word-break: break-all;
     text-decoration: none;
     overflow: auto;
 }
@@ -138,16 +139,12 @@ body {
   padding-top: 20px;
   position: absolute;
 }
+
 .news-modded:active .text{
     width: 25vw;
     overflow: auto;
     display: block;
     background-color: green;
-    opacity: 100%:
-    padding-left: 2%;
-    padding-right: 2%;
-    padding-top: 2%;
-    padding-bottom: 2%;
 }
 
 .news div {
