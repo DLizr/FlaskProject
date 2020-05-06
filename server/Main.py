@@ -36,7 +36,7 @@ def main():
     app.register_blueprint(news_api.blueprint)
     session = db_session.create_session()
     updateUsers(session)
-    app.run()
+    app.run(host="0.0.0.0", port=5000)
 
 
 @app.route('/stealth/<int:id>')
