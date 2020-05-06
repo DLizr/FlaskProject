@@ -18,6 +18,7 @@ class Server:
         player = Player(websocket)
         if (not await cls.__verifyPlayer(player)):
             await player.sendMessageSafe("BAD_CODE")
+            logger.warning(player.getAddress() + " has tried to connect but didn't pass the verification!")
             return
         
         cls.__cooldown += 4
@@ -35,13 +36,19 @@ class Server:
     
     @classmethod
     def run(cls):
-        server = websockets.serve(Server.userHandler, "localhost", 31666, max_queue=2000000)
-        logger.info("Server started.")
-        
-        HttpPipe.run()
-        
-        asyncio.get_event_loop().run_until_complete(server)
-        asyncio.get_event_loop().run_forever()
+        try:
+            server = websockets.serve(Server.userHandler, "localhost", 31666, max_queue=2000000)
+            logger.info("Server started.")
+            
+            HttpPipe.run()
+            
+            asyncio.get_event_loop().run_until_complete(server)
+            asyncio.get_event_loop().run_forever()
+        except KeyboardInterrupt:
+            logger.info("Stopped the socket server.")
+            logger.info("Stopping HTML server...")
+            HttpPipe.stop()
+            logger.info("Stopped HTML server.")
     
     @staticmethod
     async def __verifyPlayer(player: Player):
