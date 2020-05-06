@@ -61,5 +61,11 @@ def run():
     __thread.start()
 
 
+def stop():
+    code = requests.post("http://localhost:5001/post/shutdown").status_code
+    if (code != 200):
+        logger.fatal("Unable to shut the server down!")
+
+
 if __name__ == "__main__":
     run()
