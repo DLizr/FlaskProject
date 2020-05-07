@@ -9,9 +9,9 @@
 
 {% block content %}
     <h1>Авторизация</h1>
-    <form action="" method="post">
+    <form action="" method="post" class="form">
         {{ form.hidden_tag() }}
-        <p>
+        <p class="paragraph">
             {{ form.email.label }}<br>
             {{ form.email(class="form-control", type="email") }}<br>
             {% for error in form.email.errors %}
@@ -20,7 +20,7 @@
                 </div>
             {% endfor %}
         </p>
-        <p>
+        <p class="paragraph">
             {{ form.password.label }}<br>
             {{ form.password(class="form-control", type="password") }}<br>
             {% for error in form.password.errors %}

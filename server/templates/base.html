@@ -16,21 +16,18 @@
         <a href="/about" class="F2">Об авторах</a>
     </nav>
         {% if current_user.is_authenticated %}
-        <br>
             <a class="playButton" href="/game">Играть</a>
         </br>
         {% else %}
-        <br>
             <a class="non-playButton"> Войдите в систему, чтобы играть</a>
         </br>
         {% endif %}
-        <br>
         </br>
     <table>
         <tr><th>Место</th><th>Никнейм</th><th>Кол-во побед</th></tr>
         {% for i in users %}
             {% if current_user.is_authenticated and current_user.is_admin == 1 %}
-                    <tr><td><a class="nicks" href="/stealth/{{ i.id }}">{{ i.name }}</a></td><td>{{ i.wins }}</td></tr>
+                    <tr><td>{{ users.index(i) + 1}}</td><td><a class="nicks" href="/stealth/{{ i.id }}">{{ i.name }}</a></td><td>{{ i.wins }}</td></tr>
             {% else %}
                 {% if current_user.is_authenticated and current_user.id == i.id %}
                     <tr><td>{{ users.index(i) + 1}}</td><td>--> Вы <--</td><td>{{ i.wins }}</td></tr>

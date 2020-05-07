@@ -14,6 +14,8 @@ from data.RegisterForm import RegisterForm
 from data.news import News
 
 from data.users import User
+global player_ids
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandex_secret_key'
@@ -24,7 +26,7 @@ if not os.path.exists("db/blogs.sqlite"):
     os.mkdir("db")
     with open("db/blogs.sqlite", mode='w'):
         pass
-
+player_ids = set()
 
 def updateUsers(session):
     global users
@@ -199,6 +201,8 @@ def news_delete(id):
 @app.route("/game")
 @login_required
 def game():
+    if current_user.id in player_ids:
+        return render_template('Error.html', number=403)
     code = str(random.randint(0, 2 ** 32))
     requests.post("http://localhost:5001/post/adduser", json={"user": [code, current_user.id]})
     return render_template("game.html", code=code)
@@ -219,6 +223,7 @@ def localhostOnly(func):
 @app.route("/post/addgame/<int:playerId>", methods=["POST"])
 @localhostOnly
 def addGame(playerId):
+    player_ids.remove(playerId)
     session = db_session.create_session()
     user = session.query(User).get(playerId)
     if (not user):
@@ -233,6 +238,7 @@ def addGame(playerId):
 @app.route("/post/addwin/<int:playerId>", methods=["POST"])
 @localhostOnly
 def addWin(playerId):
+    player_ids.remove(playerId)
     session = db_session.create_session()
     user = session.query(User).get(playerId)
     if (not user):
