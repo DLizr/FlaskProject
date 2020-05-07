@@ -17,7 +17,11 @@
     </nav>
         </br>
         <div id="newtitle">{{ new.title }}</div>
-        <div id="new">{{ new.content }}</div>
+        <div id="new">
+            {% for line in new.content.split("\n")%}
+            {{ line }}<br/>
+            {% endfor %}
+        </div>
         <div id="back">
             {% if count >= new.id - 1 >= 1 %}
                 <a href="{{ new.id - 1 }}" class="btn-success"><</a>
@@ -33,13 +37,13 @@
     <div id="RegisterLogin">
     {% if current_user.is_authenticated %}
         <div id="nick">{{ current_user.name }}</div>
-        <a href="http://127.0.0.1:5000/logout" id="logout">Выйти</a>
+        <a href="/logout" id="logout">Выйти</a>
         {% if current_user.is_admin %}
-        <a href="http://127.0.0.1:5000/news" class="btn-secondary">Добавить новость</a>
+        <a href="/news" class="btn-secondary">Добавить новость</a>
         {% endif %}
     {% else %}
-        <a class="btn-primary" href="http://127.0.0.1:5000/register">Зарегистрироваться</a>
-        <a class="btn-success" href="http://127.0.0.1:5000/login">Войти</a>
+        <a class="btn-primary" href="/register">Зарегистрироваться</a>
+        <a class="btn-success" href="/login">Войти</a>
     {% endif %}
     </div>
         <h1 class="H">Новости последних обновлений</h1>
