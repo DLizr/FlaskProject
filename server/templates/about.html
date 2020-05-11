@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon"/>
     <meta name="viewport" content="width=device-width">
 </head>
-<body>
+<body class="H">
 <header>
     <div id="leftContent">
     <nav class="F">
@@ -48,9 +48,6 @@
         <h2>{{item.title}}</h2>
         <div class="news-modded">
             <a href="/content/{{ item.id }}">{{item.content[:item.content.find('.')]}}...<strong>Читать дальше</strong></a>
-        </div>
-        <div>
-            Автор - {{item.user.name}}
         </div>
         <div>
             Дата написания - {{item.created_date}}

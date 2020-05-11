@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ title }}</title>
+    <title>Protectivio</title>
 </head>
 <body class="H">
     {% extends "base.html" %}
@@ -15,9 +15,6 @@
         <h2>{{item.title}}</h2>
         <div class="news-modded">
             <a href="/content/{{ item.id }}">{{item.content[:item.content.find('.')]}}...<strong>Читать дальше</strong></a>
-        </div>
-        <div>
-            Автор - {{item.user.name}}
         </div>
         <div>
             Дата написания - {{item.created_date}}

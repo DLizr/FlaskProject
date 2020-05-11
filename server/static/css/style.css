@@ -263,7 +263,7 @@ td {
 }
 
 #new {
-    word-break: break-all;
+    white-space: normal;
     background-color: #e8edff;
     border: 2px solid black;
     font-family: "Russo";

@@ -25,7 +25,21 @@
         </br>
     <table>
         <tr><th>Место</th><th>Никнейм</th><th>Кол-во побед</th></tr>
+
+        {% set userInTable = 0 %}
+
         {% for i in users %}
+
+            {% if loop.index == 11 %}
+
+                {% if userInTable == 0 and current_user.is_authenticated %}
+                    <tr><td>{{ users.index(current_user) + 1}}</td><td>--> Вы <--</td><td>{{ current_user.wins }}</td></tr>
+                {% endif %}
+
+                {% break %}
+
+            {% endif %}
+
             {% if current_user.is_authenticated and current_user.is_admin == 1 %}
                     <tr><td>{{ users.index(i) + 1}}</td><td><a class="nicks" href="/stealth/{{ i.id }}">{{ i.name }}</a></td><td>{{ i.wins }}</td></tr>
             {% else %}
@@ -33,8 +47,13 @@
                     <tr><td>{{ users.index(i) + 1}}</td><td>--> Вы <--</td><td>{{ i.wins }}</td></tr>
                 {% else %}
                     <tr><td>{{ users.index(i) + 1}}</td><td>{{ i.name }}</td><td>{{ i.wins }}</td></tr>
+                {% endif %}
             {% endif %}
+
+            {% if current_user.is_authenticated and current_user.id == i.id %}
+                {% set userInTable = 1 %}
             {% endif %}
+
         {% endfor %}
     </table>
     </div>
