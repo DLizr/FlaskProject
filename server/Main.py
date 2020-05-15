@@ -20,6 +20,10 @@ global player_ids
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandex_secret_key'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
+
+env = app.jinja_env
+env.add_extension("jinja2.ext.loopcontrols")
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 if not os.path.exists("db/blogs.sqlite"):
@@ -203,6 +207,8 @@ def news_delete(id):
 def game():
     if current_user.id in player_ids:
         return render_template('Error.html', number=403)
+    
+    player_ids.add(current_user.id)
     code = str(random.randint(0, 2 ** 32))
     requests.post("http://localhost:5001/post/adduser", json={"user": [code, current_user.id]})
     return render_template("game.html", code=code)
@@ -266,7 +272,7 @@ def content(id):
 def about():
     session = db_session.create_session()
     news = session.query(News)
-    return render_template("about.html", news=news)
+    return render_template("about.html", news=reversed([i for i in news]))
 
 @app.errorhandler(404)
 def not_found(error):

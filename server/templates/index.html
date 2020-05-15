@@ -17,9 +17,6 @@
             <a href="/content/{{ item.id }}" class="news-modded">{{item.content[:item.content.find('.')]}}...<strong class="news-modded">Читать дальше</strong></a>
         </div>
         <div>
-            Автор - {{item.user.name}}
-        </div>
-        <div>
             Дата написания - {{item.created_date}}
         </div>
         {% if current_user.is_authenticated and current_user == item.user %}
