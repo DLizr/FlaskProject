@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ title }}</title>
+    <title>Protectivio</title>
 </head>
 <body class="H">
     {% extends "base.html" %}
@@ -14,7 +14,7 @@
     <div class="news">
         <h2>{{item.title}}</h2>
         <div class="news-modded">
-            <a href="/content/{{ item.id }}">{{item.content[:item.content.find('.')]}}...<strong>Читать дальше</strong></a>
+            <a href="/content/{{ item.id }}" class="news-modded">{{item.content[:item.content.find('.')]}}...<strong class="news-modded">Читать дальше</strong></a>
         </div>
         <div>
             Автор - {{item.user.name}}

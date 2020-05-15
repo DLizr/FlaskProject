@@ -270,7 +270,21 @@ def about():
 
 @app.errorhandler(404)
 def not_found(error):
-    return render_template('Error.html', number=error)
+    session = db_session.create_session()
+    news = session.query(News)
+    return render_template('Error.html', error=error, news=reversed([i for i in news]))
+
+@app.errorhandler(403)
+def four_hundred_three(error):
+    session = db_session.create_session()
+    news = session.query(News)
+    return render_template('Error.html', error=error, news=reversed([i for i in news]))
+
+@app.errorhandler(500)
+def five_hundred(error):
+    session = db_session.create_session()
+    news = session.query(News)
+    return render_template('Error.html', error=error, news=reversed([i for i in news]))
 
 
 if __name__ == '__main__':

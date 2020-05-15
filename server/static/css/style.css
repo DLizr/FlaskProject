@@ -105,7 +105,6 @@ body {
 }
 
 .non-playButton:hover {
-    border: 3vh dotted #3a7999;
     background-color: #AD0000;
     color: red;
 }
@@ -119,6 +118,7 @@ body {
 }
 
 .news {
+    white-space: normal;
     padding-left: 5%;
     padding-right: 5%;
     padding-top: 5%;
@@ -126,6 +126,7 @@ body {
     background-color: #32f3cf;
 }
 .news-modded {
+    white-space: normal;
     word-break: break-all;
     text-decoration: none;
     overflow: auto;
@@ -135,6 +136,7 @@ body {
     background-color: #32f4ff;
 }
 .text {
+  white-space: normal;
   display: none;
   padding-top: 20px;
   position: absolute;
@@ -147,7 +149,15 @@ body {
     background-color: green;
 }
 
+.news-modded strong{
+    white-space: normal;
+    word-break: break-all;
+    text-decoration: none;
+    overflow: auto;
+}
+
 .news div {
+    white-space: normal;
     display: flex;
     align-items: stretch;
     justify-content: center;
@@ -263,6 +273,7 @@ td {
 }
 
 #new {
+    white-space: normal;
     word-break: break-all;
     background-color: #e8edff;
     border: 2px solid black;
@@ -315,13 +326,13 @@ td {
    margin-top: 3vh;
    margin-left: 1vw;
    color: #f5f4ed;
-   font-size: 2vw;
+   font-size: 3vw;
    text-decoration: none;
    font-family: "Neucha";
 }
 .F2 {
     margin-top: 3vh;
-    font-size: 1vw;
+    font-size: 2vw;
     color: #f5f4ed;
     margin-right: 3vw;
     font-family: "Neucha";
