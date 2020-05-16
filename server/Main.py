@@ -14,8 +14,8 @@ from data.RegisterForm import RegisterForm
 from data.news import News
 
 from data.users import User
-global player_ids
 
+global player_ids
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandex_secret_key'
@@ -31,6 +31,7 @@ if not os.path.exists("db/blogs.sqlite"):
     with open("db/blogs.sqlite", mode='w'):
         pass
 player_ids = set()
+
 
 def updateUsers(session):
     global users
@@ -207,7 +208,7 @@ def news_delete(id):
 def game():
     if current_user.id in player_ids:
         return render_template('Error.html', number=403)
-    
+
     player_ids.add(current_user.id)
     code = str(random.randint(0, 2 ** 32))
     requests.post("http://localhost:5001/post/adduser", json={"user": [code, current_user.id]})
@@ -222,6 +223,7 @@ def localhostOnly(func):
             return jsonify({"error": "Unauthorized sender"}), 403
 
         return func(*args, **kwargs)
+
     localhostOnlyRoute.__name__ = func.__name__
     return localhostOnlyRoute
 
@@ -268,29 +270,59 @@ def content(id):
     news = session.query(News)
     return render_template("right.html", new=new, count=len([i for i in session.query(News)]), news=news)
 
+
 @app.route("/about")
 def about():
     session = db_session.create_session()
     news = session.query(News)
     return render_template("about.html", news=reversed([i for i in news]))
 
+
 @app.errorhandler(404)
 def not_found(error):
     session = db_session.create_session()
     news = session.query(News)
-    return render_template('Error.html', error=error, news=reversed([i for i in news]))
+    return render_template('Error.html', error='404 не найден: запрошенный URL-адрес не был найден'
+                                               ' на сервере. Если вы ввели URL вручную, пожалуйста,'
+                                               ' проверьте орфографию и повторите попытку.',
+                           news=reversed([i for i in news]))
+
 
 @app.errorhandler(403)
-def four_hundred_three(error):
+def forbidden(error):
     session = db_session.create_session()
     news = session.query(News)
-    return render_template('Error.html', error=error, news=reversed([i for i in news]))
+    return render_template('Error.html', error='Ошибка 403 запрещено:'
+                                               ' доступ к странице или ресурсу,'
+                                               ' который вы пытались открыть,'
+                                               ' по какой-то причине абсолютно запрещен.',
+                           news=reversed([i for i in news]))
+
 
 @app.errorhandler(500)
-def five_hundred(error):
+def internal_error(error):
     session = db_session.create_session()
     news = session.query(News)
-    return render_template('Error.html', error=error, news=reversed([i for i in news]))
+    return render_template('Error.html', error='Внутренняя ошибка сервера 500: '
+                                               'что что-то пошло не так на сервере веб-сайта,'
+                                               ' но сервер не может более конкретно сообщить'
+                                               ' о том, в чем именно заключается проблема.',
+                           news=reversed([i for i in news]))
+
+
+@app.errorhandler(401)
+def unauthorized(error):
+    session = db_session.create_session()
+    news = session.query(News)
+    return render_template('Error.html', error='401 не авторизован:'
+                                               ' сервер не смог проверить,'
+                                               ' что вы авторизованы для доступа'
+                                               ' к запрошенному URL-адресу.'
+                                               ' Вы либо ввели неверные учетные данные '
+                                               '(например, неверный пароль), '
+                                               'либо ваш браузер не понимает, '
+                                               'как предоставить необходимые'
+                                               ' учетные данные.', news=reversed([i for i in news]))
 
 
 if __name__ == '__main__':
