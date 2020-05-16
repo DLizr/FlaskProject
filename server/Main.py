@@ -37,6 +37,11 @@ def updateUsers(session):
     global users
     users = sorted(session.query(User).filter(User.banned_from_table == 0).all(), key=lambda x: -x.wins)
 
+def updateNews():
+    global news
+    session = db_session.create_session()
+    news = session.query(News)
+
 
 def main():
     db_session.global_init("db/blogs.sqlite")
@@ -49,9 +54,9 @@ def main():
 @app.route('/stealth/<int:id>')
 def stealthbutton(id):
     if current_user.is_authenticated != 1:
-        return render_template('Error.html', number=403)
+        unauthorized()
     if current_user.is_admin == 0:
-        return render_template('Error.html', number=403)
+        forbidden()
     session = db_session.create_session()
     banned = session.query(User).filter(User.id == id).first()
     banned.banned_from_table = 1
@@ -68,15 +73,14 @@ def favicon():
 
 @app.route("/")
 def index():
-    session = db_session.create_session()
-    news = session.query(News)
+    updateNews()
     return render_template("index.html", news=reversed([i for i in news]), users=users)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
     if current_user.is_authenticated == 1:
-        return render_template('Error.html', number=403)
+        unauthorized()
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -110,7 +114,7 @@ def load_user(user_id):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated == 1:
-        return render_template('Error.html', number=403)
+        unauthorized()
     form = LoginForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -135,9 +139,9 @@ def logout():
 @login_required
 def add_news():
     if current_user.is_authenticated != 1:
-        return render_template('Error.html', number=403)
+        unauthorized()
     if current_user.is_admin == 0:
-        return render_template('Error.html', number=403)
+        forbidden()
     form = NewsForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -157,9 +161,9 @@ def add_news():
 @login_required
 def edit_news(id):
     if current_user.is_authenticated != 1:
-        return render_template('Error.html', number=403)
+        unauthorized()
     if current_user.is_admin == 0:
-        return render_template('Error.html', number=403)
+        forbidden()
     form = NewsForm()
     if request.method == "GET":
         session = db_session.create_session()
@@ -189,9 +193,9 @@ def edit_news(id):
 @login_required
 def news_delete(id):
     if current_user.is_authenticated != 1:
-        return render_template('Error.html', number=403)
+        unauthorized()
     if current_user.is_admin == 0:
-        return render_template('Error.html', number=403)
+        forbidden()
     session = db_session.create_session()
     news = session.query(News).filter(News.id == id,
                                       News.user == current_user).first()
@@ -206,9 +210,10 @@ def news_delete(id):
 @app.route("/game")
 @login_required
 def game():
+    if current_user.is_authenticated != 1:
+        unauthorized()
     if current_user.id in player_ids:
-        return render_template('Error.html', number=403)
-
+        forbidden()
     player_ids.add(current_user.id)
     code = str(random.randint(0, 2 ** 32))
     requests.post("http://localhost:5001/post/adduser", json={"user": [code, current_user.id]})
@@ -220,7 +225,7 @@ def localhostOnly(func):
         senderIp = request.headers.get('X-Forwarded-For', request.remote_addr)
 
         if (senderIp != "127.0.0.1"):
-            return jsonify({"error": "Unauthorized sender"}), 403
+            forbidden()
 
         return func(*args, **kwargs)
 
@@ -235,7 +240,7 @@ def addGame(playerId):
     session = db_session.create_session()
     user = session.query(User).get(playerId)
     if (not user):
-        return jsonify({"error": "Invalid user"}), 404
+        not_found()
 
     user.gamesCount += 1
     session.commit()
@@ -250,7 +255,7 @@ def addWin(playerId):
     session = db_session.create_session()
     user = session.query(User).get(playerId)
     if (not user):
-        return jsonify({"error": "Invalid user"}), 404
+        not_found()
 
     user.gamesCount += 1
     user.wins += 1
@@ -273,15 +278,13 @@ def content(id):
 
 @app.route("/about")
 def about():
-    session = db_session.create_session()
-    news = session.query(News)
+    updateNews()
     return render_template("about.html", news=reversed([i for i in news]))
 
 
 @app.errorhandler(404)
 def not_found(error):
-    session = db_session.create_session()
-    news = session.query(News)
+    updateNews()
     return render_template('Error.html', error='404 не найден: запрошенный URL-адрес не был найден'
                                                ' на сервере. Если вы ввели URL вручную, пожалуйста,'
                                                ' проверьте орфографию и повторите попытку.',
@@ -290,8 +293,7 @@ def not_found(error):
 
 @app.errorhandler(403)
 def forbidden(error):
-    session = db_session.create_session()
-    news = session.query(News)
+    updateNews()
     return render_template('Error.html', error='Ошибка 403 запрещено:'
                                                ' доступ к странице или ресурсу,'
                                                ' который вы пытались открыть,'
@@ -301,8 +303,7 @@ def forbidden(error):
 
 @app.errorhandler(500)
 def internal_error(error):
-    session = db_session.create_session()
-    news = session.query(News)
+    updateNews()
     return render_template('Error.html', error='Внутренняя ошибка сервера 500: '
                                                'что что-то пошло не так на сервере веб-сайта,'
                                                ' но сервер не может более конкретно сообщить'
@@ -312,8 +313,7 @@ def internal_error(error):
 
 @app.errorhandler(401)
 def unauthorized(error):
-    session = db_session.create_session()
-    news = session.query(News)
+    updateNews()
     return render_template('Error.html', error='401 не авторизован:'
                                                ' сервер не смог проверить,'
                                                ' что вы авторизованы для доступа'
