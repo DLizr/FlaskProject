@@ -105,7 +105,6 @@ body {
 }
 
 .non-playButton:hover {
-    border: 3vh dotted #3a7999;
     background-color: #AD0000;
     color: red;
 }
@@ -119,6 +118,7 @@ body {
 }
 
 .news {
+    white-space: normal;
     padding-left: 5%;
     padding-right: 5%;
     padding-top: 5%;
@@ -126,6 +126,7 @@ body {
     background-color: #32f3cf;
 }
 .news-modded {
+    white-space: normal;
     word-break: break-all;
     text-decoration: none;
     overflow: auto;
@@ -135,6 +136,7 @@ body {
     background-color: #32f4ff;
 }
 .text {
+  white-space: normal;
   display: none;
   padding-top: 20px;
   position: absolute;
@@ -147,7 +149,15 @@ body {
     background-color: green;
 }
 
+.news-modded strong{
+    white-space: normal;
+    word-break: break-all;
+    text-decoration: none;
+    overflow: auto;
+}
+
 .news div {
+    white-space: normal;
     display: flex;
     align-items: stretch;
     justify-content: center;
@@ -191,8 +201,7 @@ body {
 table {
   overflow: auto;
   align-self: center;
-  justify-content: center;
-  font-size: 14px;
+  font-size: 1vw;
   max-width: 70%;
   width: 70%;
   text-align: center;
@@ -201,7 +210,7 @@ table {
   border-bottom: 7px solid #9baff1;
 }
 th {
-  font-size: 13px;
+  font-size: 1vw;
   font-weight: normal;
   background: #e8edff;
   border-right: 1px solid #9baff1;
@@ -264,6 +273,7 @@ td {
 }
 
 #new {
+    white-space: normal;
     word-break: break-all;
     background-color: #e8edff;
     border: 2px solid black;
@@ -313,16 +323,64 @@ td {
 }
 
 .F1 {
-   margin-top: 1vh;
+   margin-top: 3vh;
    margin-left: 1vw;
    color: #f5f4ed;
-   font-size: 2vw;
+   font-size: 3vw;
    text-decoration: none;
    font-family: "Neucha";
 }
 .F2 {
-    font-size: 1vw;
+    margin-top: 3vh;
+    font-size: 2vw;
     color: #f5f4ed;
     margin-right: 3vw;
     font-family: "Neucha";
+}
+
+.form {
+    display: block;
+    overflow: auto;
+    height: 100%;
+}
+
+.paragraph {
+    justify-content: space-between;
+}
+
+@media only handheld and (max-device-width: 2340px) {
+    .F1 {
+   margin-top: 3vh;
+   margin-left: 1vw;
+   color: #f5f4ed;
+   font-size: 7vw;
+   text-decoration: none;
+   font-family: "Neucha";
+}
+.F2 {
+    margin-top: 3vh;
+    font-size: 6vw;
+    color: #f5f4ed;
+    margin-right: 3vw;
+    font-family: "Neucha";
+}
+.paragraph {
+    justify-content: space-between;
+    font-size: 4vw;
+}
+#newtitle {
+    font-family: "Neucha";
+    border: 3px dashed black;
+    font-size: 3vh;
+    border-radius: 20px;
+    padding-left: 1vw;
+    padding-right: 1vw;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+    background-color: #e8edff;
+    margin-left: 2vw;
+    margin-right: 2vw;
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+}
 }
