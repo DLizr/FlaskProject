@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ title }}</title>
+    <title>Protectivio</title>
 </head>
 <body class="H">
     {% extends "base.html" %}
@@ -10,14 +10,11 @@
     {% block content %}
     <h1>Новости последних обновлений</h1>
     {% for item in news%}
-    <br></br>
+    </br>
     <div class="news">
         <h2>{{item.title}}</h2>
         <div class="news-modded">
-            <a href="/content/{{ item.id }}">{{item.content[:item.content.find('.')]}}...<strong>Читать дальше</strong></a>
-        </div>
-        <div>
-            Автор - {{item.user.name}}
+            <a href="/content/{{ item.id }}" class="news-modded">{{item.content[:item.content.find('.')]}}...<strong class="news-modded">Читать дальше</strong></a>
         </div>
         <div>
             Дата написания - {{item.created_date}}
@@ -30,7 +27,7 @@
         {% endif %}
     </div>
     {% endfor %}
-    <br></br>
+    </br>
     {% endblock %}
 </body>
 </html>

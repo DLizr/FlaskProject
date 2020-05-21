@@ -8,14 +8,14 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon"/>
     <meta name="viewport" content="width=device-width">
 </head>
-<body>
+<body class="H">
 <header>
     <div id="leftContent">
     <nav class="F">
         <a href="/" class="F1">Protectivio</a>
         <a href="/about" class="F2">Об авторах</a>
     </nav>
-        <br></br>
+        </br>
         <div id="newtitle">Об авторах</div>
         <div id="new">https://github.com/DLizr/Protectivio - ссылка на репозиторий GitHub.
             Игра сделана двумя яндекс-лицеистами как финальный проект web: Димой и Артёмом.
@@ -31,26 +31,23 @@
     <div id="RegisterLogin">
     {% if current_user.is_authenticated %}
         <div id="nick">{{ current_user.name }}</div>
-        <a href="http://127.0.0.1:5000/logout" id="logout">Выйти</a>
+        <a href="/logout" id="logout">Выйти</a>
         {% if current_user.is_admin %}
-        <a href="http://127.0.0.1:5000/news" class="btn-secondary">Добавить новость</a>
+        <a href="/news" class="btn-secondary">Добавить новость</a>
         {% endif %}
     {% else %}
-        <a class="btn-primary" href="http://127.0.0.1:5000/register">Зарегистрироваться</a>
-        <a class="btn-success" href="http://127.0.0.1:5000/login">Войти</a>
+        <a class="btn-primary" href="/register">Зарегистрироваться</a>
+        <a class="btn-success" href="/login">Войти</a>
     {% endif %}
         </div>
 
         <h1 class="H">Новости последних обновлений</h1>
     {% for item in news%}
-    <br></br>
+    </br>
     <div class="news">
         <h2>{{item.title}}</h2>
         <div class="news-modded">
             <a href="/content/{{ item.id }}">{{item.content[:item.content.find('.')]}}...<strong>Читать дальше</strong></a>
-        </div>
-        <div>
-            Автор - {{item.user.name}}
         </div>
         <div>
             Дата написания - {{item.created_date}}
@@ -64,7 +61,7 @@
     {% endif %}
     </div>
     {% endfor %}
-    <br></br>
+    </br>
 </div>
 </body>
 </html>
