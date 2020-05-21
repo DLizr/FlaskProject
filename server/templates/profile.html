@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet"  href="/static/css/style.css">
+    <title>Protectivio</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon"/>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon"/>
+    <meta name="viewport" content="width=device-width">
+</head>
+<body>
+<header>
+    <div id="leftContent">
+    <nav class="F">
+        <a href="/" class="F1">Protectivio</a>
+        <a href="/about" class="F2">Об авторах</a>
+    </nav>
+        </br>
+        <div id="newtitle">Профиль {{ user.name }}</div>
+        <div id="new">
+                Дата регистрации: {{ user.created_date }}<br/>
+                {% if user.gamesCount != 0 %}
+                    Процент побед: {{ (user.wins / (user.gamesCount / 100)) * 100 }}%<br/>
+                {% else %}
+                    Процент побед: 0%<br/>
+                {% endif %}
+                Количество побед: {{ user.wins }}<br/>
+                Количество игр: {{ user.gamesCount}}<br/>
+        </div>
+        <div id="back">
+            <a href="/" class="btn-primary">Вернуться</a>
+        </div>
+    </div>
+</header>
+<div class="rightContent">
+    <div id="RegisterLogin">
+    {% if current_user.is_authenticated %}
+        <div id="nick">{{ current_user.name }}</div>
+        <a href="/logout" id="logout">Выйти</a>
+        {% if current_user.is_admin %}
+        <a href="/news" class="btn-secondary">Добавить новость</a>
+        {% endif %}
+    {% else %}
+        <a class="btn-primary" href="/register">Зарегистрироваться</a>
+        <a class="btn-success" href="/login">Войти</a>
+    {% endif %}
+    </div>
+        <h1 class="H">Новости последних обновлений</h1>
+    {% for item in news%}
+    </br>
+    <div class="news">
+        <h2>{{item.title}}</h2>
+        <div class="news-modded">
+            <a href="/content/{{ item.id }}">{{item.content[:item.content.find('.')]}}...<strong>Читать дальше</strong></a>
+        </div>
+        <div>
+            Автор - {{item.user.name}}
+        </div>
+        <div>
+            Дата написания - {{item.created_date}}
+        </div>
+        {% if current_user.is_authenticated and current_user == item.user %}
+    <div>
+        <a href="/news/{{ item.id }}" class="btn-secondary">Изменить</a>
+        <a href="/news_delete/{{ item.id }}" class="btn-primary">Удалить</a>
+    </div>
+
+    {% endif %}
+    </div>
+    {% endfor %}
+    </br>
+    </div>
+</body>
+</html>

@@ -264,7 +264,13 @@ td {
 }
 
 .nicks {
+    color: blue;
+    text-decoration: none;
+}
+
+.ban-nick {
     color: red;
+    text-decoration: line-through;
 }
 
 .errorimg {

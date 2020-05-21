@@ -35,11 +35,10 @@ player_ids = set()
 
 def updateUsers(session):
     global users
-    users = sorted(session.query(User).filter(User.banned_from_table == 0).all(), key=lambda x: -x.wins)
+    users = sorted(session.query(User).all(), key=lambda x: -x.wins)
 
-def updateNews():
+def updateNews(session):
     global news
-    session = db_session.create_session()
     news = session.query(News)
 
 
@@ -48,6 +47,7 @@ def main():
     app.register_blueprint(news_api.blueprint)
     session = db_session.create_session()
     updateUsers(session)
+    updateNews(session)
     app.run(host="0.0.0.0", port=5000)
 
 
@@ -59,7 +59,10 @@ def stealthbutton(id):
         forbidden()
     session = db_session.create_session()
     banned = session.query(User).filter(User.id == id).first()
-    banned.banned_from_table = 1
+    if banned.banned_from_table != 1:
+        banned.banned_from_table = 1
+    else:
+        banned.banned_from_table = 0
     session.commit()
     updateUsers(session)
     return redirect('/')
@@ -73,7 +76,6 @@ def favicon():
 
 @app.route("/")
 def index():
-    updateNews()
     return render_template("index.html", news=reversed([i for i in news]), users=users)
 
 
@@ -148,10 +150,10 @@ def add_news():
         news = News()
         news.title = form.title.data
         news.content = form.content.data
-        news.is_private = form.is_private.data
         current_user.news.append(news)
         session.merge(current_user)
         session.commit()
+        updateNews(session)
         return redirect('/')
     return render_template('news.html', title='Добавление новости',
                            form=form, users=users)
@@ -183,6 +185,7 @@ def edit_news(id):
             news.content = form.content.data
             news.is_private = form.is_private.data
             session.commit()
+            updateNews(session)
             return redirect('/')
         else:
             abort(404)
@@ -202,6 +205,7 @@ def news_delete(id):
     if news:
         session.delete(news)
         session.commit()
+        updateNews(session)
     else:
         abort(404)
     return redirect('/')
@@ -278,13 +282,11 @@ def content(id):
 
 @app.route("/about")
 def about():
-    updateNews()
     return render_template("about.html", news=reversed([i for i in news]))
 
 
 @app.errorhandler(404)
 def not_found(error):
-    updateNews()
     return render_template('Error.html', error='404 не найден: запрошенный URL-адрес не был найден'
                                                ' на сервере. Если вы ввели URL вручную, пожалуйста,'
                                                ' проверьте орфографию и повторите попытку.',
@@ -293,7 +295,6 @@ def not_found(error):
 
 @app.errorhandler(403)
 def forbidden(error):
-    updateNews()
     return render_template('Error.html', error='Ошибка 403 запрещено:'
                                                ' доступ к странице или ресурсу,'
                                                ' который вы пытались открыть,'
@@ -303,7 +304,6 @@ def forbidden(error):
 
 @app.errorhandler(500)
 def internal_error(error):
-    updateNews()
     return render_template('Error.html', error='Внутренняя ошибка сервера 500: '
                                                'что что-то пошло не так на сервере веб-сайта,'
                                                ' но сервер не может более конкретно сообщить'
@@ -313,7 +313,6 @@ def internal_error(error):
 
 @app.errorhandler(401)
 def unauthorized(error):
-    updateNews()
     return render_template('Error.html', error='401 не авторизован:'
                                                ' сервер не смог проверить,'
                                                ' что вы авторизованы для доступа'
@@ -323,6 +322,13 @@ def unauthorized(error):
                                                'либо ваш браузер не понимает, '
                                                'как предоставить необходимые'
                                                ' учетные данные.', news=reversed([i for i in news]))
+
+
+@app.route("/profile/<int:id>")
+def profile(id):
+    session = db_session.create_session()
+    user = session.query(User).filter(User.id == id).first()
+    return render_template("profile.html", news=reversed([i for i in news]), user=user)
 
 
 if __name__ == '__main__':
