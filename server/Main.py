@@ -328,6 +328,8 @@ def unauthorized(error):
 def profile(id):
     session = db_session.create_session()
     user = session.query(User).filter(User.id == id).first()
+    if not user:
+        abort(403)
     return render_template("profile.html", news=reversed([i for i in news]), user=user)
 
 
