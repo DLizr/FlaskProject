@@ -1,3 +1,4 @@
+from collections import deque
 import random
 
 from src.simulation.data._InteractingBuilding import InteractingBuilding
@@ -51,49 +52,29 @@ class Mortar(InteractingBuilding):
     
     def __findTarget(self):
         x, y = self.__x, self.__y
-        for i in range(1, 9):  # Breadth-first search optimized for finding the closest target first, holy boilerplate.
-            if (i % 2 == 0):
-                i2 = i // 2
-                if (self.__checkCell(x + i2 - i, y + i2)):
-                    return
-                if (self.__checkCell(x + i - i2, y - i2)):
-                    return
-                if (self.__checkCell(x - i2, y + i2 - i)):
-                    return
-                if (self.__checkCell(x + i2, y + i - i2)):
-                    return
-                
-            for i2 in range(i//2 + 1, i):
-                if (self.__checkCell(x + i2 - i, y - i2)):
-                    return
-                if (self.__checkCell(x + i - i2, y + i2)):
-                    return
-                if (self.__checkCell(x + i2, y + i2 - i)):
-                    return
-                if (self.__checkCell(x - i2, y + i - i2)):
-                    return
-                
-                if (self.__checkCell(x + i2 - i, y + i2)):
-                    return
-                if (self.__checkCell(x + i - i2, y - i2)):
-                    return
-                if (self.__checkCell(x - i2, y + i2 - i)):
-                    return
-                if (self.__checkCell(x + i2, y + i - i2)):
-                    return
-                
-            if (self.__checkCell(x - i, y)):
-                return
-            if (self.__checkCell(x + i, y)):
-                return
-            if (self.__checkCell(x, y - i)):
-                return
-            if (self.__checkCell(x, y + i)):
-                return
+
+        distance = [[0 for j in range(max(0, x - 9), x + 10)] for i in range(max(0, y - 9), y + 10)]
+        bfsQueue = deque()
+        bfsQueue.appendleft((x, y))
+        while (len(bfsQueue) > 0):
+            tileX, tileY = bfsQueue.pop()
+            if (distance[tileY][tileX] > 9):
+                break
+            if (self.__tryToAttack(tileX, tileY)):
+                break
+            for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+                if (self.__checkCell(tileX + dx, tileY + dy)):
+                    if (distance[tileY + dy][tileX + dx] == 0):
+                        distance[tileY + dy][tileX + dx] = distance[tileY][tileX] + 1
+                        bfsQueue.appendleft((tileX + dx, tileY + dy))
+            
     
-    def __checkCell(self, x: int, y: int):
+    def __checkCell(self, x: int, y: int) -> bool:
         c = self.__field.get(x, y)
-        
+        return c != Field.TILE_INVALID
+    
+    def __tryToAttack(self, x: int, y: int) -> bool:
+        c = self.__field.get(x, y)
         if (c and c.getTeam() == self.ATTACKING):
             self.__lastTarget = (x, y)
             return True

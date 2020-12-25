@@ -1,4 +1,5 @@
 class Field:
+    TILE_INVALID = 0
     
     def __init__(self, base: list, width: int, height: int):
         self.__base = base
@@ -20,7 +21,7 @@ class Field:
     def get(self, x: int, y: int):
         if (0 <= x < self.__width and 0 <= y < self.__height):
             return self.__base[y * self.__width + x]
-        return None
+        return self.TILE_INVALID
     
     def remove(self, x: int, y: int):
         self.__base[y * self.__width + x] = None
