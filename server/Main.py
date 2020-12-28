@@ -37,6 +37,7 @@ def updateUsers(session):
     global users
     users = sorted(session.query(User).all(), key=lambda x: -x.wins)
 
+
 def updateNews(session):
     global news
     news = session.query(News)
@@ -51,14 +52,25 @@ def main():
     app.run(host="0.0.0.0", port=5000)
 
 
+def ifadmin(func):
+    def ifadmin(*args, **kwargs):
+        if current_user.is_authenticated != 1:
+            return unauthorized()
+        if current_user.is_admin == 0:
+            return forbidden()
+
+        return func(*args, **kwargs)
+
+    return ifadmin
+
+
 @app.route('/stealth/<int:id>')
+@ifadmin
 def stealthbutton(id):
-    if current_user.is_authenticated != 1:
-        unauthorized()
-    if current_user.is_admin == 0:
-        forbidden()
     session = db_session.create_session()
     banned = session.query(User).filter(User.id == id).first()
+    if not banned:
+        return not_found()
     if banned.banned_from_table != 1:
         banned.banned_from_table = 1
     else:
@@ -80,9 +92,9 @@ def index():
 
 
 @app.route('/register', methods=['GET', 'POST'])
-def reqister():
+def register():
     if current_user.is_authenticated == 1:
-        unauthorized()
+        return unauthorized()
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -116,7 +128,7 @@ def load_user(user_id):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated == 1:
-        unauthorized()
+        return unauthorized()
     form = LoginForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -140,10 +152,8 @@ def logout():
 @app.route('/news', methods=['GET', 'POST'])
 @login_required
 def add_news():
-    if current_user.is_authenticated != 1:
-        unauthorized()
     if current_user.is_admin == 0:
-        forbidden()
+        return forbidden()
     form = NewsForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -163,9 +173,9 @@ def add_news():
 @login_required
 def edit_news(id):
     if current_user.is_authenticated != 1:
-        unauthorized()
+        return unauthorized()
     if current_user.is_admin == 0:
-        forbidden()
+        return forbidden()
     form = NewsForm()
     if request.method == "GET":
         session = db_session.create_session()
@@ -196,9 +206,9 @@ def edit_news(id):
 @login_required
 def news_delete(id):
     if current_user.is_authenticated != 1:
-        unauthorized()
+        return unauthorized()
     if current_user.is_admin == 0:
-        forbidden()
+        return forbidden()
     session = db_session.create_session()
     news = session.query(News).filter(News.id == id,
                                       News.user == current_user).first()
@@ -215,9 +225,9 @@ def news_delete(id):
 @login_required
 def game():
     if current_user.is_authenticated != 1:
-        unauthorized()
+        return unauthorized()
     if current_user.id in player_ids:
-        forbidden()
+        return forbidden()
     player_ids.add(current_user.id)
     code = str(random.randint(0, 2 ** 32))
     requests.post("http://localhost:5001/post/adduser", json={"user": [code, current_user.id]})
@@ -229,7 +239,7 @@ def localhostOnly(func):
         senderIp = request.headers.get('X-Forwarded-For', request.remote_addr)
 
         if (senderIp != "127.0.0.1"):
-            forbidden()
+            return forbidden()
 
         return func(*args, **kwargs)
 
@@ -243,9 +253,8 @@ def addGame(playerId):
     player_ids.remove(playerId)
     session = db_session.create_session()
     user = session.query(User).get(playerId)
-    if (not user):
-        not_found()
-
+    if not user:
+        return not_found()
     user.gamesCount += 1
     session.commit()
 
@@ -258,9 +267,8 @@ def addWin(playerId):
     player_ids.remove(playerId)
     session = db_session.create_session()
     user = session.query(User).get(playerId)
-    if (not user):
-        not_found()
-
+    if not user:
+        return not_found()
     user.gamesCount += 1
     user.wins += 1
     session.commit()
@@ -286,7 +294,7 @@ def about():
 
 
 @app.errorhandler(404)
-def not_found(error):
+def not_found(error=404):
     return render_template('Error.html', error='404 не найден: запрошенный URL-адрес не был найден'
                                                ' на сервере. Если вы ввели URL вручную, пожалуйста,'
                                                ' проверьте орфографию и повторите попытку.',
@@ -294,16 +302,16 @@ def not_found(error):
 
 
 @app.errorhandler(403)
-def forbidden(error):
+def forbidden(error=403):
     return render_template('Error.html', error='Ошибка 403 запрещено:'
                                                ' доступ к странице или ресурсу,'
                                                ' который вы пытались открыть,'
-                                               ' по какой-то причине абсолютно запрещен.',
+                                               ' по какой-то причине абсолютно запрещён.',
                            news=reversed([i for i in news]))
 
 
 @app.errorhandler(500)
-def internal_error(error):
+def internal_error(error=500):
     return render_template('Error.html', error='Внутренняя ошибка сервера 500: '
                                                'что что-то пошло не так на сервере веб-сайта,'
                                                ' но сервер не может более конкретно сообщить'
@@ -312,7 +320,7 @@ def internal_error(error):
 
 
 @app.errorhandler(401)
-def unauthorized(error):
+def unauthorized(error=401):
     return render_template('Error.html', error='401 не авторизован:'
                                                ' сервер не смог проверить,'
                                                ' что вы авторизованы для доступа'
