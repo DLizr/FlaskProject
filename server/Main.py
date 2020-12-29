@@ -52,8 +52,8 @@ def main():
     app.run(host="0.0.0.0", port=5000)
 
 
-def ifadmin(func):
-    def ifadmin(*args, **kwargs):
+def adminsOnly(func):
+    def adminsOnlyRoute(*args, **kwargs):
         if current_user.is_authenticated != 1:
             return unauthorized()
         if current_user.is_admin == 0:
@@ -61,11 +61,12 @@ def ifadmin(func):
 
         return func(*args, **kwargs)
 
-    return ifadmin
+    adminsOnlyRoute.__name__ = func.__name__
+    return adminsOnlyRoute
 
 
 @app.route('/stealth/<int:id>')
-@ifadmin
+@adminsOnly
 def stealthbutton(id):
     session = db_session.create_session()
     banned = session.query(User).filter(User.id == id).first()
@@ -150,10 +151,8 @@ def logout():
 
 
 @app.route('/news', methods=['GET', 'POST'])
-@login_required
+@adminsOnly
 def add_news():
-    if current_user.is_admin == 0:
-        return forbidden()
     form = NewsForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -170,12 +169,8 @@ def add_news():
 
 
 @app.route('/news/<int:id>', methods=['GET', 'POST'])
-@login_required
+@adminsOnly
 def edit_news(id):
-    if current_user.is_authenticated != 1:
-        return unauthorized()
-    if current_user.is_admin == 0:
-        return forbidden()
     form = NewsForm()
     if request.method == "GET":
         session = db_session.create_session()
@@ -203,12 +198,8 @@ def edit_news(id):
 
 
 @app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
-@login_required
+@adminsOnly
 def news_delete(id):
-    if current_user.is_authenticated != 1:
-        return unauthorized()
-    if current_user.is_admin == 0:
-        return forbidden()
     session = db_session.create_session()
     news = session.query(News).filter(News.id == id,
                                       News.user == current_user).first()
