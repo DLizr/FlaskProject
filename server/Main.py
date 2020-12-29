@@ -40,7 +40,7 @@ def updateUsers(session):
 
 def updateNews(session):
     global news
-    news = session.query(News)
+    news = reversed([new for new in session.query(News)])
 
 
 def main():
@@ -89,7 +89,7 @@ def favicon():
 
 @app.route("/")
 def index():
-    return render_template("index.html", news=reversed([i for i in news]), users=users)
+    return render_template("index.html", news=[i for i in news], users=users)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -281,7 +281,7 @@ def content(id):
 
 @app.route("/about")
 def about():
-    return render_template("about.html", news=reversed([i for i in news]))
+    return render_template("about.html", news=[i for i in news])
 
 
 @app.errorhandler(404)
@@ -289,7 +289,7 @@ def not_found(error=404):
     return render_template('Error.html', error='404 не найден: запрошенный URL-адрес не был найден'
                                                ' на сервере. Если вы ввели URL вручную, пожалуйста,'
                                                ' проверьте орфографию и повторите попытку.',
-                           news=reversed([i for i in news]))
+                           news=[i for i in news])
 
 
 @app.errorhandler(403)
@@ -298,7 +298,7 @@ def forbidden(error=403):
                                                ' доступ к странице или ресурсу,'
                                                ' который вы пытались открыть,'
                                                ' по какой-то причине абсолютно запрещён.',
-                           news=reversed([i for i in news]))
+                           news=[i for i in news])
 
 
 @app.errorhandler(500)
@@ -307,7 +307,7 @@ def internal_error(error=500):
                                                'что что-то пошло не так на сервере веб-сайта,'
                                                ' но сервер не может более конкретно сообщить'
                                                ' о том, в чем именно заключается проблема.',
-                           news=reversed([i for i in news]))
+                           news=[i for i in news])
 
 
 @app.errorhandler(401)
@@ -320,7 +320,7 @@ def unauthorized(error=401):
                                                '(например, неверный пароль), '
                                                'либо ваш браузер не понимает, '
                                                'как предоставить необходимые'
-                                               ' учетные данные.', news=reversed([i for i in news]))
+                                               ' учетные данные.', news=[i for i in news])
 
 
 @app.route("/profile/<int:id>")
@@ -329,7 +329,7 @@ def profile(id):
     user = session.query(User).filter(User.id == id).first()
     if not user:
         abort(403)
-    return render_template("profile.html", news=reversed([i for i in news]), user=user)
+    return render_template("profile.html", news=[i for i in news], user=user)
 
 
 if __name__ == '__main__':

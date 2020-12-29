@@ -18,9 +18,9 @@
         </br>
         <div id="newtitle">Профиль {{ user.name }}</div>
         <div id="new">
-                Дата регистрации: {{ user.created_date }}<br/>
+                Дата регистрации: {{ user.created_date.strftime("%d.%m.%Y") }}<br/>
                 {% if user.gamesCount != 0 %}
-                    Процент побед: {{ (user.wins / (user.gamesCount / 100)) * 100 }}%<br/>
+                    Процент побед: {{ (user.wins / user.gamesCount) * 100 }}%<br/>
                 {% else %}
                     Процент побед: 0%<br/>
                 {% endif %}
