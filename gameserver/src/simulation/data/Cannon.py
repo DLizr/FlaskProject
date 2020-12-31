@@ -2,16 +2,19 @@ import random
 
 from src.simulation.data._InteractingBuilding import InteractingBuilding
 from src.simulation.Field import Field
+from src.util.pathfinding.SearchInRadius import SearchInRadius
 
 
 class Cannon(InteractingBuilding):
     
-    __hp = 10
-    __reloadSpeed = 5
-    __damage = 5
-    __speed = 0.2
+    hp = 10
+    reloadSpeed = 5
+    damage = 5
+    speed = 0.2
+    attackRadius = 6
     
     def __init__(self, x: int, y: int):
+        super().__init__(self.hp, x, y)
         self.__lastTarget: tuple = None
         self.__x = x
         self.__y = y
@@ -19,19 +22,18 @@ class Cannon(InteractingBuilding):
         
         self.__noTargets = False
         self.__reload = random.randint(0, 4)
+        self.__targetFinder: SearchInRadius = None
         self.__hitQueue = []
-    
-    def getHP(self):
-        return self.__hp
-    
-    def dealDamage(self, dmg: int):
-        self.__hp -= dmg
     
     def setField(self, field: Field):
         self.__field = field
+        self.__targetFinder = SearchInRadius(field, self.__x, self.__y)
+        self.__targetFinder.setAttackingFunction(self.__canAttack)
+        self.__targetFinder.setCellValidator(self.__isCellValid)
+        self.__targetFinder.findTargets()
     
     def update(self):
-        if (self.__hp <= 0):
+        if (self.getHP() <= 0):
             return
         self.__handleQueue()
         if (self.__noTargets):
@@ -47,58 +49,21 @@ class Cannon(InteractingBuilding):
         
         if (self.__reload == 0):  # Just shot
             return "S:{}:{}:{}:{}".format(str(self.__x), str(self.__y), str(self.__lastTarget[0]), str(self.__lastTarget[1]))
-
     
     def __findTarget(self):
-        x, y = self.__x, self.__y
-        for i in range(1, 6):  # Breadth-first search optimized for finding the closest target first, holy boilerplate.
-            if (i % 2 == 0):
-                i2 = i // 2
-                if (self.__checkCell(x + i2 - i, y + i2)):
-                    return
-                if (self.__checkCell(x + i - i2, y - i2)):
-                    return
-                if (self.__checkCell(x - i2, y + i2 - i)):
-                    return
-                if (self.__checkCell(x + i2, y + i - i2)):
-                    return
-                
-            for i2 in range(i//2 + 1, i):
-                if (self.__checkCell(x + i2 - i, y - i2)):
-                    return
-                if (self.__checkCell(x + i - i2, y + i2)):
-                    return
-                if (self.__checkCell(x + i2, y + i2 - i)):
-                    return
-                if (self.__checkCell(x - i2, y + i - i2)):
-                    return
-                
-                if (self.__checkCell(x + i2 - i, y + i2)):
-                    return
-                if (self.__checkCell(x + i - i2, y - i2)):
-                    return
-                if (self.__checkCell(x - i2, y + i2 - i)):
-                    return
-                if (self.__checkCell(x + i2, y + i - i2)):
-                    return
-                
-            if (self.__checkCell(x - i, y)):
-                return
-            if (self.__checkCell(x + i, y)):
-                return
-            if (self.__checkCell(x, y - i)):
-                return
-            if (self.__checkCell(x, y + i)):
-                return
+        target = self.__targetFinder.getNextTarget()
+        if (target):
+            self.__lastTarget = target
     
-    def __checkCell(self, x: int, y: int):
+    def __isCellValid(self, x: int, y: int) -> bool:
         c = self.__field.get(x, y)
-        
-        if (c and c.getTeam() == self.DEFENDING):
-            self.__lastTarget = (x, y)
-            return True
-        
-        return False
+        return c != Field.TILE_INVALID
+    
+    def __canAttack(self, x: int, y: int) -> bool:
+        if (abs(x - self.__x) + abs(y - self.__y) > self.attackRadius):
+            return False
+        c = self.__field.get(x, y)
+        return c and c.getTeam() == self.DEFENDING
     
     def __shoot(self):
         if (self.__reloading()):
@@ -106,14 +71,14 @@ class Cannon(InteractingBuilding):
         
         targetX, targetY = self.__lastTarget
         distance = ((targetX - self.__x) ** 2 + (targetY - self.__y) ** 2) ** 0.5
-        time = distance // self.__speed
+        time = distance // self.speed
         
         self.__hitQueue.append([self.__lastTarget, time])
             
     def __reloading(self):
         self.__reload += 1
         
-        if (self.__reload == self.__reloadSpeed):
+        if (self.__reload == self.reloadSpeed):
             self.__reload = 0
             return False
         
@@ -133,7 +98,7 @@ class Cannon(InteractingBuilding):
         target = self.__field.get(*coords)
         if (not target):
             return
-        target.dealDamage(self.__damage)
+        target.dealDamage(self.damage)
         
         if (target.getHP() <= 0):
             self.__field.remove(*self.__lastTarget)

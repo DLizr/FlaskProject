@@ -3,16 +3,18 @@ import random
 
 from src.simulation.data._InteractingBuilding import InteractingBuilding
 from src.simulation.Field import Field
+from src.util.pathfinding.SearchInRadius import SearchInRadius
 
 
 class Mortar(InteractingBuilding):
     
-    __hp = 10
-    __reloadSpeed = 8
-    __damage = 15
-    __speed = 0.125
+    hp = 10
+    reloadSpeed = 8
+    damage = 15
+    speed = 0.125
     
     def __init__(self, x: int, y: int):
+        super().__init__(self.hp, x, y)
         self.__lastTarget: tuple = None
         self.__x = x
         self.__y = y
@@ -21,18 +23,20 @@ class Mortar(InteractingBuilding):
         self.__noTargets = False
         self.__reload = random.randint(0, 7)
         self.__hitQueue = []
+        self.__targetFinder: SearchInRadius = None
     
-    def getHP(self):
-        return self.__hp
-    
-    def dealDamage(self, dmg: int):
-        self.__hp -= dmg
-    
+    # Override
     def setField(self, field: Field):
         self.__field = field
+        self.__targetFinder = SearchInRadius(field, self.__x, self.__y)
+        self.__targetFinder.setCellValidator(self.__isCellValid)
+        self.__targetFinder.setAttackingFunction(self.__canAttack)
+        self.__targetFinder.findTargets()
+        pass
     
+    # Override
     def update(self):
-        if (self.__hp <= 0):
+        if (self.getHP() <= 0):
             return
         self.__handleQueue()
         if (self.__noTargets):
@@ -49,37 +53,18 @@ class Mortar(InteractingBuilding):
         if (self.__reload == 0):  # Just shot
             return "S:{}:{}:{}:{}".format(str(self.__x), str(self.__y), str(self.__lastTarget[0]), str(self.__lastTarget[1]))
 
-    
     def __findTarget(self):
-        x, y = self.__x, self.__y
-
-        distance = [[0 for j in range(max(0, x - 9), x + 10)] for i in range(max(0, y - 9), y + 10)]
-        bfsQueue = deque()
-        bfsQueue.appendleft((x, y))
-        while (len(bfsQueue) > 0):
-            tileX, tileY = bfsQueue.pop()
-            if (distance[tileY][tileX] > 9):
-                break
-            if (self.__tryToAttack(tileX, tileY)):
-                break
-            for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0)):
-                if (self.__checkCell(tileX + dx, tileY + dy)):
-                    if (distance[tileY + dy][tileX + dx] == 0):
-                        distance[tileY + dy][tileX + dx] = distance[tileY][tileX] + 1
-                        bfsQueue.appendleft((tileX + dx, tileY + dy))
-            
+        target = self.__targetFinder.getNextTarget()
+        if (target):
+            self.__lastTarget = target
     
-    def __checkCell(self, x: int, y: int) -> bool:
+    def __isCellValid(self, x: int, y: int) -> bool:
         c = self.__field.get(x, y)
         return c != Field.TILE_INVALID
     
-    def __tryToAttack(self, x: int, y: int) -> bool:
+    def __canAttack(self, x: int, y: int) -> bool:
         c = self.__field.get(x, y)
-        if (c and c.getTeam() == self.ATTACKING):
-            self.__lastTarget = (x, y)
-            return True
-        
-        return False
+        return c and c.getTeam() == self.ATTACKING
     
     def __shoot(self):
         if (self.__reloading()):
@@ -87,14 +72,14 @@ class Mortar(InteractingBuilding):
         
         targetX, targetY = self.__lastTarget
         distance = ((targetX - self.__x) ** 2 + (targetY - self.__y) ** 2) ** 0.5
-        time = distance // self.__speed
+        time = distance // self.speed
         
         self.__hitQueue.append([self.__lastTarget, time])
             
     def __reloading(self):
         self.__reload += 1
         
-        if (self.__reload == self.__reloadSpeed):
+        if (self.__reload == self.reloadSpeed):
             self.__reload = 0
             return False
         
@@ -114,7 +99,7 @@ class Mortar(InteractingBuilding):
         target = self.__field.get(*coords)
         if (not target):
             return
-        target.dealDamage(self.__damage)
+        target.dealDamage(self.damage)
         
         if (target.getHP() <= 0):
             self.__field.remove(*self.__lastTarget)
@@ -124,5 +109,6 @@ class Mortar(InteractingBuilding):
     def hasTarget(self):
         return not self.__noTargets or self.__hitQueue
     
+    # Override
     def getTeam(self):
         return self.DEFENDING

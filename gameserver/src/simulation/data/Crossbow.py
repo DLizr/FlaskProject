@@ -4,12 +4,13 @@ from src.simulation.Field import Field
 
 class Crossbow(InteractingBuilding):
     
-    __hp = 10
-    __reloadSpeed = 1
-    __damage = 2
-    __speed = 0.4
+    hp = 10
+    reloadSpeed = 1
+    damage = 2
+    speed = 0.4
     
     def __init__(self, x: int, y: int):
+        super().__init__(self.hp, x, y)
         self.__lastTarget: tuple = None
         self.__x = x
         self.__y = y
@@ -32,17 +33,11 @@ class Crossbow(InteractingBuilding):
         elif (self.__y > 8):
             self.__direction = [0, -1]
     
-    def getHP(self):
-        return self.__hp
-    
-    def dealDamage(self, dmg: int):
-        self.__hp -= dmg
-    
     def setField(self, field: Field):
         self.__field = field
     
     def update(self):
-        if (self.__hp <= 0):
+        if (self.getHP() <= 0):
             return
         self.__handleQueue()
         if (self.__noTargets):
@@ -62,7 +57,7 @@ class Crossbow(InteractingBuilding):
     
     def __findTarget(self):
         x, y = self.__x, self.__y
-        for i in range(1, 11):  # Breadth-first search optimized for finding the closest target first, holy boilerplate.
+        for i in range(1, 11):
             if (self.__checkCell(x + i * self.__direction[0], y + i * self.__direction[1])):
                 break
     
@@ -81,7 +76,7 @@ class Crossbow(InteractingBuilding):
         
         targetX, targetY = self.__lastTarget
         distance = ((targetX - self.__x) ** 2 + (targetY - self.__y) ** 2) ** 0.5
-        time = distance // self.__speed
+        time = distance // self.speed
         
         self.__hitQueue.append([self.__lastTarget, time])
             
@@ -108,7 +103,7 @@ class Crossbow(InteractingBuilding):
         target = self.__field.get(*coords)
         if (not target):
             return
-        target.dealDamage(self.__damage)
+        target.dealDamage(self.damage)
         
         if (target.getHP() <= 0):
             self.__field.remove(*self.__lastTarget)
