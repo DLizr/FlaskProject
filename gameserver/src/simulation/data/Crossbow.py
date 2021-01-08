@@ -83,7 +83,7 @@ class Crossbow(InteractingBuilding):
     def __reloading(self):
         self.__reload += 1
         
-        if (self.__reload == self.__reloadSpeed):
+        if (self.__reload == self.reloadSpeed):
             self.__reload = 0
             return False
         
