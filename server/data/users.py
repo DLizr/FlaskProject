@@ -19,7 +19,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                               index=True, unique=True, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime,
-                                     default=datetime.datetime.now)
+                                     default=datetime.datetime.now())
     is_admin = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     banned_from_table = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     wins = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=0)
@@ -34,6 +34,3 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
-
-
-
