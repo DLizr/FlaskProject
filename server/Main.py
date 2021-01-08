@@ -40,7 +40,7 @@ def updateUsers(session):
 
 def updateNews(session):
     global news
-    news = reversed([new for new in session.query(News)])
+    news = list(reversed([new for new in session.query(News)]))
 
 
 def main():
@@ -89,7 +89,7 @@ def favicon():
 
 @app.route("/")
 def index():
-    return render_template("index.html", news=[i for i in news], users=users)
+    return render_template("index.html", news=news, users=users)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -245,7 +245,7 @@ def addGame(playerId):
     session = db_session.create_session()
     user = session.query(User).get(playerId)
     if not user:
-        return not_found()
+        return jsonify({"error": "Invalid User"}), 404
     user.gamesCount += 1
     session.commit()
 
@@ -259,7 +259,7 @@ def addWin(playerId):
     session = db_session.create_session()
     user = session.query(User).get(playerId)
     if not user:
-        return not_found()
+        return jsonify({"error": "Invalid User"}), 404
     user.gamesCount += 1
     user.wins += 1
     session.commit()
@@ -275,13 +275,12 @@ def content(id):
     if id not in ids:
         return redirect('/404')
     new = session.query(News).filter(News.id == id).first()
-    news = session.query(News)
-    return render_template("right.html", new=new, count=len([i for i in session.query(News)]), news=news)
+    return render_template("right.html", new=new, count=len(news), news=news)
 
 
 @app.route("/about")
 def about():
-    return render_template("about.html", news=[i for i in news])
+    return render_template("about.html", news=news)
 
 
 @app.errorhandler(404)
@@ -289,7 +288,7 @@ def not_found(error=404):
     return render_template('Error.html', error='404 не найден: запрошенный URL-адрес не был найден'
                                                ' на сервере. Если вы ввели URL вручную, пожалуйста,'
                                                ' проверьте орфографию и повторите попытку.',
-                           news=[i for i in news])
+                           news=news)
 
 
 @app.errorhandler(403)
@@ -298,7 +297,7 @@ def forbidden(error=403):
                                                ' доступ к странице или ресурсу,'
                                                ' который вы пытались открыть,'
                                                ' по какой-то причине абсолютно запрещён.',
-                           news=[i for i in news])
+                           news=news)
 
 
 @app.errorhandler(500)
@@ -307,7 +306,7 @@ def internal_error(error=500):
                                                'что что-то пошло не так на сервере веб-сайта,'
                                                ' но сервер не может более конкретно сообщить'
                                                ' о том, в чем именно заключается проблема.',
-                           news=[i for i in news])
+                           news=news)
 
 
 @app.errorhandler(401)
@@ -320,16 +319,17 @@ def unauthorized(error=401):
                                                '(например, неверный пароль), '
                                                'либо ваш браузер не понимает, '
                                                'как предоставить необходимые'
-                                               ' учетные данные.', news=[i for i in news])
+                                               ' учетные данные.', news=news)
 
 
 @app.route("/profile/<int:id>")
 def profile(id):
     session = db_session.create_session()
     user = session.query(User).filter(User.id == id).first()
+    winningRate = round((user.wins / user.gamesCount) * 100, 2)
     if not user:
-        abort(403)
-    return render_template("profile.html", news=[i for i in news], user=user)
+        abort(404)
+    return render_template("profile.html", news=news, user=user, wr=winningRate)
 
 
 if __name__ == '__main__':
