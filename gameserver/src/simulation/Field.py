@@ -1,4 +1,9 @@
+from src.simulation.data.Building import Building
+from src.simulation.data.InvalidBuilding import InvalidBuilding
+
+
 class Field:
+    TILE_INVALID = InvalidBuilding()
     
     def __init__(self, base: list, width: int, height: int):
         self.__base = base
@@ -17,13 +22,19 @@ class Field:
     def breakCore(self):
         self.__coreCount -= 1
     
-    def get(self, x: int, y: int):
+    def get(self, x: int, y: int) -> Building:
         if (0 <= x < self.__width and 0 <= y < self.__height):
             return self.__base[y * self.__width + x]
-        return None
+        return self.TILE_INVALID
     
     def remove(self, x: int, y: int):
         self.__base[y * self.__width + x] = None
+    
+    def getWidth(self) -> int:
+        return self.__width
+    
+    def getHeight(self) -> int:
+        return self.__height
     
     def __str__(self):
         res = "Field:"

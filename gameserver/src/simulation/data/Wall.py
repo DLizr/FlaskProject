@@ -1,15 +1,12 @@
-from src.simulation.data._Building import Building
+from src.simulation.data.Building import Building
 
 
 class Wall(Building):
     
-    __hp = 20
+    hp = 20
     
-    def getHP(self):
-        return self.__hp
-    
-    def dealDamage(self, dmg: int):
-        self.__hp -= dmg
+    def __init__(self):
+        super().__init__(self.hp)
     
     def getTeam(self):
         return self.DEFENDING
