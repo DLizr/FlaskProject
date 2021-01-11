@@ -9,6 +9,7 @@ from src.simulation.data.Core import Core
 from src.simulation.data.Cannon import Cannon
 from src.simulation.data.Mortar import Mortar
 from src.simulation.data.Crossbow import Crossbow
+from src.simulation.data.Turret import Turret
 
 
 class Simulator:
@@ -42,6 +43,10 @@ class Simulator:
                 m = Mortar(i % 11, i // 11)
                 field.append(m)
                 self.__observers.append(m)
+            elif (cell == "T"):
+                t = Turret(i % 11, i // 11)
+                field.append(t)
+                self.__observers.append(t)
             elif (cell == "R"):
                 c = Crossbow(i % 11, i // 11)
                 field.append(c)
