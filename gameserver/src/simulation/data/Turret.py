@@ -3,14 +3,14 @@ import random
 
 from src.simulation.data._InteractingBuilding import InteractingBuilding
 from src.simulation.Field import Field
-from src.util.pathfinding.SearchInRadius import SearchInRadius
+from src.util.pathfinding.SearchInCross import SearchInCross
 
 
 class Turret(InteractingBuilding):
     hp = 10
-    reloadSpeed = 3
+    reloadSpeed = 2
     damage = 10
-    speed = 0.4
+    speed = 0.3
 
     def __init__(self, x: int, y: int):
         super().__init__(self.hp, x, y)
@@ -22,12 +22,12 @@ class Turret(InteractingBuilding):
         self.__noTargets = False
         self.__reload = random.randint(0, 7)
         self.__hitQueue = []
-        self.__targetFinder: SearchInRadius = None
+        self.__targetFinder: SearchInCross = None
 
     # Override
     def setField(self, field: Field):
         self.__field = field
-        self.__targetFinder = SearchInRadius(field, self.__x, self.__y)
+        self.__targetFinder = SearchInCross(field, self.__x, self.__y)
         self.__targetFinder.setCellValidator(self.__isCellValid)
         self.__targetFinder.setAttackingFunction(self.__canAttack)
         self.__targetFinder.findTargets()
@@ -46,7 +46,7 @@ class Turret(InteractingBuilding):
             if (not self.__lastTarget or not self.__field.get(*self.__lastTarget)):
                 self.__noTargets = True
                 return
-
+        print('shoot!')
         self.__shoot()
 
         if (self.__reload == 0):  # Just shot
@@ -102,7 +102,7 @@ class Turret(InteractingBuilding):
         target.dealDamage(self.damage)
 
     def hasTarget(self):
-        return not self.__noTargets or self.__hitQueue
+        return not self.__noTargets or self.__hitxQueue
 
     # Override
     def getTeam(self):

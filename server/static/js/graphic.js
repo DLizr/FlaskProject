@@ -209,7 +209,7 @@ AllBuildings = {
     CORE: 0,
     WALL: 1,
     MORTAR: 2,
-    TURRET: 3
+    TURRET: 3,
     CANNON: 4,
     CROSSBOW: 5
 }

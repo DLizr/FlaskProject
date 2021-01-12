@@ -1,61 +1,239 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
-        version="1.1" xmlns="http://www.w3.org/2000/svg"
-        xmlns:xlink="http://www.w3.org/1999/xlink"
-        preserveAspectRatio="xMidYMid meet"
-        viewBox="0 0 640 640"
-        width="680"
-        height="680">
-    <defs>
-        <path d="M-17.15 -9.33L664.27 -9.33L664.27 649.33L-17.15 649.33L-17.15 -9.33Z" id="b104BJJvCf"></path>
-        <path d="M556.82 358.41C562.34 358.41 566.82 362.89 566.82 368.41C566.82 412.64 566.82 535.35 566.82 579.58C566.82 585.1 562.34 589.58 556.82 589.58C460.38 589.58 181.05 589.58 84.6 589.58C79.08 589.58 74.6 585.1 74.6 579.58C74.6 535.35 74.6 412.64 74.6 368.41C74.6 362.89 79.08 358.41 84.6 358.41C181.05 358.41 460.38 358.41 556.82 358.41Z"
-              id="k1heXi89yy"></path>
-        <path d="M217.53 127.95C223.05 127.95 227.53 132.43 227.53 137.95C227.53 212.2 227.53 424.95 227.53 499.21C227.53 504.73 223.05 509.21 217.53 509.21C197.91 509.21 149.04 509.21 129.41 509.21C123.89 509.21 119.41 504.73 119.41 499.21C119.41 424.95 119.41 212.2 119.41 137.95C119.41 132.43 123.89 127.95 129.41 127.95C149.04 127.95 197.91 127.95 217.53 127.95Z"
-              id="e2iU93TgbG"></path>
-        <path d="M227.53 134.71C227.53 146.29 203.31 155.69 173.47 155.69C143.64 155.69 119.41 146.29 119.41 134.71C119.41 123.13 143.64 113.72 173.47 113.72C203.31 113.72 227.53 123.13 227.53 134.71Z"
-              id="b1I8YlPZq0"></path>
-        <mask id="maska5bwQdAqgQ" x="117.41" y="111.72" width="112.12" height="45.97" maskUnits="userSpaceOnUse">
-            <rect x="117.41" y="111.72" width="112.12" height="45.97" fill="white"></rect>
-            <use xlink:href="#b1I8YlPZq0" opacity="1" fill="black"></use>
-        </mask>
-        <path d="M492.09 127.95C497.61 127.95 502.09 132.43 502.09 137.95C502.09 212.2 502.09 424.95 502.09 499.21C502.09 504.73 497.61 509.21 492.09 509.21C473.18 509.21 426.44 509.21 407.53 509.21C402.01 509.21 397.53 504.73 397.53 499.21C397.53 424.95 397.53 212.2 397.53 137.95C397.53 132.43 402.01 127.95 407.53 127.95C426.44 127.95 473.18 127.95 492.09 127.95Z"
-              id="d1g9Jy4sgY"></path>
-        <path d="M502.09 134.71C502.09 146.29 478.67 155.69 449.81 155.69C420.96 155.69 397.53 146.29 397.53 134.71C397.53 123.13 420.96 113.72 449.81 113.72C478.67 113.72 502.09 123.13 502.09 134.71Z"
-              id="agmG6rvAT"></path>
-        <mask id="maskbUNNCqXFH" x="395.53" y="111.72" width="108.56" height="45.97" maskUnits="userSpaceOnUse">
-            <rect x="395.53" y="111.72" width="108.56" height="45.97" fill="white"></rect>
-            <use xlink:href="#agmG6rvAT" opacity="1" fill="black"></use>
-        </mask>
-    </defs>
-    <g>
-        <g>
-            <g>
-                <use xlink:href="#b104BJJvCf" opacity="1" fill="#000d26" fill-opacity="1"></use>
-            </g>
-            <g>
-                <use xlink:href="#k1heXi89yy" opacity="1" fill="#0e1e3e" fill-opacity="1"></use>
-            </g>
-            <g>
-                <use xlink:href="#e2iU93TgbG" opacity="1" fill="#234077" fill-opacity="1"></use>
-            </g>
-            <g>
-                <use xlink:href="#b1I8YlPZq0" opacity="1" fill="#0737f6" fill-opacity="1"></use>
-                <g mask="url(#maska5bwQdAqgQ)">
-                    <use xlink:href="#b1I8YlPZq0" opacity="1" fill-opacity="0" stroke="#131d3c" stroke-width="2"
-                         stroke-opacity="1"></use>
-                </g>
-            </g>
-            <g>
-                <use xlink:href="#d1g9Jy4sgY" opacity="1" fill="#234077" fill-opacity="1"></use>
-            </g>
-            <g>
-                <use xlink:href="#agmG6rvAT" opacity="1" fill="#0737f6" fill-opacity="1"></use>
-                <g mask="url(#maskbUNNCqXFH)">
-                    <use xlink:href="#agmG6rvAT" opacity="1" fill-opacity="0" stroke="#131d3c" stroke-width="2"
-                         stroke-opacity="1"></use>
-                </g>
-            </g>
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   preserveAspectRatio="xMidYMid meet"
+   viewBox="0 0 640 640"
+   width="680"
+   height="680"
+   id="svg56"
+   sodipodi:docname="turret.svg"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)">
+  <metadata
+     id="metadata60">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     id="namedview58"
+     showgrid="false"
+     inkscape:zoom="1.09"
+     inkscape:cx="354.58716"
+     inkscape:cy="340"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg56" />
+  <defs
+     id="defs18">
+    <path
+       d="M-17.15 -9.33L664.27 -9.33L664.27 649.33L-17.15 649.33L-17.15 -9.33Z"
+       id="b104BJJvCf" />
+    <path
+       d="M556.82 358.41C562.34 358.41 566.82 362.89 566.82 368.41C566.82 412.64 566.82 535.35 566.82 579.58C566.82 585.1 562.34 589.58 556.82 589.58C460.38 589.58 181.05 589.58 84.6 589.58C79.08 589.58 74.6 585.1 74.6 579.58C74.6 535.35 74.6 412.64 74.6 368.41C74.6 362.89 79.08 358.41 84.6 358.41C181.05 358.41 460.38 358.41 556.82 358.41Z"
+       id="k1heXi89yy" />
+    <path
+       d="M217.53 127.95C223.05 127.95 227.53 132.43 227.53 137.95C227.53 212.2 227.53 424.95 227.53 499.21C227.53 504.73 223.05 509.21 217.53 509.21C197.91 509.21 149.04 509.21 129.41 509.21C123.89 509.21 119.41 504.73 119.41 499.21C119.41 424.95 119.41 212.2 119.41 137.95C119.41 132.43 123.89 127.95 129.41 127.95C149.04 127.95 197.91 127.95 217.53 127.95Z"
+       id="e2iU93TgbG" />
+    <path
+       d="M227.53 134.71C227.53 146.29 203.31 155.69 173.47 155.69C143.64 155.69 119.41 146.29 119.41 134.71C119.41 123.13 143.64 113.72 173.47 113.72C203.31 113.72 227.53 123.13 227.53 134.71Z"
+       id="b1I8YlPZq0" />
+    <mask
+       id="maska5bwQdAqgQ"
+       x="117.41"
+       y="111.72"
+       width="112.12"
+       height="45.97"
+       maskUnits="userSpaceOnUse">
+      <rect
+         x="117.41"
+         y="111.72"
+         width="112.12"
+         height="45.97"
+         fill="white"
+         id="rect6" />
+      <use
+         xlink:href="#b1I8YlPZq0"
+         opacity="1"
+         fill="black"
+         id="use8" />
+    </mask>
+    <path
+       d="M492.09 127.95C497.61 127.95 502.09 132.43 502.09 137.95C502.09 212.2 502.09 424.95 502.09 499.21C502.09 504.73 497.61 509.21 492.09 509.21C473.18 509.21 426.44 509.21 407.53 509.21C402.01 509.21 397.53 504.73 397.53 499.21C397.53 424.95 397.53 212.2 397.53 137.95C397.53 132.43 402.01 127.95 407.53 127.95C426.44 127.95 473.18 127.95 492.09 127.95Z"
+       id="d1g9Jy4sgY" />
+    <path
+       d="M502.09 134.71C502.09 146.29 478.67 155.69 449.81 155.69C420.96 155.69 397.53 146.29 397.53 134.71C397.53 123.13 420.96 113.72 449.81 113.72C478.67 113.72 502.09 123.13 502.09 134.71Z"
+       id="agmG6rvAT" />
+    <mask
+       id="maskbUNNCqXFH"
+       x="395.53"
+       y="111.72"
+       width="108.56"
+       height="45.97"
+       maskUnits="userSpaceOnUse">
+      <rect
+         x="395.53"
+         y="111.72"
+         width="108.56"
+         height="45.97"
+         fill="white"
+         id="rect13" />
+      <use
+         xlink:href="#agmG6rvAT"
+         opacity="1"
+         fill="black"
+         id="use15" />
+    </mask>
+  </defs>
+  <g
+     id="g54">
+    <g
+       id="g52">
+      <g
+         id="g22">
+        <use
+           xlink:href="#b104BJJvCf"
+           opacity="1"
+           fill="#000d26"
+           fill-opacity="1"
+           id="use20" />
+      </g>
+      <g
+         id="g26">
+        <use
+           xlink:href="#k1heXi89yy"
+           opacity="1"
+           fill="#0e1e3e"
+           fill-opacity="1"
+           id="use24" />
+      </g>
+      <g
+         id="g30">
+        <use
+           xlink:href="#e2iU93TgbG"
+           opacity="1"
+           fill="#234077"
+           fill-opacity="1"
+           id="use28" />
+      </g>
+      <g
+         id="g38">
+        <use
+           xlink:href="#b1I8YlPZq0"
+           opacity="1"
+           fill="#0737f6"
+           fill-opacity="1"
+           id="use32" />
+        <g
+           mask="url(#maska5bwQdAqgQ)"
+           id="g36">
+          <use
+             xlink:href="#b1I8YlPZq0"
+             opacity="1"
+             fill-opacity="0"
+             stroke="#131d3c"
+             stroke-width="2"
+             stroke-opacity="1"
+             id="use34" />
         </g>
+      </g>
+      <g
+         id="g42">
+        <use
+           xlink:href="#d1g9Jy4sgY"
+           opacity="1"
+           fill="#234077"
+           fill-opacity="1"
+           id="use40" />
+      </g>
+      <g
+         id="g50">
+        <use
+           xlink:href="#agmG6rvAT"
+           opacity="1"
+           fill="#0737f6"
+           fill-opacity="1"
+           id="use44" />
+        <g
+           mask="url(#maskbUNNCqXFH)"
+           id="g48">
+          <use
+             xlink:href="#agmG6rvAT"
+             opacity="1"
+             fill-opacity="0"
+             stroke="#131d3c"
+             stroke-width="2"
+             stroke-opacity="1"
+             id="use46" />
+        </g>
+      </g>
     </g>
+  </g>
+  <rect
+     style="fill:#0000ff;fill-rule:evenodd;stroke-width:0.941176"
+     id="rect62"
+     width="583.52942"
+     height="583.52942"
+     x="32.666584"
+     y="31.734055" />
+  <rect
+     style="fill:#000000;fill-rule:evenodd;stroke-width:0.941176"
+     id="rect68"
+     width="107.06961"
+     height="474.04208"
+     x="131.76471"
+     y="84.705879" />
+  <rect
+     style="fill:#000000;fill-rule:evenodd;stroke-width:0.941176"
+     id="rect68-5"
+     width="107.06961"
+     height="474.04208"
+     x="395.29413"
+     y="84.705879" />
+  <ellipse
+     style="fill:#00ffff;fill-rule:evenodd;stroke-width:0.957404"
+     id="path87"
+     cx="324.23099"
+     cy="482.24503"
+     rx="256.88074"
+     ry="120.45332"
+     inkscape:transform-center-y="2.590394" />
+  <ellipse
+     style="fill:#00ffff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.926164"
+     id="path105"
+     ry="24.997303"
+     rx="52.844036"
+     cy="86.389648"
+     cx="185.47221" />
+  <ellipse
+     style="fill:#00ffff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.926164"
+     id="path105-1"
+     ry="24.997303"
+     rx="52.844036"
+     cy="87.209923"
+     cx="449.00162" />
 </svg>
