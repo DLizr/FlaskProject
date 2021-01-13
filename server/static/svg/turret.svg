@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -47,7 +46,8 @@
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg56" />
+     inkscape:current-layer="svg56"
+     inkscape:document-rotation="0" />
   <defs
      id="defs18">
     <path
@@ -205,21 +205,21 @@
      id="rect68"
      width="107.06961"
      height="474.04208"
-     x="131.76471"
-     y="84.705879" />
+     x="244.87859"
+     y="87.296272" />
   <rect
-     style="fill:#000000;fill-rule:evenodd;stroke-width:0.941176"
+     style="fill:#000000;fill-rule:evenodd;stroke-width:0.824316"
      id="rect68-5"
-     width="107.06961"
-     height="474.04208"
-     x="395.29413"
-     y="84.705879" />
+     width="424.83539"
+     height="91.645256"
+     x="88.75338"
+     y="279.7309" />
   <ellipse
-     style="fill:#00ffff;fill-rule:evenodd;stroke-width:0.957404"
+     style="fill:#00ffff;fill-rule:evenodd;stroke-width:0.6707"
      id="path87"
-     cx="324.23099"
-     cy="482.24503"
-     rx="256.88074"
+     cx="298.75879"
+     cy="322.50406"
+     rx="126.06584"
      ry="120.45332"
      inkscape:transform-center-y="2.590394" />
   <ellipse
@@ -227,13 +227,27 @@
      id="path105"
      ry="24.997303"
      rx="52.844036"
-     cy="86.389648"
-     cx="185.47221" />
+     cy="89.843506"
+     cx="297.72263" />
   <ellipse
      style="fill:#00ffff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.926164"
      id="path105-1"
      ry="24.997303"
      rx="52.844036"
-     cy="87.209923"
-     cx="449.00162" />
+     cy="554.3443"
+     cx="298.75876" />
+  <ellipse
+     style="fill:#00ffff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.856983"
+     id="path105-3"
+     ry="44.856991"
+     rx="25.213167"
+     cy="326.38962"
+     cx="91.527252" />
+  <ellipse
+     style="fill:#00ffff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.879879"
+     id="path105-0"
+     ry="45.720455"
+     rx="26.076632"
+     cy="326.38962"
+     cx="508.58069" />
 </svg>

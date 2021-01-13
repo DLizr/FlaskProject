@@ -13,19 +13,12 @@ class SearchInCross(PathFinding):
 
     def findTargets(self):
         x, y = self.__x, self.__y
-
-        bfsQueue = deque()
-        bfsQueue.appendleft((x, y))
-        for d in range(self._field.getWidth()):
-            if (self._isCellValid(x, d)):
-                bfsQueue.appendleft((x, d))
-        for d in range(self._field.getHeight()):
-            if (self._isCellValid(d, y)):
-                bfsQueue.appendleft((d, y))
-        while (len(bfsQueue) > 0):
-            tileX, tileY = bfsQueue.pop()
-            if (self._canAttack(tileX, tileY)):
-                self.__possibleTargets.appendleft((tileX, tileY))
+        for d in range(1, 10):
+            for dx, dy in ((0, d), (0, -d), (d, 0), (-d, 0)):
+                tileX, tileY = x + dx, y + dy
+                if (self._isCellValid(tileX, tileY)):
+                    if (self._canAttack(tileX, tileY)):
+                        self.__possibleTargets.appendleft((tileX, tileY))
 
     def getNextTarget(self) -> tuple:
         while (len(self.__possibleTargets) > 0):

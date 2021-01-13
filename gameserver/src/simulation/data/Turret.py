@@ -8,9 +8,9 @@ from src.util.pathfinding.SearchInCross import SearchInCross
 
 class Turret(InteractingBuilding):
     hp = 10
-    reloadSpeed = 2
-    damage = 10
-    speed = 0.3
+    reloadSpeed = 1
+    damage = 5
+    speed = 2
 
     def __init__(self, x: int, y: int):
         super().__init__(self.hp, x, y)
@@ -40,13 +40,11 @@ class Turret(InteractingBuilding):
         self.__handleQueue()
         if (self.__noTargets):
             return
-
         if (not (self.__lastTarget and self.__field.get(*self.__lastTarget))):
             self.__findTarget()
             if (not self.__lastTarget or not self.__field.get(*self.__lastTarget)):
                 self.__noTargets = True
                 return
-        print('shoot!')
         self.__shoot()
 
         if (self.__reload == 0):  # Just shot
