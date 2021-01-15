@@ -241,7 +241,6 @@ def localhostOnly(func):
 @app.route("/post/addgame/<int:playerId>", methods=["POST"])
 @localhostOnly
 def addGame(playerId):
-    player_ids.remove(playerId)
     session = db_session.create_session()
     user = session.query(User).get(playerId)
     if not user:
@@ -255,7 +254,6 @@ def addGame(playerId):
 @app.route("/post/addwin/<int:playerId>", methods=["POST"])
 @localhostOnly
 def addWin(playerId):
-    player_ids.remove(playerId)
     session = db_session.create_session()
     user = session.query(User).get(playerId)
     if not user:
@@ -265,6 +263,17 @@ def addWin(playerId):
     session.commit()
     updateUsers(session)
 
+    return jsonify({"success": "ok"})
+
+
+@app.route("/post/removeplayer/<int:playerId>", methods=["POST"])
+@localhostOnly
+def removePlayer(playerId):
+    try:
+        player_ids.remove(playerId)
+    except KeyError:
+        return jsonify({"error": "Invalid Player"}), 404
+    
     return jsonify({"success": "ok"})
 
 

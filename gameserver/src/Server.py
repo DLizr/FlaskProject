@@ -32,6 +32,7 @@ class Server:
         await room.connectPlayer(player)
         
         RoomList.removeRoom(room.getID())
+        await player.disconnect()
         logger.info("The game in room #{} is over.".format(room.getID()))
     
     @classmethod

@@ -52,6 +52,12 @@ def addGame(playerId: int):
         logger.error("Unable to find a user with id {}. Game is not counted.".format(playerId))
 
 
+def removePlayer(playerId: int):
+    code = requests.post("http://localhost:5000/post/removeplayer/{}".format(playerId)).status_code
+    if (code != 200):
+        logger.error("Unable to remove player with id {} from queue. They might be unable to play.".format(playerId))
+
+
 def __run():
     __app.run(port="5001")
 
