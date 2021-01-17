@@ -3,6 +3,7 @@ import asyncio
 import websockets
 
 from src.util.Logger import logger
+from src.website import HttpPipe
 
 
 class Player:
@@ -32,6 +33,7 @@ class Player:
             return
     
     async def disconnect(self):
+        HttpPipe.removePlayer(self.__ID)
         try:
             await self.__websocket.ping()
             await self.__websocket.close()
