@@ -742,6 +742,8 @@ phase3 = {
     currentIndex: 0,
     wins: 0,
     loses: 0,
+    lastUpdate: Date.now(),
+    frameTime: 1000.0 / 60,
 
     bullets: [],
     phaseElement: document.getElementById("phase3"),
@@ -762,6 +764,7 @@ phase3 = {
         grid.create();
         gameScreen.selected = -1;
         gameScreen.timer.style.display = "none";
+        lastUpdate = Date.now();
     },
 
     handleMessage(msg) {
@@ -929,14 +932,15 @@ phase3 = {
     },
 
     update() {
+        let timeNow = Date.now();
         for (let i=0; i < phase3.bullets.length; i++) {
             let element = phase3.bullets[i];
             if (element == undefined) break; // 
             let bullet = phase3.bullets[i][0];
             let x = parseFloat(bullet.style.left);
             let y = parseFloat(bullet.style.top);
-            bullet.style.left = `${x + phase3.bullets[i][1]}px`;
-            bullet.style.top = `${y + phase3.bullets[i][2]}px`;
+            bullet.style.left = `${x + phase3.bullets[i][1] * (timeNow - lastUpdate) / phase3.frameTime}px`;
+            bullet.style.top = `${y + phase3.bullets[i][2] * (timeNow - lastUpdate) / phase3.frameTime}px`;
 
             phase3.bullets[i][3]++;
             if (phase3.bullets[i][3] >= phase3.bullets[i][4]) {
@@ -947,13 +951,14 @@ phase3 = {
                 i--;
             }
         }
+        lastUpdate = timeNow;
     },
 
     hitBuilding(bullet, damage) {
         let x = parseFloat(bullet.style.left);
         let y = parseFloat(bullet.style.top);
         let cell = grid.getCellByAbsoluteCoords(x, y);
-        if (cell.building == -1) return;
+        if (cell == undefined || cell.building == -1) return;
 
         cell.hp -= damage;
         cell.cell.style.opacity = 0.5;
