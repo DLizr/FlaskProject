@@ -1009,9 +1009,9 @@ phase3 = {
 var SCREEN = loading;
 SCREEN.startRendering();
 render = function() {
-    //try {
+    try {
         SCREEN.update();
-    //} catch {/* Display is being resized, waiting. */}
+    } catch {/* Display is being resized, waiting. */}
     window.requestAnimationFrame(render);
 }
 
