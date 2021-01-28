@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 
 from src.player.Player import Player
 
@@ -55,6 +56,7 @@ class Simulator:
     
     async def startSimulating(self, player1: Player, player2: Player):
         while True:
+            startTime = datetime.datetime.now();
             messages = self.__update()
             for msg in messages:
                 await player1.sendMessage(msg)
@@ -78,7 +80,9 @@ class Simulator:
                     self.__winner = 2
                 break
             
-            await asyncio.sleep(0.25)
+            timeDelta = datetime.datetime.now() - startTime
+            if (timeDelta.seconds < 1 and timeDelta.microseconds <= 250000):
+                await asyncio.sleep(0.25 - timeDelta.microseconds / 1000000)
             self.__time += 1
             
     
