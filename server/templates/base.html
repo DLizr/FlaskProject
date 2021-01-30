@@ -67,7 +67,7 @@
 <div class="rightContent">
     <div id="RegisterLogin">
     {% if current_user.is_authenticated %}
-    <a href="/profile" id="nick">{{ current_user.name }}</a>
+    <a href="/profile/{{ current_user.id }}" id="nick">{{ current_user.name }}</a>
     <a href="/logout" id="logout">Выйти</a>
         {% if current_user.is_admin %}
         <a href="/news" class="btn-secondary">Добавить новость</a>
