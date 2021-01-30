@@ -9,7 +9,7 @@ from src.util.pathfinding.SearchInCross import SearchInCross
 class Turret(InteractingBuilding):
     hp = 10
     reloadSpeed = 1
-    damage = 5
+    damage = 2
     speed = 2
 
     def __init__(self, x: int, y: int):
@@ -20,7 +20,7 @@ class Turret(InteractingBuilding):
         self.__field = None
 
         self.__noTargets = False
-        self.__reload = random.randint(0, 7)
+        self.__reload = 0
         self.__hitQueue = []
         self.__targetFinder: SearchInCross = None
 
@@ -61,6 +61,8 @@ class Turret(InteractingBuilding):
         return c != Field.TILE_INVALID
 
     def __canAttack(self, x: int, y: int) -> bool:
+        if x != self.__x and y != self.__y:
+            return False
         c = self.__field.get(x, y)
         return c and c.getTeam() == self.ATTACKING
 
@@ -100,7 +102,7 @@ class Turret(InteractingBuilding):
         target.dealDamage(self.damage)
 
     def hasTarget(self):
-        return not self.__noTargets or self.__hitxQueue
+        return not self.__noTargets or self.__hitQueue
 
     # Override
     def getTeam(self):

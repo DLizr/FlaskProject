@@ -719,10 +719,10 @@ phase2 = {
 }
 
 BulletSpeeds = new Map([  // In tiles/second.
-    [AllBuildings.CANNON, 0.8],/
+    [AllBuildings.CANNON, 0.8],
     [AllBuildings.MORTAR, 0.5],
     [AllBuildings.CROSSBOW, 1.6],
-    [AllBuildings.TURRET, 1.9]
+    [AllBuildings.TURRET, 1.8]
 ]);
 
 Hitpoints = new Map([
@@ -738,7 +738,7 @@ Damages = new Map([
     [AllBuildings.CANNON, 5],
     [AllBuildings.MORTAR, 10],
     [AllBuildings.CROSSBOW, 2],
-    [AllBuildings.TURRET, 5]
+    [AllBuildings.TURRET, 2]
 ]);
 
 
