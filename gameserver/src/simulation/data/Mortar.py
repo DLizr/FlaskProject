@@ -100,6 +100,8 @@ class Mortar(InteractingBuilding):
         if (not target):
             return
         target.dealDamage(self.damage)
+        if (target.getHP() <= 0):
+            self.__field.remove(*self.__lastTarget)
 
     def hasTarget(self):
         return not self.__noTargets or self.__hitQueue
