@@ -185,12 +185,13 @@ loading = {
 
 
 Buildings = {
-    _sources: ["/static/svg/core.svg", "/static/svg/wall.svg", "/static/svg/mortar.svg"],
-    _shortcuts: ["0", "C", "W", "M"],
+    _sources: ["/static/svg/core.svg", "/static/svg/wall.svg", "/static/svg/mortar.svg", "/static/svg/turret.svg"],
+    _shortcuts: ["0", "C", "W", "M", "T"],
     EMPTY: -1,
     CORE: 0,
     WALL: 1,
-    MORTAR: 2
+    MORTAR: 2,
+    TURRET: 3,
 }
 
 AttackBuildings = {
@@ -202,14 +203,15 @@ AttackBuildings = {
 }
 
 AllBuildings = {
-    _sources: ["/static/svg/core.svg", "/static/svg/wall.svg", "/static/svg/mortar.svg", "/static/svg/cannon.svg", "/static/svg/crossbow.svg"],
-    _shortcuts: ["0", "C", "W", "M", "A", "R"],
+    _sources: ["/static/svg/core.svg", "/static/svg/wall.svg", "/static/svg/mortar.svg", "/static/svg/turret.svg", "/static/svg/cannon.svg", "/static/svg/crossbow.svg"],
+    _shortcuts: ["0", "C", "W", "M", "T", "A", "R"],
     EMPTY: -1,
     CORE: 0,
     WALL: 1,
     MORTAR: 2,
-    CANNON: 3,
-    CROSSBOW: 4
+    TURRET: 3,
+    CANNON: 4,
+    CROSSBOW: 5
 }
 
 currentBuildings = Buildings;
@@ -229,7 +231,8 @@ gameScreen = {
     tooltips: [
         document.getElementById("phase1wallTooltip"),
         document.getElementById("phase1coreTooltip"),
-        document.getElementById("phase1mortarTooltip")
+        document.getElementById("phase1mortarTooltip"),
+        document.getElementById("phase1turretTooltip")
     ],
 
     startListening() {
@@ -718,7 +721,8 @@ phase2 = {
 BulletSpeeds = new Map([  // In tiles/second.
     [AllBuildings.CANNON, 0.8],
     [AllBuildings.MORTAR, 0.5],
-    [AllBuildings.CROSSBOW, 1.6]
+    [AllBuildings.CROSSBOW, 1.6],
+    [AllBuildings.TURRET, 1.8]
 ]);
 
 Hitpoints = new Map([
@@ -726,13 +730,15 @@ Hitpoints = new Map([
     [AllBuildings.WALL, 20],
     [AllBuildings.MORTAR, 15],
     [AllBuildings.CANNON, 10],
-    [AllBuildings.CROSSBOW, 10]
+    [AllBuildings.CROSSBOW, 10],
+    [AllBuildings.TURRET, 10]
 ]);
 
 Damages = new Map([
     [AllBuildings.CANNON, 5],
     [AllBuildings.MORTAR, 10],
-    [AllBuildings.CROSSBOW, 2]
+    [AllBuildings.CROSSBOW, 2],
+    [AllBuildings.TURRET, 2]
 ]);
 
 

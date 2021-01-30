@@ -3,14 +3,14 @@ import random
 
 from src.simulation.data._InteractingBuilding import InteractingBuilding
 from src.simulation.Field import Field
-from src.util.pathfinding.SearchInRadius import SearchInRadius
+from src.util.pathfinding.SearchInCross import SearchInCross
 
 
-class Mortar(InteractingBuilding):
+class Turret(InteractingBuilding):
     hp = 10
-    reloadSpeed = 8
-    damage = 15
-    speed = 0.125
+    reloadSpeed = 1
+    damage = 2
+    speed = 2
 
     def __init__(self, x: int, y: int):
         super().__init__(self.hp, x, y)
@@ -20,14 +20,14 @@ class Mortar(InteractingBuilding):
         self.__field = None
 
         self.__noTargets = False
-        self.__reload = random.randint(0, 7)
+        self.__reload = 0
         self.__hitQueue = []
-        self.__targetFinder: SearchInRadius = None
+        self.__targetFinder: SearchInCross = None
 
     # Override
     def setField(self, field: Field):
         self.__field = field
-        self.__targetFinder = SearchInRadius(field, self.__x, self.__y)
+        self.__targetFinder = SearchInCross(field, self.__x, self.__y)
         self.__targetFinder.setCellValidator(self.__isCellValid)
         self.__targetFinder.setAttackingFunction(self.__canAttack)
         self.__targetFinder.findTargets()
@@ -40,13 +40,11 @@ class Mortar(InteractingBuilding):
         self.__handleQueue()
         if (self.__noTargets):
             return
-
         if (not (self.__lastTarget and self.__field.get(*self.__lastTarget))):
             self.__findTarget()
             if (not self.__lastTarget or not self.__field.get(*self.__lastTarget)):
                 self.__noTargets = True
                 return
-
         self.__shoot()
 
         if (self.__reload == 0):  # Just shot
@@ -63,6 +61,8 @@ class Mortar(InteractingBuilding):
         return c != Field.TILE_INVALID
 
     def __canAttack(self, x: int, y: int) -> bool:
+        if x != self.__x and y != self.__y:
+            return False
         c = self.__field.get(x, y)
         return c and c.getTeam() == self.ATTACKING
 
