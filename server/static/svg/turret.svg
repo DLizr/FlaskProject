@@ -15,7 +15,7 @@
    height="680"
    id="svg56"
    sodipodi:docname="turret.svg"
-   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)">
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
   <metadata
      id="metadata60">
     <rdf:RDF>
@@ -24,6 +24,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -37,14 +38,14 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1920"
-     inkscape:window-height="1017"
+     inkscape:window-height="1048"
      id="namedview58"
      showgrid="false"
-     inkscape:zoom="1.09"
-     inkscape:cx="354.58716"
-     inkscape:cy="340"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:zoom="0.62225397"
+     inkscape:cx="-606.12675"
+     inkscape:cy="758.50519"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg56"
      inkscape:document-rotation="0" />
@@ -110,144 +111,173 @@
     </mask>
   </defs>
   <g
-     id="g54">
+     id="g54"
+     transform="matrix(0.96683914,0,0,1.0002483,16.581291,-9.4912286)"
+     style="fill:#000060;fill-opacity:1">
     <g
-       id="g52">
+       id="g52"
+       style="fill:#000060;fill-opacity:1">
       <g
-         id="g22">
+         id="g22"
+         style="fill:#000060;fill-opacity:1">
         <use
            xlink:href="#b104BJJvCf"
-           opacity="1"
-           fill="#000d26"
-           fill-opacity="1"
-           id="use20" />
+           id="use20"
+           x="0"
+           y="0"
+           width="100%"
+           height="100%"
+           style="opacity:1;fill:#000060;fill-opacity:1" />
       </g>
       <g
-         id="g26">
+         id="g26"
+         style="fill:#000060;fill-opacity:1">
         <use
            xlink:href="#k1heXi89yy"
-           opacity="1"
-           fill="#0e1e3e"
-           fill-opacity="1"
-           id="use24" />
+           id="use24"
+           x="0"
+           y="0"
+           width="100%"
+           height="100%"
+           style="opacity:1;fill:#000060;fill-opacity:1" />
       </g>
       <g
-         id="g30">
+         id="g30"
+         style="fill:#000060;fill-opacity:1">
         <use
            xlink:href="#e2iU93TgbG"
-           opacity="1"
-           fill="#234077"
-           fill-opacity="1"
-           id="use28" />
+           id="use28"
+           x="0"
+           y="0"
+           width="100%"
+           height="100%"
+           style="opacity:1;fill:#000060;fill-opacity:1" />
       </g>
       <g
-         id="g38">
+         id="g38"
+         style="fill:#000060;fill-opacity:1">
         <use
            xlink:href="#b1I8YlPZq0"
-           opacity="1"
-           fill="#0737f6"
-           fill-opacity="1"
-           id="use32" />
+           id="use32"
+           x="0"
+           y="0"
+           width="100%"
+           height="100%"
+           style="opacity:1;fill:#000060;fill-opacity:1" />
         <g
            mask="url(#maska5bwQdAqgQ)"
-           id="g36">
+           id="g36"
+           style="fill:#000060;fill-opacity:1">
           <use
              xlink:href="#b1I8YlPZq0"
-             opacity="1"
-             fill-opacity="0"
-             stroke="#131d3c"
-             stroke-width="2"
-             stroke-opacity="1"
-             id="use34" />
+             id="use34"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%"
+             style="opacity:1;fill:#000060;fill-opacity:1;stroke:#131d3c;stroke-width:2;stroke-opacity:1" />
         </g>
       </g>
       <g
-         id="g42">
+         id="g42"
+         style="fill:#000060;fill-opacity:1">
         <use
            xlink:href="#d1g9Jy4sgY"
-           opacity="1"
-           fill="#234077"
-           fill-opacity="1"
-           id="use40" />
+           id="use40"
+           x="0"
+           y="0"
+           width="100%"
+           height="100%"
+           style="opacity:1;fill:#000060;fill-opacity:1" />
       </g>
       <g
-         id="g50">
+         id="g50"
+         style="fill:#000060;fill-opacity:1">
         <use
            xlink:href="#agmG6rvAT"
-           opacity="1"
-           fill="#0737f6"
-           fill-opacity="1"
-           id="use44" />
+           id="use44"
+           x="0"
+           y="0"
+           width="100%"
+           height="100%"
+           style="opacity:1;fill:#000060;fill-opacity:1" />
         <g
            mask="url(#maskbUNNCqXFH)"
-           id="g48">
+           id="g48"
+           style="fill:#000060;fill-opacity:1">
           <use
              xlink:href="#agmG6rvAT"
-             opacity="1"
-             fill-opacity="0"
-             stroke="#131d3c"
-             stroke-width="2"
-             stroke-opacity="1"
-             id="use46" />
+             id="use46"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%"
+             style="opacity:1;fill:#000060;fill-opacity:1;stroke:#131d3c;stroke-width:2;stroke-opacity:1" />
         </g>
       </g>
     </g>
   </g>
   <rect
-     style="fill:#0000ff;fill-rule:evenodd;stroke-width:0.941176"
+     style="fill:#0000d6;fill-rule:evenodd;stroke-width:0.94117498;fill-opacity:1"
      id="rect62"
      width="583.52942"
      height="583.52942"
-     x="32.666584"
-     y="31.734055" />
+     x="37.64706"
+     y="18.823523" />
   <rect
-     style="fill:#000000;fill-rule:evenodd;stroke-width:0.941176"
+     style="fill:#007fed;fill-rule:evenodd;stroke-width:1.01926005;fill-opacity:1"
      id="rect68"
-     width="107.06961"
-     height="474.04208"
-     x="244.87859"
-     y="87.296272" />
+     width="112.94118"
+     height="527.05884"
+     x="272.94116"
+     y="47.058807" />
   <rect
-     style="fill:#000000;fill-rule:evenodd;stroke-width:0.824316"
+     style="fill:#007fed;fill-rule:evenodd;stroke-width:1.01926005;fill-opacity:1"
      id="rect68-5"
-     width="424.83539"
-     height="91.645256"
-     x="88.75338"
-     y="279.7309" />
-  <ellipse
-     style="fill:#00ffff;fill-rule:evenodd;stroke-width:0.6707"
+     width="527.05884"
+     height="112.94118"
+     x="65.882355"
+     y="254.11765" />
+  <circle
+     style="fill:#00ffff;fill-rule:evenodd;stroke-width:3.76470588;stroke:#003b95;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1"
      id="path87"
-     cx="298.75879"
-     cy="322.50406"
-     rx="126.06584"
-     ry="120.45332"
-     inkscape:transform-center-y="2.590394" />
+     cx="329.41177"
+     cy="310.58823"
+     inkscape:transform-center-y="2.8336714"
+     inkscape:transform-center-x="-1.447905e-05"
+     r="131.76471" />
   <ellipse
-     style="fill:#00ffff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.926164"
+     style="fill:#00ccff;fill-opacity:1;fill-rule:evenodd;stroke-width:1.01753998"
      id="path105"
-     ry="24.997303"
-     rx="52.844036"
-     cy="89.843506"
-     cx="297.72263" />
+     ry="28.235294"
+     rx="56.470589"
+     cy="47.058823"
+     cx="329.41177" />
   <ellipse
-     style="fill:#00ffff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.926164"
+     style="fill:#00ccff;fill-opacity:1;fill-rule:evenodd;stroke-width:1.01753998"
      id="path105-1"
-     ry="24.997303"
-     rx="52.844036"
-     cy="554.3443"
-     cx="298.75876" />
+     ry="28.235294"
+     rx="56.470589"
+     cy="574.11768"
+     cx="329.41177" />
   <ellipse
-     style="fill:#00ffff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.856983"
+     style="fill:#00ccff;fill-opacity:1;fill-rule:evenodd;stroke-width:1.01753998"
      id="path105-3"
-     ry="44.856991"
-     rx="25.213167"
-     cy="326.38962"
-     cx="91.527252" />
+     ry="56.470589"
+     rx="28.235294"
+     cy="310.58823"
+     cx="65.882355" />
   <ellipse
-     style="fill:#00ffff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.879879"
+     style="fill:#00ccff;fill-opacity:1;fill-rule:evenodd;stroke-width:1.01752996"
      id="path105-0"
-     ry="45.720455"
-     rx="26.076632"
-     cy="326.38962"
-     cx="508.58069" />
+     ry="56.470589"
+     rx="28.235294"
+     cy="310.58823"
+     cx="592.94116" />
+  <circle
+     style="fill:#004cbe;fill-opacity:1;stroke-width:9.41176471;stroke:none;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+     id="path4552"
+     cx="329.41177"
+     cy="310.58823"
+     r="94.117645" />
 </svg>
