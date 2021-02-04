@@ -222,6 +222,8 @@ gameScreen = {
 
     mouseX: 0,
     mouseY: 0,
+    mouseXBefore: 0,
+    mouseYBefore: 0,
     mouseDown: false,
     mouseMoved: false,
     readOnly: false,
@@ -295,7 +297,9 @@ gameScreen = {
             grid.move(x - gameScreen.mouseX, y - gameScreen.mouseY);
             gameScreen.mouseX = x;
             gameScreen.mouseY = y;
-            gameScreen.mouseMoved = true;
+            if (Math.abs(x - gameScreen.mouseXBefore) + Math.abs(y - gameScreen.mouseYBefore) >= 10) {
+                gameScreen.mouseMoved = true;
+            }
         }
 
         grid.onhover(x, y);
@@ -305,6 +309,10 @@ gameScreen = {
     ondown(e) {
         gameScreen.mouseX = e.clientX;
         gameScreen.mouseY = e.clientY;
+        
+        gameScreen.mouseXBefore = e.clientX;
+        gameScreen.mouseYBefore = e.clientY;
+        
         gameScreen.mouseDown = true;
     },
 
