@@ -139,7 +139,7 @@ def login():
             return redirect("/")
         return render_template('login.html',
                                message="Неправильный логин или пароль",
-                               form=form)
+                               form=form, users=users)
     return render_template('login.html', title='Авторизация', form=form, users=users)
 
 

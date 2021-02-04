@@ -24,11 +24,11 @@
         </div>
         <div id="back">
             {% if count >= new.id - 1 >= 1 %}
-                <a href="{{ new.id - 1 }}" class="btn-success"><</a>
+                <a href="/content/{{ new.id - 1 }}" class="btn-success"><</a>
             {% endif %}
             <a href="/" class="btn-primary">Вернуться</a>
             {% if new.id + 1 <= count %}
-                <a href="{{ new.id + 1 }}" class="btn-success">></a>
+                <a href="/content/{{ new.id + 1 }}" class="btn-success">></a>
             {% endif %}
         </div>
     </div>
@@ -36,7 +36,7 @@
 <div class="rightContent">
     <div id="RegisterLogin">
     {% if current_user.is_authenticated %}
-        <a href="profile/{{ current_user.id }}" id="nick">{{ current_user.name }}</a>
+        <a href="/profile/{{ current_user.id }}" id="nick">{{ current_user.name }}</a>
         <a href="/logout" id="logout">Выйти</a>
         {% if current_user.is_admin %}
         <a href="/news" class="btn-secondary">Добавить новость</a>
