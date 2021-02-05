@@ -127,7 +127,6 @@ body {
 }
 .news-modded {
     white-space: normal;
-    word-break: break-all;
     text-decoration: none;
     overflow: auto;
 }
@@ -151,7 +150,6 @@ body {
 
 .news-modded strong{
     white-space: normal;
-    word-break: break-all;
     text-decoration: none;
     overflow: auto;
 }
@@ -280,7 +278,6 @@ td {
 
 #new {
     white-space: normal;
-    word-break: break-all;
     background-color: #e8edff;
     border: 2px solid black;
     font-family: "Russo";
