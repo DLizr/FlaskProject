@@ -27,6 +27,7 @@
         <tr><th>Место</th><th>Никнейм</th><th>Кол-во побед</th></tr>
 
         {% set userInTable = 0 %}
+        {% set position = {0: 1} %}
 
         {% for i in users %}
 
@@ -41,24 +42,28 @@
             {% endif %}
 
             {% if current_user.is_authenticated and current_user.is_admin == 1 and i.banned_from_table != 1 %}
-                    <tr><td>{{ users.index(i) + 1}}</td><td><a class="nicks" href="/stealth/{{ i.id }}">{{ i.name }}</a>
+                    <tr><td>{{position[0]}}</td><td><a class="nicks" href="/stealth/{{ i.id }}">{{ i.name }}</a>
                     <a class="ban-nicks" href="/profile/{{ i.id }}">Профиль</a>
                     </td><td>{{ i.wins }}</td></tr>
             {% elif current_user.is_authenticated and current_user.is_admin == 1 and i.banned_from_table == 1 %}
-                    <tr><td>{{ users.index(i) + 1}}</td><td><a class="ban-nicks" href="/stealth/{{ i.id }}">{{ i.name }}(banned)</a>
+                    <tr><td>{{position[0]}}</td><td><a class="ban-nicks" href="/stealth/{{ i.id }}">{{ i.name }}(banned)</a>
                     <a class="ban-nicks" href="/profile/{{ i.id }}">Профиль</a>
                     </td><td>{{ i.wins }}</td></tr>
             {% else %}
                 {% if current_user.is_authenticated and current_user.id == i.id and current_user.banned_from_table != 1 %}
-        <tr><td>{{ users.index(i) + 1}}</td><td><a class="nicks" href="/profile/{{ i.id }}">--> Вы <--</a></td><td>{{ i.wins }}</td></tr>
+        <tr><td>{{position[0]}}</td><td><a class="nicks" href="/profile/{{ i.id }}">--> Вы <--</a></td><td>{{ i.wins }}</td></tr>
                 {% elif i.banned_from_table != 1  %}
-        <tr><td>{{ users.index(i) + 1}}</td><td><a class="nicks" href="/profile/{{ i.id }}">{{ i.name }}</a></td><td>{{ i.wins }}</td></tr>
+        <tr><td>{{position[0]}}</td><td><a class="nicks" href="/profile/{{ i.id }}">{{ i.name }}</a></td><td>{{ i.wins }}</td></tr>
+                {% else %}
+                {% set _dummy = position.update({0:position[0] - 1}) %}
                 {% endif %}
             {% endif %}
 
             {% if current_user.is_authenticated and current_user.id == i.id %}
                 {% set userInTable = 1 %}
             {% endif %}
+
+            {% set _dummy = position.update({0:position[0] + 1}) %}
 
         {% endfor %}
     </table>

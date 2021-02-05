@@ -45,27 +45,23 @@
         <a class="btn-success" href="/login">Войти</a>
     {% endif %}
     </div>
-        <h1 class="H">Новости последних обновлений</h1>
+    <h1>Новости последних обновлений</h1>
     {% for item in news%}
     </br>
     <div class="news">
         <h2>{{item.title}}</h2>
         <div class="news-modded">
-            <a href="/content/{{ item.id }}">{{item.content[:item.content.find('.')]}}...<strong>Читать дальше</strong></a>
-        </div>
-        <div>
-            Автор - {{item.user.name}}
+            <a href="/content/{{ item.id }}" class="news-modded">{{item.content[:item.content.find('.')]}}...<strong class="news-modded">Читать дальше</strong></a>
         </div>
         <div>
             Дата написания - {{item.created_date}}
         </div>
         {% if current_user.is_authenticated and current_user == item.user %}
     <div>
-        <a href="/news/{{ item.id }}" class="btn-secondary">Изменить</a>
+        <a href="/news/{{ item.id }}" class="btn-secondary">Изменить</a> .
         <a href="/news_delete/{{ item.id }}" class="btn-primary">Удалить</a>
     </div>
-
-    {% endif %}
+        {% endif %}
     </div>
     {% endfor %}
     </br>
