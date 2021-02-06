@@ -337,7 +337,9 @@ def profile(id):
     user = session.query(User).filter(User.id == id).first()
     if not user:
         abort(404)
-    winningRate = round((user.wins / user.gamesCount) * 100, 2)
+    winningRate = 0
+    if (user.gamesCount > 0):
+        winningRate = round((user.wins / user.gamesCount) * 100, 2)
     return render_template("profile.html", news=news, user=user, wr=winningRate)
 
 
